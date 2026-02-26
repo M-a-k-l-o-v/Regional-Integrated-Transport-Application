@@ -65,7 +65,6 @@ model Route {
   operator   Operator? @relation(fields: [operatorId], references: [operatorId], onDelete: SetNull)
 
   routeStops           RouteStop[]
-  busRouteStops        BusRouteStop[]
   railServiceSchedules RailServiceSchedule[]
   busSchedules         BusSchedule[]
   serviceStatuses      ServiceStatus[]
@@ -131,7 +130,6 @@ model BusStop {
 
   locality Locality? @relation(fields: [localityId], references: [localityId], onDelete: SetNull)
 
-  busRouteStops BusRouteStop[]
   busSchedules  BusSchedule[]
 
   createdAt DateTime @default(now())
@@ -147,32 +145,16 @@ model BusStop {
  */
 model RouteStop {
   routeId   String
-  stationId String
+  stopRefId String
   stopOrder Int
 
   route   Route   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
-  station Station @relation(fields: [stationId], references: [stationId], onDelete: Cascade)
+  station Station? @relation(fields: [stopRefId], references: [stationId], onDelete: Cascade)
+  busStop BusStop? @relation(fields: [stopRefId], references: [stopId], onDelete: Cascade)
 
-  @@id([routeId, stationId])
+  @@id([routeId, stopRefId])
   @@unique([routeId, stopOrder])
-  @@index([stationId])
-}
-
-/**
- * Bus route stop mapping (Route -> BusStop)
- * Used for BUS mode only.
- */
-model BusRouteStop {
-  routeId   String
-  stopId    String
-  stopOrder Int
-
-  route   Route   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
-  busStop BusStop @relation(fields: [stopId], references: [stopId], onDelete: Cascade)
-
-  @@id([routeId, stopId])
-  @@unique([routeId, stopOrder])
-  @@index([stopId])
+  @@index([stopRefId])
 }
 
 /**
