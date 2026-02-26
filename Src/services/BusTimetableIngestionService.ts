@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { SaxesParser, SaxesTag } from "saxes";
 import { prisma } from "../infrastructure/orm/prisma/client";
 import { JobStatus, TransportMode } from "@prisma/client";
 import { XMLParser } from "fast-xml-parser";
@@ -35,6 +36,201 @@ function timeToDate(serviceDate: Date, hhmmss: string): Date {
   return d;
 }
 
+function escapeText(t: string): string {
+  return t
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function attrsToString(attrs: Record<string, any>) {
+  const parts: string[] = [];
+  for (const [k, v] of Object.entries(attrs ?? {})) {
+    // saxes may provide { value } objects depending on configuration
+    const val = v && typeof v === "object" && "value" in (v as any) ? (v as any).value : v;
+    if (val === undefined || val === null) continue;
+    const escaped = String(val)
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+    parts.push(`${k}="${escaped}"`);
+  }
+  return parts.length ? " " + parts.join(" ") : "";
+}
+
+type CapturedHeader = {
+  operatorsXml?: string;
+  servicesXml?: string;
+  journeyPatternSectionsXml?: string;
+};
+
+async function captureHeaderSections(filePath: string): Promise<CapturedHeader> {
+  if (!fs.existsSync(filePath)) throw new Error(`TXC file not found: ${filePath}`);
+
+  const targets = new Set(["Operators", "Services", "JourneyPatternSections"]);
+  const captured: CapturedHeader = {};
+
+  const parser = new SaxesParser({ xmlns: false });
+  const rs = fs.createReadStream(filePath, { encoding: "utf8" });
+
+  let capturing: null | "Operators" | "Services" | "JourneyPatternSections" = null;
+  let depth = 0;
+  let buf = "";
+
+  const maybeFinish = () => {
+    if (captured.operatorsXml && captured.servicesXml && captured.journeyPatternSectionsXml) {
+      // stop the stream early
+      rs.destroy();
+    }
+  };
+
+  parser.on("opentag", (tag: SaxesTag) => {
+    const name = tag.name;
+
+    if (!capturing && targets.has(name as any)) {
+      capturing = name as any;
+      depth = 1;
+      buf = `<${name}${attrsToString(tag.attributes as any)}>`;
+      return;
+    }
+
+    if (capturing) {
+      depth++;
+      buf += `<${name}${attrsToString(tag.attributes as any)}>`;
+    }
+  });
+
+  parser.on("text", (t: string) => {
+    if (!capturing) return;
+    buf += escapeText(t);
+  });
+
+  parser.on("cdata", (t: string) => {
+    if (!capturing) return;
+    buf += `<![CDATA[${t}]]>`;
+  });
+
+  parser.on("closetag", (tag: any) => {
+    if (!capturing) return;
+
+    const name = typeof tag === "string" ? tag : tag?.name;
+    if (!name) return;
+
+    buf += `</${name}>`;
+    depth--;
+
+    if (depth === 0) {
+      if (capturing === "Operators") captured.operatorsXml = buf;
+      if (capturing === "Services") captured.servicesXml = buf;
+      if (capturing === "JourneyPatternSections") captured.journeyPatternSectionsXml = buf;
+
+      capturing = null;
+      buf = "";
+      maybeFinish();
+    }
+  });
+
+  parser.on("error", (e) => {
+    rs.destroy(e as any);
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    rs.on("data", (chunk) => parser.write(chunk));
+    rs.on("end", () => resolve());
+    rs.on("close", () => resolve());
+    rs.on("error", reject);
+  });
+
+  try {
+    parser.close();
+  } catch {
+    // ignore close errors if we destroyed early
+  }
+
+  return captured;
+}
+
+async function streamVehicleJourneys(
+  filePath: string,
+  onVehicleJourney: (vjXml: string) => Promise<void>
+): Promise<void> {
+  if (!fs.existsSync(filePath)) throw new Error(`TXC file not found: ${filePath}`);
+
+  const parser = new SaxesParser({ xmlns: false });
+  const rs = fs.createReadStream(filePath, { encoding: "utf8" });
+
+  let inVJ = false;
+  let vjDepth = 0;
+  let buf = "";
+
+  // backpressure: chain handlers so we never buffer an unbounded queue
+  let pending: Promise<void> = Promise.resolve();
+  const chain = (p: Promise<void>) => (pending = pending.then(() => p));
+
+  parser.on("opentag", (tag: SaxesTag) => {
+    const name = tag.name;
+
+    if (name === "VehicleJourney") {
+      inVJ = true;
+      vjDepth = 1;
+      buf = `<${name}${attrsToString(tag.attributes as any)}>`;
+      return;
+    }
+
+    if (inVJ) {
+      vjDepth++;
+      buf += `<${name}${attrsToString(tag.attributes as any)}>`;
+    }
+  });
+
+  parser.on("text", (t: string) => {
+    if (!inVJ) return;
+    buf += escapeText(t);
+  });
+
+  parser.on("cdata", (t: string) => {
+    if (!inVJ) return;
+    buf += `<![CDATA[${t}]]>`;
+  });
+
+  parser.on("closetag", (tag: any) => {
+    if (!inVJ) return;
+
+    const name = typeof tag === "string" ? tag : tag?.name;
+    if (!name) return;
+
+    buf += `</${name}>`;
+    vjDepth--;
+
+    if (name === "VehicleJourney" && vjDepth === 0) {
+      const vjXml = buf;
+      inVJ = false;
+      buf = "";
+
+      rs.pause();
+      chain(
+        (async () => {
+          await onVehicleJourney(vjXml);
+        })().finally(() => rs.resume())
+      );
+    }
+  });
+
+  parser.on("error", (e) => {
+    rs.destroy(e as any);
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    rs.on("data", (chunk) => parser.write(chunk));
+    rs.on("end", () => resolve());
+    rs.on("error", reject);
+  });
+
+  parser.close();
+  await pending;
+}
+
 export class BusTimetableIngestionService {
   private parser = new XMLParser({
     ignoreAttributes: false,
@@ -59,11 +255,32 @@ export class BusTimetableIngestionService {
     });
 
     try {
-      const xml = fs.readFileSync(filePath, "utf8");
-      const doc = this.parser.parse(xml);
+      // STREAMING: capture only the header sections we need (Operators/Services/JourneyPatternSections)
+      // so we never load the full XML into memory.
+      const header = await captureHeaderSections(filePath);
 
-      // Root may be TransXChange or have namespace; this is “good enough” for most files.
-      const txc = doc.TransXChange ?? doc;
+      const operatorsDoc = header.operatorsXml ? this.parser.parse(header.operatorsXml) : {};
+      const servicesDoc = header.servicesXml ? this.parser.parse(header.servicesXml) : {};
+      const jpsDoc = header.journeyPatternSectionsXml ? this.parser.parse(header.journeyPatternSectionsXml) : {};
+
+      const txc: any = {
+        Operators: operatorsDoc.Operators,
+        Services: servicesDoc.Services,
+        JourneyPatternSections: jpsDoc.JourneyPatternSections,
+      };
+
+      // Map JourneyPatternRef -> per-service context so we can route each streamed VehicleJourney correctly.
+      const jpIdToContext = new Map<
+        string,
+        {
+          routeId: string;
+          keptChain: string[];
+          existingSet: Set<string>;
+          offsets: number[];
+          serviceDate: Date;
+          batch: Array<{ routeId: string; stopId: string; arrivalTime: Date; departureTime: Date }>;
+        }
+      >();
 
       // -------- Operator + Route identity (best-effort, stable) --------
       // We’ll do a pragmatic stable route key:
@@ -173,12 +390,6 @@ export class BusTimetableIngestionService {
 
         await prisma.busRouteStop.createMany({ data: routeStopsToInsert, skipDuplicates: true });
 
-        // -------- Build per-journey schedule times (MVP) --------
-        // We derive times by:
-        // VehicleJourney.DepartureTime = start time at first stop
-        // + sum of RunTime + WaitTime along the timing links.
-        const vehicleJourneys = asArray<any>(txc.VehicleJourneys?.VehicleJourney);
-
         // Delete schedules for this route on that day (MVP “daily rebuild”)
         const dayStart = new Date(opts.serviceDate);
         dayStart.setHours(0, 0, 0, 0);
@@ -213,40 +424,73 @@ export class BusTimetableIngestionService {
           offsets[i] = offsets[i - 1] + sec;
         }
 
-        const scheduleRows: Array<{
-          routeId: string;
-          stopId: string;
-          arrivalTime: Date;
-          departureTime: Date;
-        }> = [];
+        // STREAMING: we will ingest VehicleJourneys later (single pass), so set up per-route batching state.
+        // We'll attach these to a map keyed by JourneyPattern id so we can route each VehicleJourney.
+        const journeyPatterns = asArray<any>(svc.StandardService?.JourneyPattern);
+        for (const jp of journeyPatterns) {
+          const jpId = String(jp?.["@_id"] ?? jp?.id ?? "");
+          if (!jpId) continue;
+          jpIdToContext.set(jpId, {
+            routeId,
+            keptChain,
+            existingSet,
+            offsets,
+            serviceDate: opts.serviceDate,
+            batch: [],
+          });
+        }
+      }
 
-        for (const vj of vehicleJourneys) {
-          const dep = vj.DepartureTime;
-          if (!dep) continue;
+      // STREAMING pass over the full file: ingest VehicleJourneys without loading the document into memory.
+      const BATCH_MAX = 5000;
 
-          const start = timeToDate(opts.serviceDate, String(dep));
-          // Only emit for stops that exist in DB
-          for (let i = 0; i < keptChain.length; i++) {
-            const stopId = keptChain[i];
-            if (!existingSet.has(stopId)) continue;
+      const flushContext = async (ctx: {
+        batch: Array<{ routeId: string; stopId: string; arrivalTime: Date; departureTime: Date }>;
+      }) => {
+        if (ctx.batch.length === 0) return 0;
+        const n = ctx.batch.length;
+        await prisma.busSchedule.createMany({ data: ctx.batch });
+        ctx.batch = [];
+        return n;
+      };
 
-            const t = new Date(start.getTime() + offsets[i] * 1000);
-            scheduleRows.push({
-              routeId,
-              stopId,
-              arrivalTime: t,
-              departureTime: t,
-            });
+      await streamVehicleJourneys(filePath, async (vjXml) => {
+        const parsed = this.parser.parse(vjXml);
+        const vj = parsed?.VehicleJourney;
+        if (!vj) return;
+
+        const jpRef = String(vj.JourneyPatternRef ?? "");
+        if (!jpRef) return;
+
+        const ctx = jpIdToContext.get(jpRef);
+        if (!ctx) return; // not one of the JourneyPatterns for the Services we processed
+
+        const dep = vj.DepartureTime;
+        if (!dep) return;
+
+        const start = timeToDate(ctx.serviceDate, String(dep));
+
+        for (let i = 0; i < ctx.keptChain.length; i++) {
+          const stopId = ctx.keptChain[i];
+          if (!ctx.existingSet.has(stopId)) continue;
+
+          const t = new Date(start.getTime() + ctx.offsets[i] * 1000);
+          ctx.batch.push({
+            routeId: ctx.routeId,
+            stopId,
+            arrivalTime: t,
+            departureTime: t,
+          });
+
+          if (ctx.batch.length >= BATCH_MAX) {
+            totalInserted += await flushContext(ctx);
           }
         }
+      });
 
-        // Insert in chunks to avoid huge queries
-        const CHUNK = 5000;
-        for (let i = 0; i < scheduleRows.length; i += CHUNK) {
-          const chunk = scheduleRows.slice(i, i + CHUNK);
-          await prisma.busSchedule.createMany({ data: chunk });
-          totalInserted += chunk.length;
-        }
+      // final flush
+      for (const ctx of jpIdToContext.values()) {
+        totalInserted += await flushContext(ctx);
       }
 
       await prisma.jobRun.update({

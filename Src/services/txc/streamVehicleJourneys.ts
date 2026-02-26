@@ -73,8 +73,11 @@ export async function streamVehicleJourneys(
     buf += `<![CDATA[${t}]]>`;
   });
 
-  parser.on("closetag", (name: string) => {
+  parser.on("closetag", (tag: any) => {
     if (!inVJ) return;
+
+    const name: string = typeof tag === "string" ? tag : tag?.name;
+    if (!name) return;
 
     buf += `</${name}>`;
     vjDepth--;
