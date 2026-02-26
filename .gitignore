@@ -2,3 +2,9 @@ node_modules
 # Keep environment variables out of version control
 .env
 .DS_Store
+dist/
+work-notes/*.md
+work-notes/previousNotes/*.md
+!work-notes/README.md
+!work-notes/project-context.md
+data/

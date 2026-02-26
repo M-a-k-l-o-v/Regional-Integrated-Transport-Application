@@ -46,34 +46,34 @@ enum ConfidenceLevel {
  */
 
 model Operator {
-  operatorId  String   @id
+  operatorId  String  @id
   name        String
   contactInfo String?
 
-  routes      Route[]
-  strikes     Strike[]
+  routes  Route[]
+  strikes Strike[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Route {
-  routeId   String        @id
-  mode      TransportMode @default(OTHER)
+  routeId String        @id
+  mode    TransportMode @default(OTHER)
 
   operatorId String?
   operator   Operator? @relation(fields: [operatorId], references: [operatorId], onDelete: SetNull)
 
-  routeStops          RouteStop[]
-  busRouteStops       BusRouteStop[]
-  railSchedules       RailSchedule[]
-  busSchedules        BusSchedule[]
-  serviceStatuses     ServiceStatus[]
-  disruptions         Disruption[]
-  reliabilityScores   ReliabilityScore[]
-  verifications       RouteVerification[]
-  historicalPerf      HistoricalPerformance[]
-  snapshots           ExternalRouteSnapshot[]
+  routeStops           RouteStop[]
+  busRouteStops        BusRouteStop[]
+  railServiceSchedules RailServiceSchedule[]
+  busSchedules         BusSchedule[]
+  serviceStatuses      ServiceStatus[]
+  disruptions          Disruption[]
+  reliabilityScores    ReliabilityScore[]
+  verifications        RouteVerification[]
+  historicalPerf       HistoricalPerformance[]
+  snapshots            ExternalRouteSnapshot[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,33 +82,32 @@ model Route {
   @@index([mode])
 }
 
-
 model Locality {
-  localityId   String @id          // e.g. NPTG locality code
-  name         String
-  parentId     String?
-  latitude     Float?
-  longitude    Float?
+  localityId String  @id // e.g. NPTG locality code
+  name       String
+  parentId   String?
+  latitude   Float?
+  longitude  Float?
 
   busStops BusStop[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([name])
   @@index([parentId])
 }
 
 model Station {
-  stationId String  @id
+  stationId String @id
   name      String
   latitude  Float
   longitude Float
 
-  routeStops      RouteStop[]
-  railSchedules   RailSchedule[]
-  serviceStatuses ServiceStatus[]
-  historicalPerf  HistoricalPerformance[]
+  routeStops       RouteStop[]
+  railServiceStops RailServiceStop[]
+  serviceStatuses  ServiceStatus[]
+  historicalPerf   HistoricalPerformance[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,17 +120,17 @@ model Station {
  * Separated from Station (rail domain) to avoid mixing modes.
  */
 model BusStop {
-  stopId     String  @id      // ATCOCode
+  stopId     String  @id // ATCOCode
   name       String
   latitude   Float?
   longitude  Float?
   localityId String?
   stopType   String?
 
-  locality   Locality? @relation(fields: [localityId], references: [localityId], onDelete: SetNull)
+  locality Locality? @relation(fields: [localityId], references: [localityId], onDelete: SetNull)
 
   busRouteStops BusRouteStop[]
-  busSchedules BusSchedule[]
+  busSchedules  BusSchedule[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,9 +144,9 @@ model BusStop {
  * Used for RAIL mode only.
  */
 model RouteStop {
-  routeId    String
-  stationId  String
-  stopOrder  Int
+  routeId   String
+  stationId String
+  stopOrder Int
 
   route   Route   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
   station Station @relation(fields: [stationId], references: [stationId], onDelete: Cascade)
@@ -175,25 +174,132 @@ model BusRouteStop {
 }
 
 /**
- * Rail schedule (Route -> Station)
- * Used for RAIL mode only.
+ * =========================
+ * Rail Timetable (NTROD / Rockshore JSON)
+ * =========================
+ * NOTE:
+ * - This is designed for streaming ingestion of large NDJSON timetable files.
+ * - We store schedules keyed by (trainUid + stpIndicator + start/end dates).
+ * - Stops are stored as an ordered list of locations (LO/LI/LT).
+ * - Later we will apply a Lancashire-only filter during ingestion (by CRS/STANOX/Locality coverage),
+ * but the schema keeps the full structure.
  */
-model RailSchedule {
-  scheduleId    String   @id @default(uuid())
-  routeId       String
-  stationId     String
-  arrivalTime   DateTime
-  departureTime DateTime
 
-  route   Route   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
-  station Station @relation(fields: [stationId], references: [stationId], onDelete: Cascade)
+enum RailLocationType {
+  LO
+  LI
+  LT
+}
+
+model RailTiploc {
+  tiplocCode     String  @id
+  nalco          String?
+  stanox         String?
+  crsCode        String?
+  description    String?
+  tpsDescription String?
+
+  stops RailServiceStop[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([crsCode])
+  @@index([stanox])
+  @@index([nalco])
+}
+
+model RailServiceSchedule {
+  scheduleId String @id @default(uuid())
+
+  // Core identifiers
+  trainUid     String
+  stpIndicator String
+  atocCode     String?
+  signallingId String?
+
+  // Validity
+  scheduleStartDate DateTime
+  scheduleEndDate   DateTime
+  scheduleDaysRuns  String
+  trainStatus       String?
+
+  // Optional CIF-derived fields (as provided in JsonScheduleV1)
+  trainCategory            String?
+  headcode                 String?
+  serviceCode              String?
+  businessSector           String?
+  powerType                String?
+  timingLoad               String?
+  speed                    String?
+  operatingCharacteristics String?
+  trainClass               String?
+  sleepers                 String?
+  reservations             String?
+  connectionIndicator      String?
+  cateringCode             String?
+  serviceBranding          String?
+
+  // Linking to your own domain Route is optional (we may create/link routes later)
+  routeId String?
+  route   Route?  @relation(fields: [routeId], references: [routeId], onDelete: SetNull)
+
+  stops RailServiceStop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Stable uniqueness so re-ingestion/upserts don't duplicate schedules
+  @@unique([trainUid, stpIndicator, scheduleStartDate, scheduleEndDate])
+  @@index([trainUid])
+  @@index([atocCode])
+  @@index([signallingId])
+  @@index([scheduleStartDate])
+  @@index([scheduleEndDate])
   @@index([routeId])
+}
+
+model RailServiceStop {
+  stopId     String @id @default(uuid())
+  scheduleId String
+  stopSeq    Int
+
+  locationType   RailLocationType
+  recordIdentity String?
+
+  // TIPLOC reference
+  tiplocCode String
+  tiploc     RailTiploc @relation(fields: [tiplocCode], references: [tiplocCode], onDelete: Restrict)
+
+  // Optional join to Station (filled during ingestion when we can map CRS -> Station)
+  stationId String?
+  station   Station? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+
+  // Timings (strings because feed uses HHMM / HHMMH; parse later if you want)
+  arrival         String?
+  publicArrival   String?
+  departure       String?
+  publicDeparture String?
+  pass            String?
+
+  // Ops metadata
+  platform String?
+  line     String?
+  path     String?
+
+  // Allowances
+  engineeringAllowance String?
+  pathingAllowance     String?
+  performanceAllowance String?
+
+  schedule RailServiceSchedule @relation(fields: [scheduleId], references: [scheduleId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([scheduleId, stopSeq])
+  @@index([tiplocCode])
   @@index([stationId])
-  @@index([arrivalTime])
+  @@index([locationType])
 }
 
 /**
@@ -219,12 +325,12 @@ model BusSchedule {
 }
 
 model ServiceStatus {
-  statusId          String   @id @default(uuid())
-  routeId           String
-  stationId         String?
-  delayMinutes      Int
-  cancellationFlag  Boolean
-  lastUpdated       DateTime @default(now())
+  statusId         String   @id @default(uuid())
+  routeId          String
+  stationId        String?
+  delayMinutes     Int
+  cancellationFlag Boolean
+  lastUpdated      DateTime @default(now())
 
   route   Route    @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
   station Station? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
@@ -237,7 +343,7 @@ model ServiceStatus {
 }
 
 model Disruption {
-  disruptionId String   @id @default(uuid())
+  disruptionId String    @id @default(uuid())
   routeId      String
   type         String
   description  String
@@ -260,18 +366,18 @@ model Disruption {
  */
 
 model DataSource {
-  sourceId         String  @id
-  name             String
-  baseUrl          String?
-  rateLimitPolicy  String?
-  enabled          Boolean @default(true)
-  lastPayloadHash  String?
+  sourceId        String  @id
+  name            String
+  baseUrl         String?
+  rateLimitPolicy String?
+  enabled         Boolean @default(true)
+  lastPayloadHash String?
 
-  apiHealth        APIHealth[]
-  jobRuns          JobRun[]
-  snapshots        ExternalRouteSnapshot[]
-  verifications    RouteVerification[]
-  historicalPerf   HistoricalPerformance[]
+  apiHealth      APIHealth[]
+  jobRuns        JobRun[]
+  snapshots      ExternalRouteSnapshot[]
+  verifications  RouteVerification[]
+  historicalPerf HistoricalPerformance[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -280,28 +386,28 @@ model DataSource {
 }
 
 model APIHealth {
-  apiHealthId     String          @id @default(uuid())
-  sourceId        String
-  status          ApiHealthStatus @default(OK)
-  responseTimeMs  Int
-  lastChecked     DateTime        @default(now())
+  apiHealthId    String          @id @default(uuid())
+  sourceId       String
+  status         ApiHealthStatus @default(OK)
+  responseTimeMs Int
+  lastChecked    DateTime        @default(now())
 
   source DataSource @relation(fields: [sourceId], references: [sourceId], onDelete: Cascade)
 
+  @@unique([sourceId, lastChecked])
   @@index([sourceId])
   @@index([lastChecked])
-  @@unique([sourceId, lastChecked])
 }
 
 model JobRun {
-  jobRunId          String     @id @default(uuid())
-  sourceId          String?
-  jobName           String
-  startedAt         DateTime   @default(now())
-  finishedAt        DateTime?
-  status            JobStatus  @default(SUCCESS)
-  recordsProcessed  Int        @default(0)
-  errorMessage      String?
+  jobRunId         String    @id @default(uuid())
+  sourceId         String?
+  jobName          String
+  startedAt        DateTime  @default(now())
+  finishedAt       DateTime?
+  status           JobStatus @default(SUCCESS)
+  recordsProcessed Int       @default(0)
+  errorMessage     String?
 
   source DataSource? @relation(fields: [sourceId], references: [sourceId], onDelete: SetNull)
 
@@ -311,21 +417,21 @@ model JobRun {
 }
 
 model ExternalRouteSnapshot {
-  snapshotId        String   @id @default(uuid())
-  routeId           String
-  sourceId          String
-  externalRouteKey  String?
-  retrievedAt       DateTime @default(now())
-  payloadHash       String
-  normalisedJson    Json
+  snapshotId       String   @id @default(uuid())
+  routeId          String
+  sourceId         String
+  externalRouteKey String?
+  retrievedAt      DateTime @default(now())
+  payloadHash      String
+  normalisedJson   Json
 
   route  Route      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
   source DataSource @relation(fields: [sourceId], references: [sourceId], onDelete: Cascade)
 
+  @@unique([routeId, sourceId, payloadHash])
   @@index([routeId])
   @@index([sourceId])
   @@index([retrievedAt])
-  @@unique([routeId, sourceId, payloadHash])
 }
 
 /**
@@ -335,14 +441,14 @@ model ExternalRouteSnapshot {
  */
 
 model RouteVerification {
-  verificationId     String   @id @default(uuid())
-  routeId            String
-  primarySourceId    String
-  confidenceScore    Float
-  lastVerified       DateTime @default(now())
-  notes              String?
+  verificationId  String   @id @default(uuid())
+  routeId         String
+  primarySourceId String
+  confidenceScore Float
+  lastVerified    DateTime @default(now())
+  notes           String?
 
-  route        Route      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  route         Route      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
   primarySource DataSource @relation(fields: [primarySourceId], references: [sourceId], onDelete: Restrict)
 
   @@index([routeId])
@@ -351,11 +457,11 @@ model RouteVerification {
 }
 
 model ReliabilityScore {
-  scoreId          String          @id @default(uuid())
-  routeId          String
-  score            Float
-  confidenceLevel  ConfidenceLevel
-  calculatedAt     DateTime        @default(now())
+  scoreId         String          @id @default(uuid())
+  routeId         String
+  score           Float
+  confidenceLevel ConfidenceLevel
+  calculatedAt    DateTime        @default(now())
 
   route Route @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
 
@@ -364,13 +470,13 @@ model ReliabilityScore {
 }
 
 model HistoricalPerformance {
-  perfId        String   @id @default(uuid())
-  routeId       String
-  stationId     String?
-  serviceDate   DateTime
-  delayMinutes  Int
-  cancelled     Boolean
-  sourceId      String
+  perfId       String   @id @default(uuid())
+  routeId      String
+  stationId    String?
+  serviceDate  DateTime
+  delayMinutes Int
+  cancelled    Boolean
+  sourceId     String
 
   route   Route      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
   station Station?   @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
@@ -386,10 +492,10 @@ model HistoricalPerformance {
  * Optional: industrial action affecting an operator
  */
 model Strike {
-  strikeId    String   @id @default(uuid())
-  operatorId  String
-  startDate   DateTime
-  endDate     DateTime?
+  strikeId   String    @id @default(uuid())
+  operatorId String
+  startDate  DateTime
+  endDate    DateTime?
 
   operator Operator @relation(fields: [operatorId], references: [operatorId], onDelete: Cascade)
 

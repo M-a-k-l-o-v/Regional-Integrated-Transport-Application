@@ -102,4 +102,3 @@ npm start
 - Some environment variable naming is mixed between `NAPTAN_API_BASE_URL` and `TRANSPORT_SERVER_BASE_URL`.
 
 
-- STILL WORKING ON THIS HEAVILY BUT HOPEFULLY I SHOULD BE DONE TMRW. 🤞GN

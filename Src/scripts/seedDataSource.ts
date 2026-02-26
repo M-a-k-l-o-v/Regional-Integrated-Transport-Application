@@ -1,6 +1,8 @@
+import "dotenv/config";
 import { prisma } from "../infrastructure/orm/prisma/client";
 
 async function main() {
+  // Transport server (legacy / API-based sources)
   await prisma.dataSource.upsert({
     where: { sourceId: "transport-server" },
     update: { enabled: true },
@@ -12,7 +14,19 @@ async function main() {
     },
   });
 
-  console.log("Seeded DataSource: transport-server");
+  // Rail timetable (local NDJSON ingestion)
+  await prisma.dataSource.upsert({
+    where: { sourceId: "rail_timetable" },
+    update: { enabled: true },
+    create: {
+      sourceId: "rail_timetable",
+      name: "Rail Timetable (NDJSON)",
+      baseUrl: null,
+      enabled: true,
+    },
+  });
+
+  console.log("Seeded DataSources: transport-server, rail_timetable");
 }
 
 main()
