@@ -39,6 +39,8 @@ export class BusTimetableIngestionService {
   private parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
+    // TransXChange files commonly use a default namespace; strip prefixes so keys are stable.
+    removeNSPrefix: true,
   });
 
   async ingestTransXChangeFile(sourceId: string, filePath: string, opts: IngestBusOptions) {
@@ -61,7 +63,7 @@ export class BusTimetableIngestionService {
       const doc = this.parser.parse(xml);
 
       // Root may be TransXChange or have namespace; this is “good enough” for most files.
-      const txc = doc.TransXChange ?? doc["txc:TransXChange"] ?? doc;
+      const txc = doc.TransXChange ?? doc;
 
       // -------- Operator + Route identity (best-effort, stable) --------
       // We’ll do a pragmatic stable route key:
