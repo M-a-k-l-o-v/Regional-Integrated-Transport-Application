@@ -3,7 +3,7 @@ import React from "react";
 const BlogSinglePage = () => {
     return (
         <div className="w-96 h-[892px] relative bg-neutral-50 overflow-hidden">
-            <img className="w-96 h-[892px] left-0 top-0 absolute" src="https://placehold.co/412x892" />
+            <img className="w-96 h-[892px] left-0 top-0 absolute" src="/map.png" />
             <div className="w-96 left-0 top-[752px] absolute inline-flex flex-col justify-start items-start">
                 <div className="self-stretch h-14 px-5 py-2.5 bg-white inline-flex flex-col justify-start items-start">
                     <div className="self-stretch self-stretch px-2.5 py-2.5 bg-orange-500/10 rounded-lg inline-flex justify-center items-center gap-1.5">
@@ -66,8 +66,8 @@ const BlogSinglePage = () => {
                     </div>
                 </div>
             </div>
-            <div className="w-96 h-56 left-0 top-0 absolute bg-gradient-to-l from-zinc-300/0 to-neutral-500" />
-            <div className="w-96 p-4 left-0 top-0 absolute bg-gradient-to-l from-white/0 to-neutral-400/0 shadow-[0px_5px_20px_0px_rgba(9,50,98,0.02)] inline-flex justify-start items-center gap-4">
+            <div className="w-96 h-56 left-0 top-0 absolute bg-gradient-to-t from-zinc-300/0 to-neutral-500" />
+            <div className="w-96 p-4 left-0 top-0 absolute bg-gradient-to-t from-white/0 to-neutral-400/0 shadow-[0px_5px_20px_0px_rgba(9,50,98,0.02)] inline-flex justify-start items-center gap-4">
                 <div className="flex-1 relative inline-flex flex-col justify-start items-start gap-3">
                     <div className="w-96 h-12 p-4 bg-neutral-50 rounded-[10px] outline outline-2 outline-offset-[-2px] outline-neutral-300 inline-flex justify-start items-center gap-2.5 overflow-hidden">
                         <div className="justify-center text-gray-800 text-xs font-normal font-['Inter'] leading-4">Temple</div>
@@ -219,7 +219,7 @@ const BlogSinglePage = () => {
                 </div>
                 <div className="justify-center text-white text-xs font-medium font-['Inter'] leading-4">279</div>
             </div>
-            <div className="w-56 h-64 left-[122px] top-[378.50px] absolute rounded-[10px] outline outline-[5px] outline-offset-[-2.50px] outline-blue-600" />
+            {/* <div className="w-56 h-64 left-[122px] top-[378.50px] absolute rounded-[10px] outline outline-[5px] outline-offset-[-2.50px] outline-blue-600" /> */}
             <div className="p-1 left-[185px] top-[364px] absolute bg-blue-600 rounded-lg inline-flex justify-start items-center gap-1">
                 <div className="w-4 h-4 relative overflow-hidden">
                     <div className="w-3 h-3.5 left-[2.33px] top-[1.33px] absolute outline outline-[1.50px] outline-offset-[-0.75px] outline-white" />
