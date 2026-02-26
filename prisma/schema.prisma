@@ -95,14 +95,16 @@ model Locality {
   updatedAt DateTime @updatedAt
 
   @@index([name])
+  @@index([latitude, longitude])
   @@index([parentId])
 }
 
 model Station {
-  stationId String @id
+  stationId String @id // CRS code (e.g. "LAN")
+
   name      String
-  latitude  Float
-  longitude Float
+  latitude  Float?
+  longitude Float?
 
   routeStops       RouteStop[]
   railServiceStops RailServiceStop[]

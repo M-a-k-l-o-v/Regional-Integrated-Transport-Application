@@ -10,6 +10,7 @@
     "start": "node dist/server.js",
     "notes:once": "node work-notes/scripts/generate-work-note.mjs",
     "notes:watch": "node work-notes/scripts/watch-work-notes.mjs",
+    "notes:watch:autocommit": "NOTES_AUTO_COMMIT=true node work-notes/scripts/watch-work-notes.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"

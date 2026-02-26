@@ -38,6 +38,10 @@ function unique(values) {
   return [...new Set(values)];
 }
 
+function normalizePath(file) {
+  return file.replace(/\\/g, "/");
+}
+
 function walkDir(dir, out = []) {
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
@@ -132,36 +136,104 @@ function summarizeProjectContext() {
 
 function extractAreas(files) {
   const mapped = files.map((file) => {
-    if (file.startsWith("src/parsers/rail/")) return "rail parser";
-    if (file.startsWith("src/services/")) return "ingestion services";
-    if (file.startsWith("src/infrastructure/")) return "infrastructure (api/repositories/db)";
-    if (file.startsWith("src/cronJobs/")) return "cron scheduling";
-    if (file.startsWith("prisma/")) return "database schema/migrations";
-    if (file.startsWith("README")) return "docs";
-    if (file.startsWith("package")) return "dependencies/scripts";
+    const f = normalizePath(file).toLowerCase();
+    if (f.startsWith("src/parsers/rail/")) return "rail parser";
+    if (f.startsWith("src/services/")) return "ingestion services";
+    if (f.startsWith("src/infrastructure/")) return "infrastructure (api/repositories/db)";
+    if (f.startsWith("src/cronjobs/")) return "cron scheduling";
+    if (f.startsWith("prisma/")) return "database schema/migrations";
+    if (f === "readme.md") return "docs";
+    if (f.startsWith("package")) return "dependencies/scripts";
     return "general backend";
   });
   return unique(mapped);
 }
 
 function describePath(file) {
-  if (file.startsWith("src/services/")) return "Updated ingestion/service workflow logic";
-  if (file.startsWith("src/parsers/rail/")) return "Progressed rail timetable parsing and record handling";
-  if (file.startsWith("src/infrastructure/apiClients/")) return "Adjusted external API client integration";
-  if (file.startsWith("src/infrastructure/repositories/")) return "Refined database repository persistence behavior";
-  if (file.startsWith("src/cronJobs/")) return "Changed cron scheduling/orchestration behavior";
-  if (file.startsWith("prisma/schema.prisma")) return "Modified Prisma domain schema";
-  if (file.startsWith("prisma/migrations/")) return "Added/updated database migration changes";
-  if (file.startsWith("src/scripts/")) return "Worked on backend task/ingestion scripts";
-  if (file === "README.md") return "Updated project-level documentation";
-  if (file.startsWith("work-notes/project-context.md")) return "Updated persistent project context notes";
-  if (file.startsWith("work-notes/scripts/")) return "Improved automated work-notes tooling";
-  if (file.startsWith("package.json")) return "Adjusted npm scripts/dependency configuration";
+  const f = normalizePath(file).toLowerCase();
+  if (f.startsWith("src/services/")) return "Updated ingestion/service workflow logic";
+  if (f.startsWith("src/parsers/rail/")) return "Progressed rail timetable parsing and record handling";
+  if (f.startsWith("src/infrastructure/apiclients/")) return "Adjusted external API client integration";
+  if (f.startsWith("src/infrastructure/repositories/")) return "Refined database repository persistence behavior";
+  if (f.startsWith("src/cronjobs/")) return "Changed cron scheduling/orchestration behavior";
+  if (f === "prisma/schema.prisma") return "Modified Prisma domain schema";
+  if (f.startsWith("prisma/migrations/")) return "Added/updated database migration changes";
+  if (f.startsWith("src/scripts/")) return "Worked on backend task/ingestion scripts";
+  if (f === "readme.md") return "Updated project-level documentation";
+  if (f === "work-notes/project-context.md") return "Updated persistent project context notes";
+  if (f.startsWith("work-notes/scripts/")) return "Improved automated work-notes tooling";
+  if (f === "package.json") return "Adjusted npm scripts/dependency configuration";
   return "Made general backend refinements";
 }
 
 function uniqueDescriptions(files) {
   return unique(files.map(describePath));
+}
+
+function buildRecentChangeParagraph(commitSubjects, descriptions, changedFiles) {
+  const commitPart = commitSubjects.length
+    ? `Recent commit message${commitSubjects.length > 1 ? "s" : ""}: ${commitSubjects
+        .slice(0, 3)
+        .join(" | ")}.`
+    : "No new commit was created in this window.";
+
+  const workPart = descriptions.length
+    ? `Work in this window focused on: ${descriptions
+        .slice(0, 5)
+        .map((d) => d.replace(/\.$/, ""))
+        .join("; ")}.`
+    : changedFiles.length
+      ? "You made uncommitted backend changes in this window; see the Working Tree section for concrete file scope."
+      : "No major backend edits were detected in this time window.";
+
+  return `${commitPart} ${workPart}`;
+}
+
+function categorizeForCommentary(file) {
+  const f = normalizePath(file).toLowerCase();
+  if (f.startsWith("src/parsers/rail/")) return "rail parser implementation";
+  if (f.startsWith("src/services/railingestionservice")) return "rail ingestion workflow logic";
+  if (f.startsWith("src/infrastructure/apiclients/railtimetableclient")) return "rail API client integration";
+  if (f.startsWith("src/scripts/ingestrailtimetable")) return "manual rail ingestion execution flow";
+  if (f.startsWith("src/services/accessnodesingestionservice") || f.startsWith("src/ingestion/normalisers/accessnodesnormaliser") || f.startsWith("src/infrastructure/repositories/accessnoderepository")) {
+    return "bus/access-node ingestion updates";
+  }
+  if (f.startsWith("prisma/schema.prisma") || f.startsWith("prisma/migrations/")) return "database schema and migration alignment";
+  if (f.startsWith("src/cronjobs/")) return "cron scheduling behavior";
+  if (f.startsWith("src/infrastructure/")) return "infrastructure-layer integration changes";
+  if (f === "readme.md") return "project documentation updates";
+  if (f === "package.json") return "npm script/config updates";
+  if (f.startsWith("work-notes/scripts/")) return "work-note automation tooling changes";
+  return "general backend refinement";
+}
+
+function listHuman(items) {
+  if (!items.length) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
+function buildCodexCommentary(commitSubjects, changedFiles) {
+  const scopedFiles = changedFiles.filter((f) => {
+    const norm = normalizePath(f).toLowerCase();
+    return !norm.startsWith("work-notes/") && !norm.endsWith(".ds_store");
+  });
+
+  const themes = unique(scopedFiles.map(categorizeForCommentary)).slice(0, 4);
+  const keyFiles = scopedFiles.slice(0, 4).map((f) => `\`${normalizePath(f)}\``);
+
+  const commitContext = commitSubjects.length
+    ? `Recent commit context: "${commitSubjects[0]}".`
+    : "No new commit in this window, so this reflects current uncommitted progress.";
+
+  if (!scopedFiles.length) {
+    return `${commitContext} Activity in this window is mostly note/tool maintenance rather than backend feature changes.`;
+  }
+
+  const themeText = listHuman(themes);
+  const fileText = keyFiles.join(", ");
+  return `${commitContext} You primarily worked on ${themeText}. Key touched files include ${fileText}, which indicates active implementation rather than just housekeeping edits.`;
 }
 
 function recentFileChanges(windowMinutes) {
@@ -232,17 +304,19 @@ export function generateWorkNote(windowMinutes = 30) {
     ? statusRaw
         .split("\n")
         .filter(Boolean)
-        .map((line) => line.replace(/^[ MARCUD?!]{1,2}\s+/, ""))
+        .map((line) => normalizePath(line.replace(/^[ MARCUD?!]{1,2}\s+/, "")))
     : [];
   const recentWorkScope = unique([
     ...recentFiles,
     ...changedFiles.filter((f) => !f.startsWith("work-notes/")),
   ]);
-  const recentActivity = unique([
-    ...recentCommits.slice(0, 3).map((subject) => `Committed: ${subject}`),
-    ...uniqueDescriptions(recentWorkScope).slice(0, 8),
-  ]).slice(0, 10);
-  if (!recentActivity.length) recentActivity.push("No major backend changes detected in this window");
+  const recentDescriptions = uniqueDescriptions(recentWorkScope);
+  const recentChangeParagraph = buildRecentChangeParagraph(
+    recentCommits,
+    recentDescriptions,
+    changedFiles
+  );
+  const codexCommentary = buildCodexCommentary(recentCommits, changedFiles);
   const areas = extractAreas(changedFiles);
   const readmeContext = summarizeProjectReadme();
   const projectContext = summarizeProjectContext();
@@ -275,7 +349,10 @@ ${toBullets(readmeContext)}
 ${toBullets(projectContext)}
 
 ## What Changed Recently
-${toBullets(recentActivity)}
+${recentChangeParagraph}
+
+## Codex Commentary
+${codexCommentary}
 
 ## Working Tree (Uncommitted)
 ${toBullets(changedFiles)}

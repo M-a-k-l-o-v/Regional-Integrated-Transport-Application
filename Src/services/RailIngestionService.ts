@@ -1,6 +1,31 @@
 import { prisma } from "../infrastructure/orm/prisma/client";
 import { RailTimetableClient } from "../infrastructure/apiClients/RailTimetableClient";
 
+/**
+ * Coverage set for filtering schedules.
+ * NOTE: keep this here for now; we can move it to a dedicated module later.
+ */
+const COVERAGE_CRS = new Set<string>([
+  // Lancashire
+  "ACR","ADL","AFV","APB","AUG","BMB","BAR","BES","BBN","BPN","BPB","BPS","BRF","BSV",
+  "BUB","BNC","BYM","BCB","BCJ","CNF","CYT","CRL","CTW","CLH","CNE","CSO","DWN","ENT",
+  "EBA","HPN","HHB","HSC","HCT","KKM","LAN","LHO","LAY","LEY","LOH","LTM","MLH","MCM",
+  "MOS","NEL","NLN","OMS","PBL","PLS","PFY","PRE","RGW","RIS","RSG","RUF","SLW","SVR",
+  "SQU","SAS","TWN","UPL","WNN","WHE",
+
+  // Manchester corridor (tight set)
+  "MAN","MCV","MCO","DGT","SPT","MIA","BON","BLK","HWI","WGN","WGW","ATN",
+
+  // Liverpool / Merseyside corridor (filtered)
+  "LIV","LVC","MRF","LVJ","LPY","EDG","WAV","BGE","ROB","HUY","PSC","WHN","ECL","RNH",
+  "LEG","SNH","THH","GSW","SHJ","ERL","NLW","HNX",
+]);
+
+const isInCoverage = (crs?: string | null) => !!crs && COVERAGE_CRS.has(crs);
+
+// Keep 1–2 stops before/after for context
+const CONTEXT_STOPS = 2;
+
 type TiplocV1 = {
   transaction_type?: string;
   tiploc_code: string;
@@ -65,7 +90,10 @@ function dateOnlyToUtc(dateStr: string): Date {
 export class RailIngestionService {
   constructor(private readonly client: RailTimetableClient) {}
 
-  async ingestRailRoutes(sourceId: string, maxLines?: number): Promise<{ tiplocs: number; schedules: number; stops: number }> {
+  async ingestRailRoutes(
+    sourceId: string,
+    opts: { maxLines?: number; startLine?: number } = {}
+  ): Promise<{ tiplocs: number; schedules: number; stops: number; skippedSchedules: number }> {
     // Ensure FK will never fail
     await prisma.dataSource.upsert({
       where: { sourceId },
@@ -77,7 +105,7 @@ export class RailIngestionService {
       data: {
         jobName: "ingestRailTimetable",
         sourceId,
-        status: "SUCCESS", // start optimistic; flip on error
+        status: "PARTIAL", // running / in-progress (we finalize to SUCCESS or FAILED at the end)
         recordsProcessed: 0,
       },
     });
@@ -85,13 +113,19 @@ export class RailIngestionService {
     let tiplocs = 0;
     let schedules = 0;
     let stops = 0;
+    let skippedSchedules = 0;
+
+    // In-memory TIPLOC -> CRS cache to avoid DB lookups per schedule
+    const tiplocToCrs = new Map<string, string | null>();
 
     try {
-      for await (const line of this.client.fetchDailyTimetableLines({ maxLines })) {
+      for await (const line of this.client.fetchDailyTimetableLines({ maxLines: opts.maxLines, startLine: opts.startLine })) {
         const obj = JSON.parse(line);
 
         if (obj.TiplocV1) {
           const t: TiplocV1 = obj.TiplocV1;
+          // Update cache so schedules can be filtered without DB queries
+          tiplocToCrs.set(t.tiploc_code, (t.crs_code ?? null) as any);
           // Ignore deletes for now; most feeds are Create/Update heavy
           await prisma.railTiploc.upsert({
             where: { tiplocCode: t.tiploc_code },
@@ -121,6 +155,32 @@ export class RailIngestionService {
           // Some entries are "empty" / cancelled-like records (no locations)
           const locs = s.schedule_segment?.schedule_location ?? [];
           if (!locs.length) continue;
+
+          // --- COVERAGE FILTERING (Lancashire + corridor) ---
+          // We keep only schedules that touch at least one in-coverage CRS.
+          // Then we keep only the stop slice from (firstInCoverage - CONTEXT_STOPS)
+          // to (lastInCoverage + CONTEXT_STOPS) for context.
+
+          // Determine which stop indices map to a coverage CRS.
+          const inCoverageIdx: number[] = [];
+          for (let i = 0; i < locs.length; i++) {
+            const tip = locs[i].tiploc_code;
+            const crs = tiplocToCrs.get(tip) ?? null;
+            if (isInCoverage(crs)) inCoverageIdx.push(i);
+          }
+
+          if (inCoverageIdx.length === 0) {
+            skippedSchedules++;
+            continue;
+          }
+
+          const first = inCoverageIdx[0];
+          const last = inCoverageIdx[inCoverageIdx.length - 1];
+          const fromIdx = Math.max(0, first - CONTEXT_STOPS);
+          const toIdx = Math.min(locs.length - 1, last + CONTEXT_STOPS);
+
+          const filteredLocs = locs.slice(fromIdx, toIdx + 1);
+          // --- END COVERAGE FILTERING ---
 
           const scheduleStartDate = dateOnlyToUtc(s.schedule_start_date);
           const scheduleEndDate = dateOnlyToUtc(s.schedule_end_date);
@@ -186,7 +246,7 @@ export class RailIngestionService {
           schedules++;
 
           // Ensure TIPLOC rows exist for all stop locations (fast + avoids FK failures)
-          const tiplocCodes = Array.from(new Set(locs.map((x) => x.tiploc_code)));
+          const tiplocCodes = Array.from(new Set(filteredLocs.map((x) => x.tiploc_code)));
           await prisma.railTiploc.createMany({
             data: tiplocCodes.map((code) => ({ tiplocCode: code })),
             skipDuplicates: true,
@@ -196,7 +256,7 @@ export class RailIngestionService {
           await prisma.railServiceStop.deleteMany({ where: { scheduleId: upserted.scheduleId } });
 
           await prisma.railServiceStop.createMany({
-            data: locs.map((loc, idx) => ({
+            data: filteredLocs.map((loc, idx) => ({
               scheduleId: upserted.scheduleId,
               stopSeq: idx,
               locationType: loc.location_type,
@@ -219,7 +279,7 @@ export class RailIngestionService {
             })),
           });
 
-          stops += locs.length;
+          stops += filteredLocs.length;
           continue;
         }
 
@@ -228,10 +288,14 @@ export class RailIngestionService {
 
       await prisma.jobRun.update({
         where: { jobRunId: job.jobRunId },
-        data: { status: "SUCCESS", recordsProcessed: tiplocs + schedules + stops, finishedAt: new Date() },
+        data: {
+          status: "SUCCESS",
+          recordsProcessed: tiplocs + schedules + stops,
+          finishedAt: new Date(),
+        },
       });
 
-      return { tiplocs, schedules, stops };
+      return { tiplocs, schedules, stops, skippedSchedules };
     } catch (err: any) {
       await prisma.jobRun.update({
         where: { jobRunId: job.jobRunId },
