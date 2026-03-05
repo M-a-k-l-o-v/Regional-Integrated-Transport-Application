@@ -8,3 +8,5 @@ work-notes/previousNotes/*.md
 !work-notes/README.md
 !work-notes/project-context.md
 data/
+db/snapshots/*.dump
+!db/snapshots/.gitkeep
