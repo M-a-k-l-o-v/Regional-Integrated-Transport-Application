@@ -8,6 +8,9 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
+    "notes:once": "node work-notes/scripts/generate-work-note.mjs",
+    "notes:watch": "node work-notes/scripts/watch-work-notes.mjs",
+    "notes:watch:autocommit": "NOTES_AUTO_COMMIT=true node work-notes/scripts/watch-work-notes.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
@@ -20,9 +23,11 @@
     "csv-parse": "^6.1.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "fast-xml-parser": "^5.4.1",
     "node-cron": "^4.2.1",
     "pg": "^8.18.0",
     "pino": "^10.3.1",
+    "saxes": "^6.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

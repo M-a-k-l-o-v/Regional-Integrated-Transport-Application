@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync";
 
 export type NormalisedAccessNode = {
-  stationId: string;           // AtcoCode
+  stopId: string;              // ATCOCode (BusStop primary key)
   name: string;
   latitude: number | null;
   longitude: number | null;
@@ -39,8 +39,12 @@ export function normaliseAccessNodes(csvText: string): NormalisedAccessNode[] {
 
       if (!atco || !name) return null;
 
+      /* ===== BUS STOP DOMAIN OBJECT =====
+         Access Nodes are NaPTAN bus stops.
+         These map to BusStop (NOT Station).
+      ===== END BUS STOP DOMAIN OBJECT ===== */
       return {
-        stationId: String(atco),
+        stopId: String(atco),
         name: String(name),
         latitude: latRaw ? Number(latRaw) : null,
         longitude: lonRaw ? Number(lonRaw) : null,

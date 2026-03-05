@@ -3,6 +3,7 @@ import { AccessNodesClient } from "../infrastructure/apiClients/AccessNodesClien
 import { AccessNodeRepository } from "../infrastructure/repositories/AccessNodeRepository";
 import { normaliseAccessNodes } from "../ingestion/normalisers/accessNodesNormaliser";
 import crypto from "crypto";
+import { JobStatus } from "@prisma/client";
 
 
 export class AccessNodesIngestionService {
@@ -19,7 +20,7 @@ export class AccessNodesIngestionService {
     });
 
     const run = await prisma.jobRun.create({
-      data: { jobName: "ingestAccessNodes", sourceId, status: "SUCCESS", recordsProcessed: 0 },
+      data: { jobName: "ingestAccessNodes", sourceId, status: JobStatus.PARTIAL, recordsProcessed: 0 },    
     });
 
     try {
@@ -31,9 +32,12 @@ export class AccessNodesIngestionService {
         .update(csv)
         .digest("hex");
 
+      /* ===== CHANGE BLOCK: Only fetch lastPayloadHash for change detection ===== */
       const existingSource = await prisma.dataSource.findUnique({
         where: { sourceId },
+        select: { lastPayloadHash: true },
       });
+      /* ===== END CHANGE BLOCK ===== */
 
       if (existingSource?.lastPayloadHash === hash) {
         console.log("[access-nodes] no changes detected, skipping ingestion.");
@@ -42,7 +46,7 @@ export class AccessNodesIngestionService {
           where: { jobRunId: run.jobRunId },
           data: {
             finishedAt: new Date(),
-            status: "SUCCESS",
+            status: JobStatus.SUCCESS,
             recordsProcessed: 0,
           },
         });
@@ -64,16 +68,18 @@ export class AccessNodesIngestionService {
       });
       /* ===== END HASH UPDATE ===== */
 
+      /* ===== CHANGE BLOCK: Always mark job as SUCCESS after a completed run ===== */
       await prisma.jobRun.update({
         where: { jobRunId: run.jobRunId },
-        data: { finishedAt: new Date(), status: n > 0 ? "SUCCESS" : "PARTIAL", recordsProcessed: n },
+        data: { finishedAt: new Date(), status: JobStatus.SUCCESS, recordsProcessed: n },
       });
+      /* ===== END CHANGE BLOCK ===== */
 
       return n;
     } catch (err: any) {
       await prisma.jobRun.update({
         where: { jobRunId: run.jobRunId },
-        data: { finishedAt: new Date(), status: "FAILED", errorMessage: String(err?.message ?? err) },
+        data: { finishedAt: new Date(), status: JobStatus.FAILED, errorMessage: String(err?.message ?? err) },
       });
       throw err;
     }
