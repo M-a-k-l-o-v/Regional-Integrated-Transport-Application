@@ -163,41 +163,34 @@ curl "http://localhost:3000/bus/routes/<ROUTE_ID>/calendar?date=2026-03-05"
 ## No-Server Collaboration Workflow (Snapshot Dumps)
 
 ### Why
-Timetable ingestion is heavy. Instead of asking every collaborator to re-ingest all sources, share a periodic PostgreSQL snapshot.
+Timetable ingestion is heavy. Instead of asking every collaborator to re-ingest all sources, use the baseline snapshot committed in this repo.
 
-### Create snapshot (owner machine)
+### Baseline snapshot tracked in repo
 
-Run from `code/Database`:
+Tracked files:
+- `db/snapshots/transport_latest.dump`
+- `db/snapshots/transport_latest.dump.sha256`
+
+### Restore the committed baseline (collaborator machine)
 
 ```bash
 cd "/Users/yin/Documents/UNI/Year 2 /SCC200/Regional-Integrated-Transport-Application/code/Database"
-source .env
-PSQL_URL="${DATABASE_URL%%\?*}"
-TS=$(date +%Y%m%d_%H%M)
-mkdir -p db/snapshots
-pg_dump "$PSQL_URL" \
-  --format=custom \
-  --no-owner \
-  --no-privileges \
-  --schema=public \
-  --file="db/snapshots/transport_${TS}.dump"
-```
+shasum -a 256 -c db/snapshots/transport_latest.dump.sha256
 
-### Restore snapshot (collaborator machine)
-
-```bash
 dropdb --if-exists transport
 createdb transport
-pg_restore \
+/opt/homebrew/opt/libpq/bin/pg_restore \
   --clean \
   --if-exists \
   --no-owner \
   --no-privileges \
   --dbname=transport \
-  db/snapshots/transport_YYYYMMDD_HHMM.dump
+  db/snapshots/transport_latest.dump
 ```
 
 ### Verify sync after restore
+
+Run in psql:
 
 ```sql
 SELECT COUNT(*) FROM "BusSchedule";
@@ -207,11 +200,27 @@ SELECT COUNT(*) FROM "BusServiceException";
 
 If these counts match the owner environment, collaborators are in sync.
 
+### Refresh baseline snapshot (owner machine)
+
+```bash
+cd "/Users/yin/Documents/UNI/Year 2 /SCC200/Regional-Integrated-Transport-Application/code/Database"
+source .env
+PSQL_URL="${DATABASE_URL%%\?*}"
+/opt/homebrew/opt/libpq/bin/pg_dump "$PSQL_URL" \
+  --format=custom \
+  --compress=9 \
+  --no-owner \
+  --no-privileges \
+  --schema=public \
+  --file="db/snapshots/transport_latest.dump"
+shasum -a 256 db/snapshots/transport_latest.dump > db/snapshots/transport_latest.dump.sha256
+```
+
 ## Snapshot Storage Policy
 
-- Do not commit `*.dump` files to normal git history.
-- Preferred sharing method: upload snapshot artifacts to GitHub Releases.
-- Alternative (if needed): Git LFS for dumps.
+- Keep exactly one tracked baseline dump in git: `transport_latest.dump`.
+- For larger historical snapshots, prefer GitHub Releases artifacts.
+- Do not commit multiple versioned dump files to normal git history.
 - Keep `.env` and secrets out of version control.
 
 ## Troubleshooting
