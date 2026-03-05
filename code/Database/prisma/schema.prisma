@@ -1,0 +1,564 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransportMode {
+  RAIL
+  BUS
+  TRAM
+  METRO
+  FERRY
+  OTHER
+}
+
+enum ApiHealthStatus {
+  OK
+  DEGRADED
+  DOWN
+}
+
+enum JobStatus {
+  SUCCESS
+  FAILED
+  PARTIAL
+}
+
+enum ConfidenceLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+/**
+ * =========================
+ * Core Domain (normalised)
+ * =========================
+ */
+
+model Operator {
+  operatorId  String  @id
+  name        String
+  contactInfo String?
+
+  routes  BusRoute[]
+  strikes Strike[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BusRoute {
+  routeId String        @id
+  mode    TransportMode @default(OTHER)
+
+  operatorId String?
+  operator   Operator? @relation(fields: [operatorId], references: [operatorId], onDelete: SetNull)
+
+  routeStops           RouteStop[]
+  busRouteStops        BusRouteStop[]
+  busServiceCalendar   BusServiceCalendar?
+  busServiceExceptions BusServiceException[]
+  railServiceSchedules RailServiceSchedule[]
+  busSchedules         BusSchedule[]
+  serviceStatuses      ServiceStatus[]
+  disruptions          Disruption[]
+  reliabilityScores    ReliabilityScore[]
+  verifications        RouteVerification[]
+  historicalPerf       HistoricalPerformance[]
+  snapshots            ExternalRouteSnapshot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([operatorId])
+  @@index([mode])
+}
+
+model Locality {
+  localityId String  @id // e.g. NPTG locality code
+  name       String
+  parentId   String?
+  latitude   Float?
+  longitude  Float?
+
+  busStops BusStop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([latitude, longitude])
+  @@index([parentId])
+}
+
+model Station {
+  stationId String @id // CRS code (e.g. "LAN")
+
+  name      String
+  latitude  Float?
+  longitude Float?
+
+  routeStops       RouteStop[]
+  railServiceStops RailServiceStop[]
+  serviceStatuses  ServiceStatus[]
+  historicalPerf   HistoricalPerformance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+}
+
+/**
+ * Bus stop (NaPTAN access node - bus domain only)
+ * Separated from Station (rail domain) to avoid mixing modes.
+ */
+model BusStop {
+  stopId     String  @id // ATCOCode
+  name       String
+  latitude   Float?
+  longitude  Float?
+  localityId String?
+  stopType   String?
+
+  locality Locality? @relation(fields: [localityId], references: [localityId], onDelete: SetNull)
+
+  busRouteStops BusRouteStop[]
+  busSchedules  BusSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([localityId])
+}
+
+/**
+ * Rail route stop mapping (Route -> Station)
+ * Used for RAIL mode only.
+ */
+model RouteStop {
+  routeId   String
+  stationId String
+  stopOrder Int
+
+  route   BusRoute   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  station Station @relation(fields: [stationId], references: [stationId], onDelete: Cascade)
+
+  @@id([routeId, stationId])
+  @@unique([routeId, stopOrder])
+  @@index([stationId])
+}
+
+/**
+ * Bus route stop mapping (Route -> BusStop)
+ * Used for BUS mode only.
+ */
+model BusRouteStop {
+  routeId   String
+  stopId    String
+  stopOrder Int
+
+  route   BusRoute   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  busStop BusStop @relation(fields: [stopId], references: [stopId], onDelete: Cascade)
+
+  @@id([routeId, stopId])
+  @@unique([routeId, stopOrder])
+  @@index([stopId])
+}
+
+/**
+ * =========================
+ * Rail Timetable (NTROD / Rockshore JSON)
+ * =========================
+ * NOTE:
+ * - This is designed for streaming ingestion of large NDJSON timetable files.
+ * - We store schedules keyed by (trainUid + stpIndicator + start/end dates).
+ * - Stops are stored as an ordered list of locations (LO/LI/LT).
+ * - Later we will apply a Lancashire-only filter during ingestion (by CRS/STANOX/Locality coverage),
+ * but the schema keeps the full structure.
+ */
+
+enum RailLocationType {
+  LO
+  LI
+  LT
+}
+
+model RailTiploc {
+  tiplocCode     String  @id
+  nalco          String?
+  stanox         String?
+  crsCode        String?
+  description    String?
+  tpsDescription String?
+
+  stops RailServiceStop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([crsCode])
+  @@index([stanox])
+  @@index([nalco])
+}
+
+model RailServiceSchedule {
+  scheduleId String @id @default(uuid())
+
+  // Core identifiers
+  trainUid     String
+  stpIndicator String
+  atocCode     String?
+  signallingId String?
+
+  // Validity
+  scheduleStartDate DateTime
+  scheduleEndDate   DateTime
+  scheduleDaysRuns  String
+  trainStatus       String?
+
+  // Optional CIF-derived fields (as provided in JsonScheduleV1)
+  trainCategory            String?
+  headcode                 String?
+  serviceCode              String?
+  businessSector           String?
+  powerType                String?
+  timingLoad               String?
+  speed                    String?
+  operatingCharacteristics String?
+  trainClass               String?
+  sleepers                 String?
+  reservations             String?
+  connectionIndicator      String?
+  cateringCode             String?
+  serviceBranding          String?
+
+  // Linking to your own domain Route is optional (we may create/link routes later)
+  routeId String?
+  route   BusRoute?  @relation(fields: [routeId], references: [routeId], onDelete: SetNull)
+
+  stops RailServiceStop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Stable uniqueness so re-ingestion/upserts don't duplicate schedules
+  @@unique([trainUid, stpIndicator, scheduleStartDate, scheduleEndDate])
+  @@index([trainUid])
+  @@index([atocCode])
+  @@index([signallingId])
+  @@index([scheduleStartDate])
+  @@index([scheduleEndDate])
+  @@index([routeId])
+}
+
+model RailServiceStop {
+  stopId     String @id @default(uuid())
+  scheduleId String
+  stopSeq    Int
+
+  locationType   RailLocationType
+  recordIdentity String?
+
+  // TIPLOC reference
+  tiplocCode String
+  tiploc     RailTiploc @relation(fields: [tiplocCode], references: [tiplocCode], onDelete: Restrict)
+
+  // Optional join to Station (filled during ingestion when we can map CRS -> Station)
+  stationId String?
+  station   Station? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+
+  // Timings (strings because feed uses HHMM / HHMMH; parse later if you want)
+  arrival         String?
+  publicArrival   String?
+  departure       String?
+  publicDeparture String?
+  pass            String?
+
+  // Ops metadata
+  platform String?
+  line     String?
+  path     String?
+
+  // Allowances
+  engineeringAllowance String?
+  pathingAllowance     String?
+  performanceAllowance String?
+
+  schedule RailServiceSchedule @relation(fields: [scheduleId], references: [scheduleId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([scheduleId, stopSeq])
+  @@index([tiplocCode])
+  @@index([stationId])
+  @@index([locationType])
+}
+
+/**
+ * Bus schedule (Route -> BusStop)
+ * Used for BUS mode only.
+ */
+model BusSchedule {
+  scheduleId    String   @id @default(uuid())
+  routeId       String
+  stopId        String
+  arrivalTime   DateTime
+  departureTime DateTime
+
+  route   BusRoute   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  busStop BusStop @relation(fields: [stopId], references: [stopId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([routeId])
+  @@index([stopId])
+  @@index([arrivalTime])
+}
+
+/**
+ * Bus weekly calendar metadata extracted from TXC OperatingProfile.
+ * One active calendar snapshot per route (routeId already includes service code).
+ */
+model BusServiceCalendar {
+  calendarId String @id @default(uuid())
+  routeId    String @unique
+  serviceCode String
+
+  validFrom DateTime?
+  validTo   DateTime?
+
+  runsMon Boolean @default(true)
+  runsTue Boolean @default(true)
+  runsWed Boolean @default(true)
+  runsThu Boolean @default(true)
+  runsFri Boolean @default(true)
+  runsSat Boolean @default(true)
+  runsSun Boolean @default(true)
+
+  sourceFile String?
+
+  route BusRoute @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serviceCode])
+  @@index([validFrom])
+  @@index([validTo])
+}
+
+/**
+ * Date-range exceptions extracted from TXC SpecialDaysOperation.
+ * `isRunning=true` means include override, `isRunning=false` means exclude override.
+ */
+model BusServiceException {
+  exceptionId String @id @default(uuid())
+  routeId     String
+  serviceCode String @default("")
+  startDate   DateTime
+  endDate     DateTime
+  isRunning   Boolean
+  reason      String @default("")
+  sourceFile  String?
+
+  route BusRoute @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([routeId])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([isRunning])
+}
+
+model ServiceStatus {
+  statusId         String   @id @default(uuid())
+  routeId          String
+  stationId        String?
+  delayMinutes     Int
+  cancellationFlag Boolean
+  lastUpdated      DateTime @default(now())
+
+  route   BusRoute    @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  station Station? @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([routeId])
+  @@index([stationId])
+  @@index([lastUpdated])
+}
+
+model Disruption {
+  disruptionId String    @id @default(uuid())
+  routeId      String
+  type         String
+  description  String
+  startTime    DateTime
+  endTime      DateTime?
+
+  route BusRoute @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([routeId])
+  @@index([startTime])
+}
+
+/**
+ * =========================
+ * Ingestion & Sources
+ * =========================
+ */
+
+model DataSource {
+  sourceId        String  @id
+  name            String
+  baseUrl         String?
+  rateLimitPolicy String?
+  enabled         Boolean @default(true)
+  lastPayloadHash String?
+
+  apiHealth      APIHealth[]
+  jobRuns        JobRun[]
+  snapshots      ExternalRouteSnapshot[]
+  verifications  RouteVerification[]
+  historicalPerf HistoricalPerformance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+model APIHealth {
+  apiHealthId    String          @id @default(uuid())
+  sourceId       String
+  status         ApiHealthStatus @default(OK)
+  responseTimeMs Int
+  lastChecked    DateTime        @default(now())
+
+  source DataSource @relation(fields: [sourceId], references: [sourceId], onDelete: Cascade)
+
+  @@unique([sourceId, lastChecked])
+  @@index([sourceId])
+  @@index([lastChecked])
+}
+
+model JobRun {
+  jobRunId         String    @id @default(uuid())
+  sourceId         String?
+  jobName          String
+  startedAt        DateTime  @default(now())
+  finishedAt       DateTime?
+  status           JobStatus @default(SUCCESS)
+  recordsProcessed Int       @default(0)
+  errorMessage     String?
+
+  source DataSource? @relation(fields: [sourceId], references: [sourceId], onDelete: SetNull)
+
+  @@index([jobName])
+  @@index([startedAt])
+  @@index([sourceId])
+}
+
+model ExternalRouteSnapshot {
+  snapshotId       String   @id @default(uuid())
+  routeId          String
+  sourceId         String
+  externalRouteKey String?
+  retrievedAt      DateTime @default(now())
+  payloadHash      String
+  normalisedJson   Json
+
+  route  BusRoute      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  source DataSource @relation(fields: [sourceId], references: [sourceId], onDelete: Cascade)
+
+  @@unique([routeId, sourceId, payloadHash])
+  @@index([routeId])
+  @@index([sourceId])
+  @@index([retrievedAt])
+}
+
+/**
+ * =========================
+ * Verification & Reliability
+ * =========================
+ */
+
+model RouteVerification {
+  verificationId  String   @id @default(uuid())
+  routeId         String
+  primarySourceId String
+  confidenceScore Float
+  lastVerified    DateTime @default(now())
+  notes           String?
+
+  route         BusRoute      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  primarySource DataSource @relation(fields: [primarySourceId], references: [sourceId], onDelete: Restrict)
+
+  @@index([routeId])
+  @@index([primarySourceId])
+  @@index([lastVerified])
+}
+
+model ReliabilityScore {
+  scoreId         String          @id @default(uuid())
+  routeId         String
+  score           Float
+  confidenceLevel ConfidenceLevel
+  calculatedAt    DateTime        @default(now())
+
+  route BusRoute @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+
+  @@index([routeId])
+  @@index([calculatedAt])
+}
+
+model HistoricalPerformance {
+  perfId       String   @id @default(uuid())
+  routeId      String
+  stationId    String?
+  serviceDate  DateTime
+  delayMinutes Int
+  cancelled    Boolean
+  sourceId     String
+
+  route   BusRoute      @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
+  station Station?   @relation(fields: [stationId], references: [stationId], onDelete: SetNull)
+  source  DataSource @relation(fields: [sourceId], references: [sourceId], onDelete: Cascade)
+
+  @@index([routeId])
+  @@index([stationId])
+  @@index([serviceDate])
+  @@index([sourceId])
+}
+
+/**
+ * Optional: industrial action affecting an operator
+ */
+model Strike {
+  strikeId   String    @id @default(uuid())
+  operatorId String
+  startDate  DateTime
+  endDate    DateTime?
+
+  operator Operator @relation(fields: [operatorId], references: [operatorId], onDelete: Cascade)
+
+  @@index([operatorId])
+  @@index([startDate])
+}

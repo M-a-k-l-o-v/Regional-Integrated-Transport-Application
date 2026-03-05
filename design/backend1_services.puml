@@ -1,0 +1,147 @@
+@startuml Backend1_Services
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Interfaces" {
+  interface TransportApiClient {
+    +fetchRoutes(query : String) : Json
+    +fetchStations(query : String) : Json
+    +fetchLiveStatus(query : String) : Json
+  }
+}
+
+package "Services (Role 1)" {
+
+  class SchedulerService {
+    +runIngestionJobs() : void
+    +runHealthChecks() : void
+    +runVerificationJobs() : void
+    +runReliabilityJobs() : void
+    -recordJobStart(jobName : String) : JobRun
+    -recordJobEnd(run : JobRun, status : String, processed : Integer, err : String) : void
+  }
+
+  class ApiHealthService {
+    +checkSource(sourceId : String) : APIHealth
+    +checkAllSources() : APIHealth[*]
+    -measureLatencyMs(client : TransportApiClient) : Integer
+    -classifyStatus(latencyMs : Integer, ok : Boolean) : String
+  }
+
+  class ApiIngestionService {
+    +ingestRoutes(sourceId : String) : Integer
+    +ingestStations(sourceId : String) : Integer
+    +ingestLiveStatus(sourceId : String) : Integer
+    -callApi(client : TransportApiClient, endpoint : String, params : Map) : Json
+    -normaliseRoutes(raw : Json, sourceId : String) : ExternalRouteSnapshot[*]
+    -persistSnapshots(snapshots : ExternalRouteSnapshot[*]) : Integer
+  }
+
+  class RouteVerificationService {
+    +verifyRoute(routeId : String) : RouteVerification
+    +verifyBatch(routeIds : String[*]) : Integer
+    -selectPrimarySource(routeId : String) : String
+    -loadSnapshots(routeId : String) : ExternalRouteSnapshot[*]
+    -compareSnapshots(a : ExternalRouteSnapshot, b : ExternalRouteSnapshot) : Float
+    -computeConfidence(scores : Float[*]) : Float
+    -persistVerification(v : RouteVerification) : void
+  }
+
+  class ReliabilityService {
+    +calculateRouteScore(routeId : String) : ReliabilityScore
+    +calculateBatch(routeIds : String[*]) : Integer
+    -loadHistory(routeId : String) : HistoricalPerformance[*]
+    -extractFactors(routeId : String) : Map
+    -applyWeights(factors : Map) : Float
+    -confidenceFromVerification(routeId : String) : String
+    -persistScore(score : ReliabilityScore) : void
+  }
+}
+
+package "Repositories" {
+  class ApiHealthRepository {
+    +upsert(h : APIHealth) : void
+    +latest(sourceId : String) : APIHealth
+  }
+
+  class SnapshotRepository {
+    +saveAll(snaps : ExternalRouteSnapshot[*]) : Integer
+    +findByRoute(routeId : String) : ExternalRouteSnapshot[*]
+  }
+
+  class VerificationRepository {
+    +save(v : RouteVerification) : void
+    +latestForRoute(routeId : String) : RouteVerification
+  }
+
+  class ReliabilityRepository {
+    +save(s : ReliabilityScore) : void
+    +latestForRoute(routeId : String) : ReliabilityScore
+  }
+
+  class HistoryRepository {
+    +insertMany(rows : HistoricalPerformance[*]) : Integer
+    +byRoute(routeId : String) : HistoricalPerformance[*]
+  }
+
+  class RouteRepository {
+    +getRoute(routeId : String) : Route
+    +listRoutes() : Route[*]
+  }
+
+  class JobRunRepository {
+    +start(jobName : String) : JobRun
+    +finish(runId : String, status : String, processed : Integer, err : String) : void
+  }
+
+  class RouteNormaliser {
+    +normaliseRoutes(raw : Json, sourceId : String) : ExternalRouteSnapshot[*]
+    +normaliseStations(raw : Json, sourceId : String) : Station[*]
+  }
+}
+
+' ===== Dependencies / Uses =====
+ApiIngestionService ..> TransportApiClient : uses
+ApiIngestionService --> SnapshotRepository : persists
+ApiIngestionService --> JobRunRepository : logs runs
+ApiIngestionService --> RouteNormaliser : uses
+
+SchedulerService --> ApiIngestionService
+SchedulerService --> ApiHealthService
+SchedulerService --> RouteVerificationService
+SchedulerService --> ReliabilityService
+SchedulerService --> JobRunRepository
+
+ApiHealthService ..> TransportApiClient : uses
+ApiHealthService --> ApiHealthRepository
+
+RouteVerificationService --> RouteRepository
+RouteVerificationService --> SnapshotRepository
+RouteVerificationService --> VerificationRepository
+RouteVerificationService --> ApiHealthRepository
+
+ReliabilityService --> RouteRepository
+ReliabilityService --> HistoryRepository
+ReliabilityService --> VerificationRepository
+ReliabilityService --> ReliabilityRepository
+
+' ===== Force vertical stacking (hidden links) =====
+TransportApiClient -[hidden]down- SchedulerService
+SchedulerService -[hidden]down- ApiHealthService
+ApiHealthService -[hidden]down- ApiIngestionService
+ApiIngestionService -[hidden]down- RouteVerificationService
+RouteVerificationService -[hidden]down- ReliabilityService
+
+ApiHealthRepository -[hidden]down- SnapshotRepository
+SnapshotRepository -[hidden]down- VerificationRepository
+VerificationRepository -[hidden]down- ReliabilityRepository
+ReliabilityRepository -[hidden]down- HistoryRepository
+HistoryRepository -[hidden]down- RouteRepository
+RouteRepository -[hidden]down- JobRunRepository
+JobRunRepository -[hidden]down- RouteNormaliser
+
+@enduml
+
