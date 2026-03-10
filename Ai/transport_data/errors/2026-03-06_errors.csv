@@ -1,0 +1,2 @@
+timestamp,source,error_message
+2026-03-06T08:25:13.231140,departures,"CNF: HTTPSConnectionPool(host='transport.scc.lancs.ac.uk', port=443): Read timed out. (read timeout=15)"
