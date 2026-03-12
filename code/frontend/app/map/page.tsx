@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import Link from 'next/link';
 const BlogSinglePage = () => {
     return (
         <div className="w-screen flex flex-col items-center justify-center h-screen relative bg-neutral-50 overflow-hidden">
@@ -46,9 +47,9 @@ const BlogSinglePage = () => {
                     
                     <div className="self-stretch justify-center items-center flex flex-row inline-flex min-h-12 min-w-30 px-5 w-full bg-orange-500/10 rounded-lg">
                         <Image
-                            className="white"
-                            src="/icons/walk_icon.svg"
-                            alt="Walk"
+                            className="text-green-800"
+                            src="/icons/directions_walk.svg"
+                            alt="Train"
                             width={40}
                             height={40}
                         />
@@ -58,7 +59,7 @@ const BlogSinglePage = () => {
                     <div className="self-stretch justify-center items-center flex flex-row inline-flex min-h-12 min-w-30 px-5 w-full bg-orange-500/10 rounded-lg">
                         <Image
                             className="text-green-800"
-                            src="/icons/train_icon.svg"
+                            src="/icons/train.svg"
                             alt="Train"
                             width={40}
                             height={40}
@@ -84,35 +85,67 @@ const BlogSinglePage = () => {
                         <div className="inline-flex flex-col justify-center items-center gap-1.5">
                             <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
                                 <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-5 h-4 left-[2px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
+                                    <Image
+                                        className="black"
+                                        src="/icons/favorite.svg"
+                                        alt="Bus"
+                                        width={40}
+                                        height={40}
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div className="inline-flex flex-col justify-center items-center gap-1.5">
                             <div className="p-2 bg-green-800 rounded-[10px] inline-flex justify-start items-center gap-2.5">
                                 <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[4px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-white" />
+                                    <Image
+                                        className="black"
+                                        src="/icons/map.svg"
+                                        alt="Bus"
+                                        width={40}
+                                        height={40}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <Link href="/home">
+                            <div className="inline-flex flex-col justify-center items-center gap-1.5">
+                                <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
+                                    <div className="w-6 h-6 relative overflow-hidden">
+                                        <Image
+                                            className="black"
+                                            src="/icons/home.svg"
+                                            alt="Bus"
+                                            width={40}
+                                            height={40}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
+                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
+                                <div className="w-6 h-6 relative overflow-hidden">
+                                    <Image
+                                        className="black"
+                                        src="/icons/person.svg"
+                                        alt="Bus"
+                                        width={40}
+                                        height={40}
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div className="inline-flex flex-col justify-center items-center gap-1.5">
                             <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
                                 <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[3px] top-[2.27px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-4 left-[4px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[3.05px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
+                                    <Image
+                                        className="black"
+                                        src="/icons/settings.svg"
+                                        alt="Bus"
+                                        width={40}
+                                        height={40}
+                                    />
                                 </div>
                             </div>
                         </div>
