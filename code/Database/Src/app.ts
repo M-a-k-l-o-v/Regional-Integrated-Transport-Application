@@ -1,6 +1,11 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./infrastructure/orm/prisma/client";
+import { z } from "zod";
+import { JourneyPlanningService } from "./services/journeys/JourneyPlanningService";
+import { JourneyLegDetailService } from "./services/journeys/JourneyLegDetailService";
+import { getBusServiceLabel } from "./services/journeys/helpers";
+import { getBusStopGroup, searchBusStopGroups } from "./services/busStopGroups";
 
 function parsePositiveInt(value: unknown, fallback: number): number {
   if (value === undefined || value === null || value === "") return fallback;
@@ -85,10 +90,83 @@ function searchRank(qLower: string, name: string, code: string): number {
   return 6;
 }
 
+function searchTypePriority(type: "station" | "bus_stop" | "bus_stop_group"): number {
+  if (type === "bus_stop_group") return 0;
+  if (type === "station") return 1;
+  return 2;
+}
+
+function buildScheduledDataState(lastUpdated: Date | null | undefined) {
+  const updated = lastUpdated ?? null;
+
+  return {
+    mode: "scheduled" as const,
+    isLive: false,
+    fallback: true,
+    lastUpdated: updated ? updated.toISOString() : null,
+  };
+}
+
+function getRailStpPriority(stpIndicator: string | null | undefined): number {
+  if (stpIndicator === "O") return 3;
+  if (stpIndicator === "N") return 2;
+  if (stpIndicator === "P") return 1;
+  return 0;
+}
+
+function getRailDepartureGroupKey(row: {
+  trainUid: string;
+  scheduledDepartureRaw: string | null;
+  _sortMinutes: number;
+}): string {
+  return `${row.trainUid}::${row.scheduledDepartureRaw ?? row._sortMinutes}`;
+}
+
+function getRailStopDisplayName(stop: {
+  station: { name: string } | null;
+  tiploc: {
+    tpsDescription: string | null;
+    description: string | null;
+    crsCode: string | null;
+  };
+}): string | null {
+  return (
+    stop.station?.name ??
+    stop.tiploc.tpsDescription ??
+    stop.tiploc.description ??
+    stop.tiploc.crsCode ??
+    null
+  );
+}
+
+const journeyPlanRequestSchema = z.object({
+  origin: z.object({
+    type: z.enum(["station", "bus_stop", "bus_stop_group"]),
+    id: z.string().min(1),
+  }),
+  destination: z.object({
+    type: z.enum(["station", "bus_stop", "bus_stop_group"]),
+    id: z.string().min(1),
+  }),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().regex(/^\d{2}:\d{2}$/),
+  preference: z.enum(["fastest", "balanced", "fewest_changes"]).default("fastest"),
+  maxItineraries: z.coerce.number().int().min(1).max(8).default(3),
+});
+
+const journeyLegDetailRequestSchema = z.object({
+  mode: z.enum(["bus", "rail"]),
+  scheduleId: z.string().min(1),
+  fromId: z.string().min(1),
+  toId: z.string().min(1),
+});
+
 export function createApp() {
   const app = express();
   app.use(cors());
   app.use(express.json());
+  const journeyPlanningService = new JourneyPlanningService(prisma);
+  const journeyLegDetailService = new JourneyLegDetailService(prisma);
 
   app.get("/", (_req, res) => {
     res.json({ message: "Backend is running" });
@@ -104,9 +182,12 @@ export function createApp() {
       return res.status(400).json({ error: "q must be at least 2 characters" });
     }
 
-    const limit = Math.min(parsePositiveInt(req.query.limit, 20), 100);
+    const limit = Math.min(parsePositiveInt(req.query.limit, 20), 500);
     const perTypeLimit = Math.max(limit, Math.ceil(limit * 1.5));
+    const scheduledOnly = req.query.scheduledOnly === "true";
     const qLower = q.toLowerCase();
+    const groupedStops = searchBusStopGroups(q);
+    const groupedMemberStopIds = new Set(groupedStops.flatMap((group) => group.memberStopIds));
 
     const [busStops, stations] = await Promise.all([
       prisma.busStop.findMany({
@@ -114,12 +195,20 @@ export function createApp() {
           OR: [
             { stopId: { contains: q, mode: "insensitive" } },
             { name: { contains: q, mode: "insensitive" } },
+            { locality: { name: { contains: q, mode: "insensitive" } } },
           ],
         },
         select: {
           stopId: true,
           name: true,
           localityId: true,
+          locality: {
+            select: {
+              name: true,
+            },
+          },
+          latitude: true,
+          longitude: true,
         },
         take: perTypeLimit,
       }),
@@ -133,31 +222,86 @@ export function createApp() {
         select: {
           stationId: true,
           name: true,
+          latitude: true,
+          longitude: true,
         },
         take: perTypeLimit,
       }),
     ]);
 
+    const candidateCoveredStopIds =
+      scheduledOnly
+        ? new Set(
+            (
+              await prisma.busSchedule.findMany({
+                where: {
+                  stopId: {
+                    in: Array.from(
+                      new Set([
+                        ...busStops.map((stop) => stop.stopId),
+                        ...groupedStops.flatMap((group) => group.memberStopIds),
+                      ])
+                    ),
+                  },
+                },
+                select: {
+                  stopId: true,
+                },
+                distinct: ["stopId"],
+              })
+            ).map((row) => row.stopId)
+          )
+        : null;
+
     const mixed = [
+      ...groupedStops.map((group) => ({
+        type: "bus_stop_group" as const,
+        id: group.groupId,
+        code: group.code,
+        name: group.name,
+        localityId: null as string | null,
+        localityName: group.localityName,
+        latitude: group.latitude,
+        longitude: group.longitude,
+        memberStopIds: group.memberStopIds,
+      })).filter((group) =>
+        !candidateCoveredStopIds || group.memberStopIds.some((stopId) => candidateCoveredStopIds.has(stopId))
+      ),
       ...busStops.map((stop) => ({
         type: "bus_stop" as const,
         id: stop.stopId,
         code: stop.stopId,
         name: stop.name,
         localityId: stop.localityId,
-      })),
+        localityName: stop.locality?.name ?? null,
+        latitude: stop.latitude,
+        longitude: stop.longitude,
+      })).filter((stop) => {
+        if (candidateCoveredStopIds && !candidateCoveredStopIds.has(stop.id)) return false;
+        if (!groupedMemberStopIds.has(stop.id)) return true;
+        return stop.code.toLowerCase() === qLower;
+      }),
       ...stations.map((station) => ({
         type: "station" as const,
         id: station.stationId,
         code: station.stationId,
         name: station.name,
         localityId: null as string | null,
+        localityName: null as string | null,
+        latitude: station.latitude,
+        longitude: station.longitude,
       })),
     ];
 
     mixed.sort((a, b) => {
+      const busHubBoostA = a.type === "bus_stop_group" && qLower.includes("bus") ? -1 : 0;
+      const busHubBoostB = b.type === "bus_stop_group" && qLower.includes("bus") ? -1 : 0;
+      if (busHubBoostA !== busHubBoostB) return busHubBoostA - busHubBoostB;
+
       const rankDiff = searchRank(qLower, a.name, a.code) - searchRank(qLower, b.name, b.code);
       if (rankDiff !== 0) return rankDiff;
+      const priorityDiff = searchTypePriority(a.type) - searchTypePriority(b.type);
+      if (priorityDiff !== 0) return priorityDiff;
       return a.name.localeCompare(b.name);
     });
 
@@ -170,13 +314,71 @@ export function createApp() {
     });
   });
 
-  app.get("/bus/departures/:stopId", async (req, res) => {
-    const stopId = req.params.stopId?.trim();
-    if (!stopId) {
-      return res.status(400).json({ error: "stopId is required" });
+  app.post("/journeys/plan", async (req, res) => {
+    const parsed = journeyPlanRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: parsed.error.issues.map((issue) => issue.message).join("; "),
+      });
     }
 
-    const limit = Math.min(parsePositiveInt(req.query.limit, 20), 100);
+    if (
+      parsed.data.origin.type === parsed.data.destination.type &&
+      parsed.data.origin.id === parsed.data.destination.id
+    ) {
+      return res.status(400).json({ error: "Origin and destination must be different" });
+    }
+
+    try {
+      const result = await journeyPlanningService.plan(parsed.data);
+      return res.json(result);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Journey planning failed";
+      if (message.includes("not found")) {
+        return res.status(404).json({ error: message });
+      }
+      return res.status(500).json({ error: message });
+    }
+  });
+
+  app.get("/journeys/legs/detail", async (req, res) => {
+    const parsed = journeyLegDetailRequestSchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: parsed.error.issues.map((issue) => issue.message).join("; "),
+      });
+    }
+
+    try {
+      const result = await journeyLegDetailService.getDetail(parsed.data);
+      return res.json(result);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Journey leg detail lookup failed";
+      if (message.includes("not found")) {
+        return res.status(404).json({ error: message });
+      }
+      return res.status(500).json({ error: message });
+    }
+  });
+
+  async function loadBusDepartures({
+    scope,
+    req,
+    res,
+  }: {
+    scope: {
+      type: "bus_stop" | "bus_stop_group";
+      id: string;
+      code: string;
+      name: string;
+      localityName: string | null;
+      memberStopIds: string[];
+    };
+    req: express.Request;
+    res: express.Response;
+  }) {
+    const stopIds = scope.memberStopIds;
+    const limit = Math.min(parsePositiveInt(req.query.limit, 20), 500);
     const windowMinutes = Math.min(parsePositiveInt(req.query.windowMinutes, 120), 24 * 60);
 
     const dateRaw = req.query.date;
@@ -203,18 +405,9 @@ export function createApp() {
     const serviceDay = toUtcDayRange(serviceDate);
     const windowEnd = new Date(from.getTime() + windowMinutes * 60 * 1000);
 
-    const stop = await prisma.busStop.findUnique({
-      where: { stopId },
-      select: { stopId: true, name: true, localityId: true },
-    });
-
-    if (!stop) {
-      return res.status(404).json({ error: `Bus stop not found: ${stopId}` });
-    }
-
     const rows = await prisma.busSchedule.findMany({
       where: {
-        stopId,
+        stopId: { in: stopIds },
         departureTime: {
           gte: from,
           lte: windowEnd,
@@ -230,6 +423,13 @@ export function createApp() {
             },
           },
         },
+        busStop: {
+          select: {
+            stopId: true,
+            name: true,
+            localityId: true,
+          },
+        },
       },
       orderBy: { departureTime: "asc" },
       take: limit,
@@ -237,14 +437,62 @@ export function createApp() {
 
     const departures = rows.map((row) => ({
       scheduleId: row.scheduleId,
+      stopId: row.busStop.stopId,
+      stopName: row.busStop.name,
       routeId: row.route.routeId,
       operator: row.route.operator ?? (row.route.operatorId ? { operatorId: row.route.operatorId, name: null } : null),
       departureTime: row.departureTime.toISOString(),
       arrivalTime: row.arrivalTime.toISOString(),
       minutesUntilDeparture: Math.max(0, Math.floor((row.departureTime.getTime() - from.getTime()) / 60000)),
+      _updatedAt: row.updatedAt,
     }));
-
     const routeIds = Array.from(new Set(departures.map((x) => x.routeId)));
+
+    const departureTimes = Array.from(new Set(rows.map((row) => row.departureTime.getTime()))).map((ms) => new Date(ms));
+    const journeyStops =
+      routeIds.length === 0 || departureTimes.length === 0
+        ? []
+        : await prisma.busJourneyStop.findMany({
+            where: {
+              stopId: { in: stopIds },
+              departureTime: { in: departureTimes },
+              journey: {
+                routeId: { in: routeIds },
+              },
+            },
+            select: {
+              stopId: true,
+              departureTime: true,
+              journey: {
+                select: {
+                  routeId: true,
+                  lineRef: true,
+                  direction: true,
+                  destinationDisplay: true,
+                },
+              },
+            },
+            orderBy: [{ departureTime: "asc" }, { stopSeq: "asc" }],
+          });
+
+    const journeyByKey = new Map<
+      string,
+      {
+        lineRef: string | null;
+        direction: string | null;
+        destinationDisplay: string | null;
+      }
+    >();
+    for (const row of journeyStops) {
+      const key = `${row.journey.routeId}::${row.stopId}::${row.departureTime.toISOString()}`;
+      if (!journeyByKey.has(key)) {
+        journeyByKey.set(key, {
+          lineRef: row.journey.lineRef,
+          direction: row.journey.direction,
+          destinationDisplay: row.journey.destinationDisplay,
+        });
+      }
+    }
     const [calendars, exceptions] =
       routeIds.length === 0
         ? [[], []]
@@ -300,8 +548,21 @@ export function createApp() {
       return baseRuns;
     });
 
+    const latestDepartureUpdate = filteredDepartures.reduce<Date | null>(
+      (latest, row) => (!latest || row._updatedAt > latest ? row._updatedAt : latest),
+      null
+    );
+
     return res.json({
-      stop,
+      scope: {
+        type: scope.type,
+        id: scope.id,
+        code: scope.code,
+        name: scope.name,
+        localityName: scope.localityName,
+        memberStopIds: scope.type === "bus_stop_group" ? scope.memberStopIds : undefined,
+      },
+      dataState: buildScheduledDataState(latestDepartureUpdate),
       window: {
         from: from.toISOString(),
         to: windowEnd.toISOString(),
@@ -309,7 +570,77 @@ export function createApp() {
         serviceDate: serviceDay.start.toISOString().slice(0, 10),
       },
       count: filteredDepartures.length,
-      departures: filteredDepartures,
+      departures: filteredDepartures.map(({ _updatedAt, ...row }) => {
+        const journey = journeyByKey.get(`${row.routeId}::${row.stopId}::${row.departureTime}`);
+        return {
+          ...row,
+          lineRef: getBusServiceLabel(journey?.lineRef, row.routeId),
+          direction: journey?.direction ?? null,
+          destinationDisplay: journey?.destinationDisplay ?? null,
+        };
+      }),
+    });
+  }
+
+  app.get("/bus/departures/:stopId", async (req, res) => {
+    const stopId = req.params.stopId?.trim();
+    if (!stopId) {
+      return res.status(400).json({ error: "stopId is required" });
+    }
+
+    const stop = await prisma.busStop.findUnique({
+      where: { stopId },
+      select: {
+        stopId: true,
+        name: true,
+        locality: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!stop) {
+      return res.status(404).json({ error: `Bus stop not found: ${stopId}` });
+    }
+
+    return loadBusDepartures({
+      scope: {
+        type: "bus_stop",
+        id: stop.stopId,
+        code: stop.stopId,
+        name: stop.name,
+        localityName: stop.locality?.name ?? null,
+        memberStopIds: [stop.stopId],
+      },
+      req,
+      res,
+    });
+  });
+
+  app.get("/bus/groups/:groupId/departures", async (req, res) => {
+    const groupId = req.params.groupId?.trim();
+    if (!groupId) {
+      return res.status(400).json({ error: "groupId is required" });
+    }
+
+    const group = getBusStopGroup(groupId);
+    if (!group) {
+      return res.status(404).json({ error: `Bus stop group not found: ${groupId}` });
+    }
+
+    return loadBusDepartures({
+      scope: {
+        type: "bus_stop_group",
+        id: group.groupId,
+        code: group.code,
+        name: group.name,
+        localityName: group.localityName,
+        memberStopIds: group.memberStopIds,
+      },
+      req,
+      res,
     });
   });
 
@@ -378,6 +709,7 @@ export function createApp() {
       routeId,
       date: day.start.toISOString().slice(0, 10),
       runsOnDate,
+      dataState: buildScheduledDataState(calendar.updatedAt),
       calendar,
       exceptions: exceptions.map((x) => ({
         startDate: x.startDate.toISOString().slice(0, 10),
@@ -449,25 +781,21 @@ export function createApp() {
             atocCode: true,
             trainStatus: true,
             scheduleDaysRuns: true,
+            updatedAt: true,
           },
         },
       },
       take: 5000,
     });
 
-    const departures = candidateStops
+    const preliminaryDepartures = candidateStops
       .filter((stop) => {
         const runs = stop.schedule.scheduleDaysRuns ?? "";
         if (runs.length >= 7 && runs[dayIndex] !== "1") return false;
         return true;
       })
       .map((stop) => {
-        const rawTime =
-          stop.publicDeparture ??
-          stop.departure ??
-          stop.publicArrival ??
-          stop.arrival ??
-          stop.pass;
+        const rawTime = stop.publicDeparture;
 
         const depMinutes = parseRailTimeToMinutes(rawTime);
         if (depMinutes === null) return null;
@@ -489,18 +817,132 @@ export function createApp() {
           minutesUntilDeparture: minsUntil,
           source: "timetable",
           isLive: false,
+          _updatedAt: stop.schedule.updatedAt,
           _sortMinutes: depMinutes,
         };
       })
       .filter((item): item is NonNullable<typeof item> => item !== null)
+      .sort((a, b) => a._sortMinutes - b._sortMinutes);
+
+    const candidateTrainUids = Array.from(new Set(preliminaryDepartures.map((row) => row.trainUid)));
+    const cancellationSchedules =
+      candidateTrainUids.length === 0
+        ? []
+        : await prisma.railServiceSchedule.findMany({
+            where: {
+              trainUid: { in: candidateTrainUids },
+              stpIndicator: "C",
+              scheduleStartDate: { lte: serviceDate },
+              scheduleEndDate: { gte: serviceDate },
+            },
+            select: {
+              trainUid: true,
+              scheduleDaysRuns: true,
+            },
+          });
+
+    const cancelledPermanentTrainUids = new Set(
+      cancellationSchedules
+        .filter((schedule) => {
+          const runs = schedule.scheduleDaysRuns ?? "";
+          return !(runs.length >= 7 && runs[dayIndex] !== "1");
+        })
+        .map((schedule) => schedule.trainUid)
+    );
+
+    const departuresByKey = new Map<string, Array<(typeof preliminaryDepartures)[number]>>();
+    for (const row of preliminaryDepartures) {
+      const key = getRailDepartureGroupKey(row);
+      const list = departuresByKey.get(key) ?? [];
+      list.push(row);
+      departuresByKey.set(key, list);
+    }
+
+    const departures = Array.from(departuresByKey.values())
+      .map((group) => {
+        const chosen = [...group].sort((a, b) => {
+          const priorityDiff = getRailStpPriority(b.stpIndicator) - getRailStpPriority(a.stpIndicator);
+          if (priorityDiff !== 0) return priorityDiff;
+          const updatedDiff = b._updatedAt.getTime() - a._updatedAt.getTime();
+          if (updatedDiff !== 0) return updatedDiff;
+          return a.scheduleId.localeCompare(b.scheduleId);
+        })[0];
+
+        if (chosen.stpIndicator === "P" && cancelledPermanentTrainUids.has(chosen.trainUid)) {
+          return null;
+        }
+
+        return chosen;
+      })
+      .filter((row): row is NonNullable<typeof row> => row !== null)
       .sort((a, b) => a._sortMinutes - b._sortMinutes)
-      .slice(0, limit)
-      .map(({ _sortMinutes, ...row }) => row);
+      .slice(0, limit);
+
+    const scheduleIds = Array.from(new Set(departures.map((row) => row.scheduleId)));
+    const scheduleStops =
+      scheduleIds.length === 0
+        ? []
+        : await prisma.railServiceStop.findMany({
+            where: {
+              scheduleId: { in: scheduleIds },
+            },
+            select: {
+              scheduleId: true,
+              locationType: true,
+              publicArrival: true,
+              publicDeparture: true,
+              station: {
+                select: {
+                  stationId: true,
+                  name: true,
+                },
+              },
+              tiploc: {
+                select: {
+                  crsCode: true,
+                  description: true,
+                  tpsDescription: true,
+                },
+              },
+            },
+            orderBy: [{ scheduleId: "asc" }, { stopSeq: "desc" }],
+          });
+
+    const destinationByScheduleId = new Map<string, string>();
+    const fallbackDestinationByScheduleId = new Map<string, string>();
+    for (const stop of scheduleStops) {
+      const fallback = getRailStopDisplayName(stop);
+      if (fallback && !fallbackDestinationByScheduleId.has(stop.scheduleId)) {
+        fallbackDestinationByScheduleId.set(stop.scheduleId, fallback);
+      }
+
+      if (destinationByScheduleId.has(stop.scheduleId)) continue;
+
+      const hasPublicCall = Boolean(stop.publicArrival || stop.publicDeparture);
+      if (!hasPublicCall) continue;
+
+      const passengerFacingDestination = getRailStopDisplayName(stop);
+      if (passengerFacingDestination) {
+        destinationByScheduleId.set(stop.scheduleId, passengerFacingDestination);
+      }
+    }
+
+    for (const [scheduleId, fallback] of fallbackDestinationByScheduleId) {
+      if (!destinationByScheduleId.has(scheduleId)) {
+        destinationByScheduleId.set(scheduleId, fallback);
+      }
+    }
+
+    const latestRailUpdate = departures.reduce<Date | null>(
+      (latest, row) => (!latest || row._updatedAt > latest ? row._updatedAt : latest),
+      null
+    );
 
     const windowEnd = new Date(from.getTime() + windowMinutes * 60 * 1000);
 
     return res.json({
       station,
+      dataState: buildScheduledDataState(latestRailUpdate),
       window: {
         from: from.toISOString(),
         to: windowEnd.toISOString(),
@@ -508,7 +950,10 @@ export function createApp() {
         serviceDate: serviceDate.toISOString().slice(0, 10),
       },
       count: departures.length,
-      departures,
+      departures: departures.map(({ _sortMinutes, _updatedAt, ...row }) => ({
+        ...row,
+        destination: destinationByScheduleId.get(row.scheduleId) ?? null,
+      })),
     });
   });
 

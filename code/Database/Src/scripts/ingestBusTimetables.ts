@@ -4,7 +4,7 @@ import { BusTimetableIngestionService } from "../services/BusTimetableIngestionS
 
 // NOTE: When calling this script, wrap --file=... or --dir=... values in quotes if they contain spaces.
 // Example:
-//   npx ts-node src/scripts/ingestBusTimetables.ts --file="data/.../my file.xml" --serviceDate=2026-02-23
+//   npx ts-node Src/scripts/ingestBusTimetables.ts --file="data/.../my file.xml" --serviceDate=2026-02-23
 function parseArg(name: string): string | undefined {
   const a = process.argv.find(x => x.startsWith(`--${name}=`));
   return a ? a.split("=").slice(1).join("=") : undefined;

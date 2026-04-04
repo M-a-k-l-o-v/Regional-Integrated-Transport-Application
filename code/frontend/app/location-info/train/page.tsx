@@ -1,324 +1,164 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import Link from 'next/link';
-const BlogSinglePage = () => {
-    return (
-        <div>
+import AppShell from "../../components/AppShell";
+import BoardVisitTracker from "../../components/BoardVisitTracker";
+import PageHeader from "../../components/PageHeader";
+import PanelCard from "../../components/PanelCard";
+import TrainBoardControls from "../../components/TrainBoardControls";
+import {
+  DEFAULT_TRAIN_FROM,
+  PlannerLocation,
+  RailDeparturesResponse,
+  fetchJson,
+  formatShortTime,
+  formatTimestamp,
+} from "../../lib/transportApi";
 
-            <div className="w-screen scrollable h-full flex flex-col p-10 gap-10 items-center justify-center bg-neutral-50">
-                
-                <div className="w-full h-full p-5 left-0 top-0 absolute inline-flex flex-col justify-start items-start gap-10">
-                    
-                    {/* Header */}
-                    <div className="self-stretch h-10 inline-flex flex-col justify-start items-start">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-3 left-[4px] top-[6px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                        <div className="self-stretch self-stretch inline-flex flex-col justify-between items-center">
-                            <div className="justify-center text-gray-800 text-base font-semibold font-['Inter'] leading-5">Lancaster Train Station</div>
-                            <div className="w-30 h-4 justify-center text-stone-600 text-xs font-semibold font-['Inter'] leading-4">Last updated 17:12</div>
-                        </div>
-                    </div>
+export const dynamic = "force-dynamic";
 
-                    {/* Arrivals and Departures Buttons */}
-                    <div className="flex w-full gap-5 justify-center items-start self-stretch h-2 rounded-[10px] inline-flex flex-row justify-start items-start">
-                        <div className="flex-1 p-4 self-stretch self-stretch bg-green-800 rounded-[10px] inline-flex justify-center items-center gap-1.5 overflow-hidden">
-                            <div className="flex justify-center items-center gap-1.5">
-                                <div className="text-center justify-start text-white text-base font-medium font-['Inter'] uppercase">Arrivals</div>
-                            </div>
-                        </div>
-                        <div className="flex-1 p-4 self-stretch self-stretch bg-white rounded-[10px] outline outline-2 outline-offset-[-2px] outline-neutral-300 inline-flex justify-center items-center">
-                            <div className="text-center justify-start text-zinc-700 text-base font-medium font-['Inter'] uppercase">Departures</div>
-                        </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="w-full scrollable h-full flex gap-5 flex-col justify-center items-center pb-20">
-                        
-                        <div className="w-full p-4 opacity-50 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-between items-start gap-3">
-                            <div className="self-stretch inline-flex justify-start items-start gap-3">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">17:00</div>
-                                    </div>
-                                    <div className="justify-center text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Blackburn</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 opacity-50 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-between items-start gap-3">
-                            <div className="self-stretch inline-flex justify-start items-start gap-3">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">17:10</div>
-                                    </div>
-                                    <div className="justify-center text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Burnley</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter']">17:20</div>
-                                    </div>
-                                    <div className="justify-center">
-                                        <span className="text-gray-800 text-xs font-semibold font-['Inter']">Preston<br/></span><span className="text-gray-800 text-xs font-normal font-['Inter'] leading-4">Platform 3 • Northern</span></div>
-                                </div>
-                                <div className="flex justify-start items-start gap-3">
-                                    <div className="p-0.5 bg-blue-600 rounded-md flex justify-start items-start gap-2.5">
-                                        <div className="w-5 h-5 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/wheelchair.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="w-28 px-2 py-1 bg-indigo-50 rounded-md flex justify-center items-center gap-2.5">
-                                        <div className="justify-center text-blue-600 text-xs font-medium font-['Inter']">Current</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">17:35</div>
-                                    </div>
-                                    <div className="justify-center"><span className="text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Barrow-in-Furness<br/></span><span className="text-gray-800 text-xs font-normal font-['Inter'] leading-4">Platform 2 • Northern</span></div>
-                                </div>
-                                <div className="w-28 px-2 py-1 bg-amber-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-yellow-600 text-xs font-medium font-['Inter'] leading-4">Delayed</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">17:50</div>
-                                    </div>
-                                    <div className="justify-center"><span className="text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Morecambe<br/></span><span className="text-gray-800 text-xs font-normal font-['Inter'] leading-4">Platform 2 • Northern</span></div>
-                                </div>
-                                <div className="w-28 px-2 py-1 bg-emerald-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-green-500 text-xs font-medium font-['Inter'] leading-4">On time</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">18:05</div>
-                                    </div>
-                                    <div className="justify-center"><span className="text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Blackpool<br/></span><span className="text-gray-800 text-xs font-normal font-['Inter'] leading-4">Platform --- • Avanti West Coast</span></div>
-                                </div>
-                                <div className="bg-white flex justify-start items-start gap-3">
-                                    <div className="w-28 px-2 py-1 bg-rose-200 rounded-md flex justify-center items-center gap-2.5">
-                                        <div className="justify-center text-rose-500 text-xs font-medium font-['Inter'] leading-4">Scheduled only</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Reeves Corner</div>
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">Next arrival : Today / 9:35</div>
-                                    </div>
-                                </div>
-                                <div className="w-20 px-2 py-1 bg-emerald-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-green-500 text-xs font-medium font-['Inter'] leading-4">On time</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex justify-between items-start">
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center text-gray-800 text-xs font-semibold font-['Inter'] leading-4">Reeves Corner</div>
-                                    <div className="inline-flex justify-center items-start gap-2">
-                                        <div className="w-4 h-4 relative overflow-hidden">
-                                            <Image
-                                                className="black"
-                                                src="/icons/clock.svg"
-                                                alt="Bus"
-                                                width={40}
-                                                height={40}
-                                            />
-                                        </div>
-                                        <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">Next arrival : Today / 9:35</div>
-                                    </div>
-                                </div>
-                                <div className="w-20 px-2 py-1 bg-emerald-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-green-500 text-xs font-medium font-['Inter'] leading-4">On time</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="flex flex-col justify-center items-center bottom-0">
-                <div className="w-full h-20 p-2.5 flex-1 fixed bottom-20 z-50 bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] inline-flex flex-col justify-center items-center gap-2.5">
-                    <div className="self-stretch h-12 px-5 py-2.5 bg-gradient-to-br from-green-800 to-green-800 rounded-[10px] inline-flex justify-center items-center gap-2.5">
-                        <div className="text-center justify-start text-white text-lg font-bold font-['Inter']">View in Real Time</div>
-                    </div>
-                </div>
-
-                <div className="w-full fixed flex-0 h-20 p-4 z-10 bottom-0 justify-center items-center absolute bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] inline-flex gap-10 overflow-hidden">
-                    <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                        <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                            <div className="w-6 h-6 relative overflow-hidden">
-                                <Image
-                                    className="black"
-                                    src="/icons/favorite.svg"
-                                    alt="Bus"
-                                    width={40}
-                                    height={40}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <Link href="/map">
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <Image
-                                        className="black"
-                                        src="/icons/map.svg"
-                                        alt="Bus"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-
-                    <Link href="/home">
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-2 bg-green-800 rounded-[10px] inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <Image
-                                        className="black"
-                                        src="/icons/home.svg"
-                                        alt="Bus"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-
-                    <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                        <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                            <div className="w-6 h-6 relative overflow-hidden">
-                                <Image
-                                    className="black"
-                                    src="/icons/person.svg"
-                                    alt="Bus"
-                                    width={40}
-                                    height={40}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                        <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                            <div className="w-6 h-6 relative overflow-hidden">
-                                <Image
-                                    className="black"
-                                    src="/icons/settings.svg"
-                                    alt="Bus"
-                                    width={40}
-                                    height={40}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+type TrainPageProps = {
+  searchParams?: Promise<{
+    crs?: string;
+    from?: string;
+    q?: string;
+    stationName?: string;
+  }>;
 };
-export default BlogSinglePage;
+
+function getInitialStation(
+  params: Awaited<TrainPageProps["searchParams"]>,
+  result: RailDeparturesResponse | null
+): PlannerLocation | null {
+  if (result) {
+    return {
+      type: "station",
+      id: result.station.stationId,
+      code: result.station.stationId,
+      name: result.station.name,
+      localityName: null,
+    };
+  }
+
+  const crs = typeof params?.crs === "string" ? params.crs.trim().toUpperCase() : "";
+  const stationName = typeof params?.stationName === "string" ? params.stationName.trim() : "";
+  if (crs.length !== 3) return null;
+
+  return {
+    type: "station",
+    id: crs,
+    code: crs,
+    name: stationName || crs,
+    localityName: null,
+  };
+}
+
+export default async function TrainLocationPage({ searchParams }: TrainPageProps) {
+  const params = (await searchParams) ?? {};
+  const crs = typeof params.crs === "string" ? params.crs.trim().toUpperCase() : "";
+  const from = typeof params.from === "string" && params.from.trim().length > 0 ? params.from : DEFAULT_TRAIN_FROM;
+  const query = typeof params.q === "string" ? params.q.trim() : "";
+
+  const result =
+    crs.length === 3
+      ? await fetchJson<RailDeparturesResponse>(
+          `/rail/departures/${encodeURIComponent(crs)}?from=${encodeURIComponent(from)}&windowMinutes=240&limit=20`
+        )
+      : { data: null, error: null };
+
+  return (
+    <AppShell activePath="boards">
+      <PageHeader
+        eyebrow="Rail board"
+        title={result.data?.station.name ?? "Train departures"}
+        description="Passenger-facing scheduled rail departures. Operational-only locations are filtered out and STP overlay precedence is applied before the board is rendered."
+        backHref="/boards"
+        backLabel="Back"
+      />
+
+      {result.data ? (
+        <BoardVisitTracker
+          mode="rail"
+          location={{
+            type: "station",
+            id: result.data.station.stationId,
+            code: result.data.station.stationId,
+            name: result.data.station.name,
+            localityName: null,
+          }}
+          href={`/location-info/train?crs=${encodeURIComponent(result.data.station.stationId)}&from=${encodeURIComponent(from)}`}
+        />
+      ) : null}
+
+      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
+        <div className="space-y-4">
+          {result.error ? (
+            <PanelCard eyebrow="Rail error" title="Unable to load the rail board">
+              <p className="text-sm text-rose-700">{result.error}</p>
+            </PanelCard>
+          ) : null}
+
+          {result.data ? (
+            result.data.departures.length === 0 ? (
+              <PanelCard eyebrow="No departures" title="Nothing matched this time window">
+                <p className="text-sm text-[var(--muted)]">No departures were returned for the requested station and time window.</p>
+              </PanelCard>
+            ) : (
+              result.data.departures.map((departure) => (
+                <PanelCard
+                  key={`${departure.scheduleId}:${departure.stopId}`}
+                  eyebrow="Rail leg"
+                  title={departure.destination ?? "Destination unavailable"}
+                >
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div className="app-stat-tile min-w-[118px]">
+                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Departs</div>
+                        <div className="mt-1 text-3xl font-semibold text-[var(--brand-ink)]">
+                          {departure.scheduledDeparture ?? departure.scheduledDepartureRaw ?? "Unknown"}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-lg font-semibold text-[var(--foreground)]">{departure.destination ?? "Destination unavailable"}</div>
+                        <div className="text-sm text-[var(--muted)]">
+                          {departure.platform ? `Platform ${departure.platform}` : "Platform TBC"}
+                          {departure.operatorCode ? ` · ${departure.operatorCode}` : ""}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 shadow-[var(--shadow-soft)]">
+                      Scheduled
+                    </div>
+                  </div>
+                </PanelCard>
+              ))
+            )
+          ) : (
+            <PanelCard eyebrow="Rail board" title="Search for a station">
+              <p className="text-sm text-[var(--muted)]">Use the station search to load a passenger-facing scheduled rail board.</p>
+            </PanelCard>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          <PanelCard eyebrow="Controls" title="Load another station">
+            <TrainBoardControls
+              initialStation={getInitialStation(params, result.data)}
+              initialFrom={from}
+              query={query}
+            />
+          </PanelCard>
+
+          <PanelCard eyebrow="Data state" title="Scheduled fallback">
+            <div className="space-y-3 text-sm text-[var(--muted)]">
+              <p>Last updated {formatTimestamp(result.data?.dataState.lastUpdated ?? null)}.</p>
+              <p>Live rail enrichment is not implemented yet, so this board is sourced from the timetable snapshot.</p>
+              {result.data ? (
+                <p>
+                  Window {formatShortTime(result.data.window.from)} to {formatShortTime(result.data.window.to)} · {result.data.count} departures returned.
+                </p>
+              ) : null}
+            </div>
+          </PanelCard>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

@@ -1,8 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { SaxesParser, SaxesTag } from "saxes";
 import { prisma } from "../infrastructure/orm/prisma/client";
-import { JobStatus, TransportMode } from "@prisma/client";
+import {
+  BusJourneyTimingQuality,
+  BusJourneyTimingSource,
+  JobStatus,
+  TransportMode,
+} from "@prisma/client";
 import { XMLParser } from "fast-xml-parser";
 
 const OPERATOR_NAME_OVERRIDES: Record<string, string> = {
@@ -52,6 +58,47 @@ type RouteCalendarAccumulator = {
   hasWeekdayData: boolean;
   exceptions: DateRangeOverride[];
   sourceFile: string;
+};
+
+type JourneyPatternContext = {
+  routeId: string;
+  stopIds: string[];
+  offsets: number[];
+  fullStopIds: string[];
+  fullLinkRefs: string[];
+  selectedFullIndices: number[];
+  serviceDate: Date;
+  direction: string | null;
+  destinationDisplay: string | null;
+};
+
+type TimingChain = {
+  stopIds: string[];
+  offsets: number[];
+  linkRefs: string[];
+};
+
+type OffsetAnalysis = {
+  totalEdgeCount: number;
+  positiveEdgeCount: number;
+  nonPositiveEdgeCount: number;
+  hasNegativeEdge: boolean;
+};
+
+type TimingCandidate = {
+  offsets: number[];
+  source: BusJourneyTimingSource;
+  analysis: OffsetAnalysis;
+};
+
+type TimingResolution = {
+  offsets: number[];
+  source: BusJourneyTimingSource;
+  quality: BusJourneyTimingQuality;
+  totalEdgeCount: number;
+  positiveEdgeCount: number;
+  nonPositiveEdgeCount: number;
+  repairNote: string | null;
 };
 
 function weekdayFlagsAll(value: boolean): WeekdayFlags {
@@ -255,12 +302,278 @@ function durationToSeconds(d: string | undefined): number {
   return h * 3600 + min * 60 + s;
 }
 
+function getStopPointRef(node: any): string {
+  return String(node?.StopPointRef ?? "").trim();
+}
+
+function timingLinkDurationSeconds(link: any): number {
+  return (
+    durationToSeconds(link?.RunTime) +
+    durationToSeconds(link?.WaitTime) +
+    durationToSeconds(link?.From?.WaitTime) +
+    durationToSeconds(link?.To?.WaitTime)
+  );
+}
+
+function buildTimingChainFromLinks(timingLinks: any[]): TimingChain | null {
+  const stopIds: string[] = [];
+  const offsets: number[] = [];
+  const linkRefs: string[] = [];
+
+  for (const link of timingLinks) {
+    const fromRef = getStopPointRef(link?.From);
+    const toRef = getStopPointRef(link?.To);
+    if (!fromRef || !toRef) continue;
+
+    if (stopIds.length === 0) {
+      stopIds.push(fromRef);
+      offsets.push(0);
+    } else if (stopIds[stopIds.length - 1] !== fromRef) {
+      return null;
+    }
+
+    const nextOffset = offsets[offsets.length - 1] + timingLinkDurationSeconds(link);
+    stopIds.push(toRef);
+    offsets.push(nextOffset);
+    linkRefs.push(String(link?.["@_id"] ?? link?.id ?? "").trim());
+  }
+
+  return stopIds.length > 0 ? { stopIds, offsets, linkRefs } : null;
+}
+
+function countPositiveOffsetEdges(offsets: number[]): number {
+  let total = 0;
+  for (let i = 1; i < offsets.length; i++) {
+    if (offsets[i] > offsets[i - 1]) total++;
+  }
+  return total;
+}
+
+function selectOffsetsByIndices(offsets: number[], indices: number[]): number[] | null {
+  if (indices.some((index) => index < 0 || index >= offsets.length)) return null;
+  return indices.map((index) => offsets[index]);
+}
+
+function buildOffsetsFromLinkRefs(linkRefs: string[], durationByLinkRef: Map<string, number>): number[] | null {
+  const offsets = [0];
+  for (const linkRef of linkRefs) {
+    if (!linkRef || !durationByLinkRef.has(linkRef)) return null;
+    offsets.push(offsets[offsets.length - 1] + (durationByLinkRef.get(linkRef) ?? 0));
+  }
+  return offsets;
+}
+
+function analyseOffsets(offsets: number[]): OffsetAnalysis {
+  let positiveEdgeCount = 0;
+  let nonPositiveEdgeCount = 0;
+  let hasNegativeEdge = false;
+
+  for (let index = 1; index < offsets.length; index += 1) {
+    const delta = offsets[index] - offsets[index - 1];
+    if (delta > 0) {
+      positiveEdgeCount += 1;
+    } else {
+      nonPositiveEdgeCount += 1;
+      if (delta < 0) hasNegativeEdge = true;
+    }
+  }
+
+  return {
+    totalEdgeCount: Math.max(0, offsets.length - 1),
+    positiveEdgeCount,
+    nonPositiveEdgeCount,
+    hasNegativeEdge,
+  };
+}
+
+function compareTimingCandidates(left: TimingCandidate, right: TimingCandidate): number {
+  if (left.analysis.nonPositiveEdgeCount !== right.analysis.nonPositiveEdgeCount) {
+    return left.analysis.nonPositiveEdgeCount - right.analysis.nonPositiveEdgeCount;
+  }
+  if (left.analysis.positiveEdgeCount !== right.analysis.positiveEdgeCount) {
+    return right.analysis.positiveEdgeCount - left.analysis.positiveEdgeCount;
+  }
+  if (left.source === BusJourneyTimingSource.VEHICLE_JOURNEY_LINKS && right.source !== BusJourneyTimingSource.VEHICLE_JOURNEY_LINKS) {
+    return -1;
+  }
+  if (right.source === BusJourneyTimingSource.VEHICLE_JOURNEY_LINKS && left.source !== BusJourneyTimingSource.VEHICLE_JOURNEY_LINKS) {
+    return 1;
+  }
+  return 0;
+}
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return Math.round((sorted[middle - 1] + sorted[middle]) / 2);
+  }
+  return sorted[middle];
+}
+
+function interpolateOffsets(offsets: number[]): number[] | null {
+  if (offsets.length <= 1) return [...offsets];
+
+  const baseAnalysis = analyseOffsets(offsets);
+  if (baseAnalysis.nonPositiveEdgeCount === 0) return [...offsets];
+  if (baseAnalysis.hasNegativeEdge) return null;
+
+  const repaired = [...offsets];
+  const positiveDurations: number[] = [];
+  for (let index = 1; index < offsets.length; index += 1) {
+    const delta = offsets[index] - offsets[index - 1];
+    if (delta > 0) positiveDurations.push(delta);
+  }
+
+  const fallbackEdgeSeconds = Math.max(60, positiveDurations.length > 0 ? median(positiveDurations) : 60);
+
+  let anchorIndex = 0;
+  while (anchorIndex < repaired.length - 1) {
+    if (repaired[anchorIndex + 1] > repaired[anchorIndex]) {
+      anchorIndex += 1;
+      continue;
+    }
+
+    let nextIndex = anchorIndex + 1;
+    while (nextIndex < repaired.length && repaired[nextIndex] <= repaired[anchorIndex]) {
+      nextIndex += 1;
+    }
+
+    if (nextIndex < repaired.length) {
+      const edgeCount = nextIndex - anchorIndex;
+      const totalSpan = repaired[nextIndex] - repaired[anchorIndex];
+      if (totalSpan < edgeCount) return null;
+
+      let previous = repaired[anchorIndex];
+      for (let innerIndex = 1; innerIndex < edgeCount; innerIndex += 1) {
+        const proportional = repaired[anchorIndex] + Math.round((totalSpan * innerIndex) / edgeCount);
+        const nextValue = Math.max(previous + 1, proportional);
+        repaired[anchorIndex + innerIndex] = nextValue;
+        previous = nextValue;
+      }
+
+      anchorIndex = nextIndex;
+      continue;
+    }
+
+    for (let innerIndex = anchorIndex + 1; innerIndex < repaired.length; innerIndex += 1) {
+      repaired[innerIndex] = repaired[innerIndex - 1] + fallbackEdgeSeconds;
+    }
+    break;
+  }
+
+  return analyseOffsets(repaired).nonPositiveEdgeCount === 0 ? repaired : null;
+}
+
+function buildTimingPeerKey(
+  routeId: string,
+  journeyPatternRef: string,
+  lineRef: string | null,
+  direction: string | null,
+  stopIds: string[]
+): string {
+  return buildJourneyKey([routeId, journeyPatternRef, lineRef ?? "", direction ?? "", ...stopIds]);
+}
+
+function qualityRank(quality: BusJourneyTimingQuality): number {
+  if (quality === BusJourneyTimingQuality.EXACT) return 3;
+  if (quality === BusJourneyTimingQuality.REPAIRED) return 2;
+  if (quality === BusJourneyTimingQuality.ESTIMATED) return 1;
+  return 0;
+}
+
+function isBetterTimingResolution(left: TimingResolution, right: TimingResolution): boolean {
+  const leftQuality = qualityRank(left.quality);
+  const rightQuality = qualityRank(right.quality);
+  if (leftQuality !== rightQuality) {
+    return leftQuality > rightQuality;
+  }
+  if (left.nonPositiveEdgeCount !== right.nonPositiveEdgeCount) {
+    return left.nonPositiveEdgeCount < right.nonPositiveEdgeCount;
+  }
+  if (left.positiveEdgeCount !== right.positiveEdgeCount) {
+    return left.positiveEdgeCount > right.positiveEdgeCount;
+  }
+  return false;
+}
+
 function timeToDate(serviceDate: Date, hhmmss: string): Date {
   // hh:mm:ss or hh:mm
   const [h, m, s] = hhmmss.split(":").map(Number);
   const d = new Date(serviceDate);
   d.setHours(h ?? 0, m ?? 0, s ?? 0, 0);
   return d;
+}
+
+function toSourceFileKey(filePath: string): string {
+  const rel = path.relative(process.cwd(), filePath).trim();
+  if (rel.length > 0 && !rel.startsWith("..")) return rel;
+  return path.basename(filePath);
+}
+
+function buildJourneyKey(parts: string[]): string {
+  return createHash("sha256").update(parts.join("|")).digest("hex");
+}
+
+function resolveJourneyTiming(
+  directCandidates: TimingCandidate[],
+  peerResolution: TimingResolution | null
+): TimingResolution {
+  const rankedDirectCandidates = [...directCandidates].sort(compareTimingCandidates);
+  const bestDirectCandidate = rankedDirectCandidates[0] ?? {
+    offsets: [0],
+    source: BusJourneyTimingSource.UNUSABLE,
+    analysis: analyseOffsets([0]),
+  };
+
+  if (bestDirectCandidate.analysis.nonPositiveEdgeCount === 0) {
+    return {
+      offsets: bestDirectCandidate.offsets,
+      source: bestDirectCandidate.source,
+      quality: BusJourneyTimingQuality.EXACT,
+      totalEdgeCount: bestDirectCandidate.analysis.totalEdgeCount,
+      positiveEdgeCount: bestDirectCandidate.analysis.positiveEdgeCount,
+      nonPositiveEdgeCount: bestDirectCandidate.analysis.nonPositiveEdgeCount,
+      repairNote: null,
+    };
+  }
+
+  if (peerResolution && peerResolution.quality !== BusJourneyTimingQuality.INVALID) {
+    return {
+      ...peerResolution,
+      source: BusJourneyTimingSource.DERIVED_FROM_PATTERN_PEER,
+      quality: BusJourneyTimingQuality.REPAIRED,
+      repairNote: "derived_from_pattern_peer",
+    };
+  }
+
+  const interpolatedOffsets = interpolateOffsets(bestDirectCandidate.offsets);
+  if (interpolatedOffsets) {
+    const analysis = analyseOffsets(interpolatedOffsets);
+    if (analysis.nonPositiveEdgeCount === 0) {
+      return {
+        offsets: interpolatedOffsets,
+        source: BusJourneyTimingSource.INTERPOLATED,
+        quality: BusJourneyTimingQuality.ESTIMATED,
+        totalEdgeCount: analysis.totalEdgeCount,
+        positiveEdgeCount: analysis.positiveEdgeCount,
+        nonPositiveEdgeCount: analysis.nonPositiveEdgeCount,
+        repairNote: bestDirectCandidate.analysis.hasNegativeEdge
+          ? "interpolated_after_negative_edges"
+          : "interpolated_from_flat_offsets",
+      };
+    }
+  }
+
+  return {
+    offsets: bestDirectCandidate.offsets,
+    source: BusJourneyTimingSource.UNUSABLE,
+    quality: BusJourneyTimingQuality.INVALID,
+    totalEdgeCount: bestDirectCandidate.analysis.totalEdgeCount,
+    positiveEdgeCount: bestDirectCandidate.analysis.positiveEdgeCount,
+    nonPositiveEdgeCount: bestDirectCandidate.analysis.nonPositiveEdgeCount,
+    repairNote: bestDirectCandidate.analysis.hasNegativeEdge ? "negative_edge_offsets" : "non_positive_offsets",
+  };
 }
 
 function escapeText(t: string): string {
@@ -476,6 +789,7 @@ export class BusTimetableIngestionService {
     const legacyLancashireOnly = opts.lancashireOnly ?? true;
     const scopeMode = opts.scopeMode ?? (legacyLancashireOnly ? "strict" : "all");
     const corridorAnchor = (opts.corridorAnchor ?? "lancaster").trim().toLowerCase();
+    const sourceFile = toSourceFileKey(filePath);
 
     // Ensure DataSource exists
     await prisma.dataSource.upsert({
@@ -513,15 +827,7 @@ export class BusTimetableIngestionService {
       }
 
       // Map JourneyPatternRef -> per-service context so we can route each streamed VehicleJourney correctly.
-      const jpIdToContext = new Map<
-        string,
-        {
-          routeId: string;
-          stopIds: string[];
-          offsets: number[];
-          serviceDate: Date;
-        }
-      >();
+      const jpIdToContext = new Map<string, JourneyPatternContext>();
       const routeCalendarByRouteId = new Map<string, RouteCalendarAccumulator>();
 
       // -------- Operator + Route identity (best-effort, stable) --------
@@ -593,10 +899,9 @@ export class BusTimetableIngestionService {
           weekdays: serviceWeekdays ?? weekdayFlagsAll(false),
           hasWeekdayData: serviceWeekdays !== null,
           exceptions: serviceExceptions,
-          sourceFile: path.basename(filePath),
+          sourceFile,
         });
 
-        let routeStopsInitialised = false;
         let routeHasContext = false;
         const journeyPatterns = asArray<any>(svc.StandardService?.JourneyPattern);
         for (const jp of journeyPatterns) {
@@ -619,15 +924,9 @@ export class BusTimetableIngestionService {
           }
           if (timingLinks.length === 0) continue;
 
-          // Build a stop chain for this JourneyPattern only.
-          const chain: string[] = [];
-          for (const link of timingLinks) {
-            const fromRef = String(link?.From?.StopPointRef ?? "");
-            const toRef = String(link?.To?.StopPointRef ?? "");
-            if (!fromRef || !toRef) continue;
-            if (chain.length === 0) chain.push(fromRef);
-            if (chain[chain.length - 1] !== toRef) chain.push(toRef);
-          }
+          const timingChain = buildTimingChainFromLinks(timingLinks);
+          if (!timingChain) continue;
+          const chain = timingChain.stopIds;
           if (chain.length === 0) continue;
 
           const chainBusStops = await prisma.busStop.findMany({
@@ -637,7 +936,8 @@ export class BusTimetableIngestionService {
           const stopMetaById = new Map(chainBusStops.map((row) => [row.stopId, row]));
 
           // Coverage filter with optional context.
-          let keptChain = chain;
+          let keepStart = 0;
+          let keepEnd = chain.length - 1;
           if (scopeMode !== "all") {
             const inCovIdx = chain
               .map((stopId, idx) => ({ stopId, idx }))
@@ -656,54 +956,37 @@ export class BusTimetableIngestionService {
 
             const first = inCovIdx[0].idx;
             const last = inCovIdx[inCovIdx.length - 1].idx;
-            const a = Math.max(0, first - keepN);
-            const b = Math.min(chain.length - 1, last + keepN);
-            keptChain = chain.slice(a, b + 1);
-          }
-
-          // Build incremental offsets for keptChain.
-          const offsetsAll: number[] = [0];
-          for (let i = 1; i < keptChain.length; i++) {
-            const prev = keptChain[i - 1];
-            const cur = keptChain[i];
-            const link = timingLinks.find(
-              (l) =>
-                String(l?.From?.StopPointRef ?? "") === prev &&
-                String(l?.To?.StopPointRef ?? "") === cur
-            );
-            const sec = link ? durationToSeconds(link.RunTime) + durationToSeconds(link.WaitTime) : 0;
-            offsetsAll[i] = offsetsAll[i - 1] + sec;
+            keepStart = Math.max(0, first - keepN);
+            keepEnd = Math.min(chain.length - 1, last + keepN);
           }
 
           // Keep only stops that exist in BusStop (FK-safe + less memory).
           const existingSet = new Set(chainBusStops.map((x) => x.stopId));
           const stopIds: string[] = [];
           const offsets: number[] = [];
+          const selectedFullIndices: number[] = [];
 
-          for (let i = 0; i < keptChain.length; i++) {
-            const stopId = keptChain[i];
+          for (let i = keepStart; i <= keepEnd; i++) {
+            const stopId = chain[i];
             if (!existingSet.has(stopId)) continue;
             stopIds.push(stopId);
-            offsets.push(offsetsAll[i]);
+            offsets.push(timingChain.offsets[i]);
+            selectedFullIndices.push(i);
           }
 
           if (stopIds.length === 0) continue;
-
-          // Initialize route stop order once (first valid JourneyPattern only).
-          if (!routeStopsInitialised) {
-            await prisma.busRouteStop.deleteMany({ where: { routeId } });
-            await prisma.busRouteStop.createMany({
-              data: stopIds.map((stopId, i) => ({ routeId, stopId, stopOrder: i })),
-              skipDuplicates: true,
-            });
-            routeStopsInitialised = true;
-          }
 
           jpIdToContext.set(jpId, {
             routeId,
             stopIds,
             offsets,
+            fullStopIds: chain,
+            fullLinkRefs: timingChain.linkRefs,
+            selectedFullIndices,
             serviceDate: opts.serviceDate,
+            direction: typeof jp?.Direction === "string" ? jp.Direction.trim().toLowerCase() || null : null,
+            destinationDisplay:
+              typeof jp?.DestinationDisplay === "string" ? jp.DestinationDisplay.trim() || null : null,
           });
           routeHasContext = true;
         }
@@ -716,14 +999,37 @@ export class BusTimetableIngestionService {
         }
       }
 
+      const routesWithContextList = Array.from(routesWithContext);
+      if (routesWithContextList.length > 0) {
+        await prisma.busJourney.deleteMany({
+          where: {
+            routeId: { in: routesWithContextList },
+            serviceDate: dayStart,
+            sourceFile,
+          },
+        });
+      }
+
+      const timingPeerByPattern = new Map<string, TimingResolution>();
+
       // STREAMING pass over the full file: ingest VehicleJourneys without loading the document into memory.
       const BATCH_MAX = 2000;
       const batch: Array<{ routeId: string; stopId: string; arrivalTime: Date; departureTime: Date }> = [];
+      let totalJourneysPersisted = 0;
+      let totalJourneyStopsPersisted = 0;
+      let totalVehicleTimingOverrides = 0;
+      let totalExactJourneyTimings = 0;
+      let totalRepairedJourneyTimings = 0;
+      let totalEstimatedJourneyTimings = 0;
+      let totalInvalidJourneyTimings = 0;
 
       const flushBatch = async () => {
         if (batch.length === 0) return 0;
         const n = batch.length;
-        await prisma.busSchedule.createMany({ data: batch });
+        await prisma.busSchedule.createMany({
+          data: batch,
+          skipDuplicates: true,
+        });
         batch.length = 0;
         return n;
       };
@@ -756,25 +1062,152 @@ export class BusTimetableIngestionService {
         if (!dep) return;
 
         const start = timeToDate(ctx.serviceDate, String(dep));
-
-        for (let i = 0; i < ctx.stopIds.length; i++) {
-          if (routesPendingClear.has(ctx.routeId)) {
-            await prisma.busSchedule.deleteMany({
-              where: {
-                routeId: ctx.routeId,
-                departureTime: { gte: dayStart, lt: dayEnd },
-              },
+        const vehicleJourneyCode = String(vj.VehicleJourneyCode ?? vj.PrivateCode ?? `${jpRef}:${dep}`);
+        const lineRef = typeof vj.LineRef === "string" ? vj.LineRef.trim() || null : null;
+        const destinationDisplay =
+          typeof vj.DestinationDisplay === "string" ? vj.DestinationDisplay.trim() || null : ctx.destinationDisplay;
+        const journeyKey = buildJourneyKey([
+          ctx.routeId,
+          dayStart.toISOString(),
+          sourceFile,
+          vehicleJourneyCode,
+          jpRef,
+          String(dep),
+          lineRef ?? "",
+        ]);
+        const timingPeerKey = buildTimingPeerKey(ctx.routeId, jpRef, lineRef, ctx.direction, ctx.stopIds);
+        const directTimingCandidates: TimingCandidate[] = [
+          {
+            offsets: ctx.offsets,
+            source: BusJourneyTimingSource.JOURNEY_PATTERN_LINKS,
+            analysis: analyseOffsets(ctx.offsets),
+          },
+        ];
+        const vehicleTimingLinks = asArray<any>(vj.VehicleJourneyTimingLink);
+        const vehicleDurationByLinkRef = new Map<string, number>();
+        for (const link of vehicleTimingLinks) {
+          const linkRef = String(link?.JourneyPatternTimingLinkRef ?? "").trim();
+          if (!linkRef) continue;
+          vehicleDurationByLinkRef.set(linkRef, timingLinkDurationSeconds(link));
+        }
+        const vehicleFullOffsets = buildOffsetsFromLinkRefs(ctx.fullLinkRefs, vehicleDurationByLinkRef);
+        if (vehicleFullOffsets) {
+          const selectedVehicleOffsets = selectOffsetsByIndices(vehicleFullOffsets, ctx.selectedFullIndices);
+          if (selectedVehicleOffsets) {
+            directTimingCandidates.push({
+              offsets: selectedVehicleOffsets,
+              source: BusJourneyTimingSource.VEHICLE_JOURNEY_LINKS,
+              analysis: analyseOffsets(selectedVehicleOffsets),
             });
-            routesPendingClear.delete(ctx.routeId);
+            const patternPositiveEdges = directTimingCandidates[0].analysis.positiveEdgeCount;
+            const vehiclePositiveEdges = countPositiveOffsetEdges(selectedVehicleOffsets);
+            if (vehiclePositiveEdges > patternPositiveEdges) {
+              totalVehicleTimingOverrides++;
+            }
           }
+        }
 
-          const stopId = ctx.stopIds[i];
-          const t = new Date(start.getTime() + ctx.offsets[i] * 1000);
-          batch.push({
-            routeId: ctx.routeId,
+        const peerTiming = timingPeerByPattern.get(timingPeerKey) ?? null;
+        const timingResolution = resolveJourneyTiming(directTimingCandidates, peerTiming);
+        const effectiveOffsets = timingResolution.offsets;
+        if (timingResolution.quality === BusJourneyTimingQuality.EXACT) totalExactJourneyTimings++;
+        else if (timingResolution.quality === BusJourneyTimingQuality.REPAIRED) totalRepairedJourneyTimings++;
+        else if (timingResolution.quality === BusJourneyTimingQuality.ESTIMATED) totalEstimatedJourneyTimings++;
+        else totalInvalidJourneyTimings++;
+
+        const journeyStopRows = ctx.stopIds.map((stopId, i) => {
+          const t = new Date(start.getTime() + effectiveOffsets[i] * 1000);
+          return {
             stopId,
+            stopSeq: i,
             arrivalTime: t,
             departureTime: t,
+            offsetSeconds: effectiveOffsets[i],
+          };
+        });
+
+        const journey = await prisma.busJourney.upsert({
+          where: { journeyKey },
+          update: {
+            routeId: ctx.routeId,
+            vehicleJourneyCode,
+            journeyPatternRef: jpRef,
+            lineRef,
+            direction: ctx.direction,
+            destinationDisplay,
+            serviceDate: dayStart,
+            departureTime: start,
+            sourceFile,
+            timingSource: timingResolution.source,
+            timingQuality: timingResolution.quality,
+            totalEdgeCount: timingResolution.totalEdgeCount,
+            positiveEdgeCount: timingResolution.positiveEdgeCount,
+            nonPositiveEdgeCount: timingResolution.nonPositiveEdgeCount,
+            timingRepairNote: timingResolution.repairNote,
+          },
+          create: {
+            journeyKey,
+            routeId: ctx.routeId,
+            vehicleJourneyCode,
+            journeyPatternRef: jpRef,
+            lineRef,
+            direction: ctx.direction,
+            destinationDisplay,
+            serviceDate: dayStart,
+            departureTime: start,
+            sourceFile,
+            timingSource: timingResolution.source,
+            timingQuality: timingResolution.quality,
+            totalEdgeCount: timingResolution.totalEdgeCount,
+            positiveEdgeCount: timingResolution.positiveEdgeCount,
+            nonPositiveEdgeCount: timingResolution.nonPositiveEdgeCount,
+            timingRepairNote: timingResolution.repairNote,
+          },
+          select: { journeyId: true },
+        });
+
+        const existingPeer = timingPeerByPattern.get(timingPeerKey);
+        if (
+          timingResolution.quality !== BusJourneyTimingQuality.INVALID &&
+          (!existingPeer || isBetterTimingResolution(timingResolution, existingPeer))
+        ) {
+          timingPeerByPattern.set(timingPeerKey, timingResolution);
+        }
+
+        await prisma.busJourneyStop.deleteMany({
+          where: { journeyId: journey.journeyId },
+        });
+
+        await prisma.busJourneyStop.createMany({
+          data: journeyStopRows.map((row) => ({
+            journeyId: journey.journeyId,
+            stopId: row.stopId,
+            stopSeq: row.stopSeq,
+            arrivalTime: row.arrivalTime,
+            departureTime: row.departureTime,
+            offsetSeconds: row.offsetSeconds,
+          })),
+        });
+
+        totalJourneysPersisted++;
+        totalJourneyStopsPersisted += journeyStopRows.length;
+
+        if (routesPendingClear.has(ctx.routeId)) {
+          await prisma.busSchedule.deleteMany({
+            where: {
+              routeId: ctx.routeId,
+              departureTime: { gte: dayStart, lt: dayEnd },
+            },
+          });
+          routesPendingClear.delete(ctx.routeId);
+        }
+
+        for (const row of journeyStopRows) {
+          batch.push({
+            routeId: ctx.routeId,
+            stopId: row.stopId,
+            arrivalTime: row.arrivalTime,
+            departureTime: row.departureTime,
           });
 
           if (batch.length >= BATCH_MAX) {
@@ -853,7 +1286,17 @@ export class BusTimetableIngestionService {
         data: { finishedAt: new Date(), status: JobStatus.SUCCESS, recordsProcessed: totalInserted },
       });
 
-      console.log("[bus] done:", { file: path.basename(filePath), inserted: totalInserted });
+      console.log("[bus] done:", {
+        file: path.basename(filePath),
+        inserted: totalInserted,
+        journeys: totalJourneysPersisted,
+        journeyStops: totalJourneyStopsPersisted,
+        vehicleTimingOverrides: totalVehicleTimingOverrides,
+        exactJourneyTimings: totalExactJourneyTimings,
+        repairedJourneyTimings: totalRepairedJourneyTimings,
+        estimatedJourneyTimings: totalEstimatedJourneyTimings,
+        invalidJourneyTimings: totalInvalidJourneyTimings,
+      });
     } catch (err: any) {
       await prisma.jobRun.update({
         where: { jobRunId: run.jobRunId },

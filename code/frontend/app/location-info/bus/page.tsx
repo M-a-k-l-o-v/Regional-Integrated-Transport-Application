@@ -1,241 +1,376 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-import Link from 'next/link';
-const BlogSinglePage = () => {
-    return (
-        <div>
+import AppShell from "../../components/AppShell";
+import BoardVisitTracker from "../../components/BoardVisitTracker";
+import BusBoardControls from "../../components/BusBoardControls";
+import PageHeader from "../../components/PageHeader";
+import PanelCard from "../../components/PanelCard";
+import {
+  BusDeparturesResponse,
+  BusRouteCalendarResponse,
+  DEFAULT_BUS_DATE,
+  PlannerLocation,
+  fetchJson,
+  formatShortDate,
+  formatShortTime,
+  formatTimestamp,
+  getRouteCode,
+} from "../../lib/transportApi";
 
-            <div className="w-screen scrollable h-full flex flex-col p-10 gap-10 items-center justify-center bg-neutral-50">
+export const dynamic = "force-dynamic";
 
-                <div className="w-full h-full p-5 left-0 top-0 absolute inline-flex flex-col justify-start items-start gap-10">
-
-                    {/* Header */}
-                    <div className="self-stretch h-10 inline-flex flex-col justify-start items-start">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-3 left-[4px] top-[6px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                        <div className="self-stretch self-stretch inline-flex flex-col justify-between items-center">
-                            <div className="justify-center text-gray-800 text-base font-semibold font-['Inter'] leading-5">Lancaster Bus Station</div>
-                            <div className="w-30 h-4 justify-center text-stone-600 text-xs font-semibold font-['Inter'] leading-4">Last updated 14:32</div>
-                        </div>
-                    </div>
-                    {/* Departures/Arrivals Buttons */}
-                    <div className="flex w-full gap-5 justify-center items-start self-stretch h-2 rounded-[10px] inline-flex flex-row justify-start items-start">
-                            <div className="flex-1 p-4 self-stretch self-stretch bg-green-800 rounded-[10px] inline-flex justify-center items-center gap-1.5 overflow-hidden">
-                                <div className="flex justify-center items-center gap-1.5">
-                                    <div className="text-center justify-start text-white text-base font-medium font-['Inter'] uppercase">Arrivals</div>
-                                </div>
-                            </div>
-                            <div className="flex-1 p-4 self-stretch self-stretch bg-white rounded-[10px] outline outline-2 outline-offset-[-2px] outline-neutral-300 inline-flex justify-center items-center">
-                                <div className="text-center justify-start text-zinc-700 text-base font-medium font-['Inter'] uppercase">Departures</div>
-                            </div>
-                        </div>
-
-
-                    {/* Content */}
-                    <div className="w-full h-full flex flex-col items-center gap-2.5">
-                        
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex flex-row justify-between items-center">
-                                
-                                <div className="inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center">
-                                        <div className="text-gray-800 text-xs font-semibold font-['Inter']">40<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Preston<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Stand 1 </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="flex justify-center items-start gap-2">
-                                    <div className="w-4 h-4 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/clock.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                    <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter']">5 mins</div>
-                                </div>
-                                
-                                <div className="w-28 px-2 py-1 bg-emerald-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-green-500 text-xs font-medium font-['Inter']">On time</div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex flex-row justify-between items-center">
-                                <div className="w-16 inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center">
-                                        <div className="text-gray-800 text-xs font-semibold font-['Inter']">41<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Morecambe<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Stand 4</div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-center items-start gap-2">
-                                    <div className="w-4 h-4 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/clock.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                    <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter']">12 mins</div>
-                                </div>
-                                <div className="w-28 px-2 py-1 bg-amber-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-yellow-600 text-xs font-medium font-['Inter']">Delayed</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex flex-row justify-between items-center">
-                                <div className="w-16 inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center">
-                                        <div className="text-gray-800 text-xs font-semibold font-['Inter']">100<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Underpass</div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Stand 6</div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-center items-start gap-2">
-                                    <div className="w-4 h-4 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/clock.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                    <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter']">18mins</div>
-                                </div>
-                                <div className="w-28 px-2 py-1 bg-emerald-100 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-green-500 text-xs font-medium font-['Inter'] leading-4">On time</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-full p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-zinc-100 flex flex-col justify-start items-start gap-3">
-                            <div className="self-stretch inline-flex flex-row justify-between items-center">
-                                <div className="w-16 inline-flex flex-col justify-start items-start gap-3">
-                                    <div className="justify-center">
-                                        <div className="text-gray-800 text-xs font-semibold font-['Inter']">2X<br/></div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Kendall</div>
-                                        <div className="text-gray-800 text-xs font-normal font-['Inter']">Stand 8</div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-center items-start gap-2">
-                                    <div className="w-4 h-4 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/clock.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                    <div className="justify-center text-zinc-600 text-xs font-normal font-['Inter']">TBD</div>
-                                </div>
-                                <div className="w-28 px-2 py-1 bg-rose-200 rounded-md flex justify-center items-center gap-2.5">
-                                    <div className="justify-center text-rose-500 text-xs font-medium font-['Inter'] leading-4">Scheduled only</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bottom Bar */}
-                <div className="flex flex-col justify-center items-center bottom-0">
-                    <div className="w-full h-20 p-2.5 flex-1 fixed bottom-20 z-50 bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] inline-flex flex-col justify-center items-center gap-2.5">
-                        <div className="self-stretch h-12 px-5 py-2.5 bg-gradient-to-br from-green-800 to-green-800 rounded-[10px] inline-flex justify-center items-center gap-2.5">
-                            <div className="text-center justify-start text-white text-lg font-bold font-['Inter']">View in Real Time</div>
-                        </div>
-                    </div>
-
-                    <div className="w-full fixed flex-0 h-20 p-4 z-10 bottom-0 justify-center items-center absolute bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] inline-flex gap-10 overflow-hidden">
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <Image
-                                        className="black"
-                                        src="/icons/favorite.svg"
-                                        alt="Bus"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <Link href="/map">
-                            <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                                <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                    <div className="w-6 h-6 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/map.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-
-                        <Link href="/home">
-                            <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                                <div className="p-2 bg-green-800 rounded-[10px] inline-flex justify-start items-center gap-2.5">
-                                    <div className="w-6 h-6 relative overflow-hidden">
-                                        <Image
-                                            className="black"
-                                            src="/icons/home.svg"
-                                            alt="Bus"
-                                            width={40}
-                                            height={40}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <Image
-                                        className="black"
-                                        src="/icons/person.svg"
-                                        alt="Bus"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <Image
-                                        className="black"
-                                        src="/icons/settings.svg"
-                                        alt="Bus"
-                                        width={40}
-                                        height={40}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+type BusPageProps = {
+  searchParams?: Promise<{
+    stopId?: string;
+    groupId?: string;
+    date?: string;
+    q?: string;
+    selectedType?: string;
+    groupName?: string;
+    stopName?: string;
+    stopCode?: string;
+    stopLocalityName?: string;
+  }>;
 };
-export default BlogSinglePage;
+
+type ServiceSummary = {
+  key: string;
+  routeId: string;
+  lineRef: string;
+  direction: string | null;
+  destinationDisplay: string | null;
+  operatorName: string;
+  departures: BusDeparturesResponse["departures"];
+  calendarData: BusRouteCalendarResponse | null;
+  calendarError: string | null;
+};
+
+function getBusBadge(calendarData: BusRouteCalendarResponse | null) {
+  if (!calendarData) {
+    return { label: "Scheduled only", className: "bg-amber-100 text-amber-900" };
+  }
+
+  if (!calendarData.runsOnDate) {
+    return { label: "Calendar mismatch", className: "bg-rose-100 text-rose-900" };
+  }
+
+  return { label: "Scheduled only", className: "bg-amber-100 text-amber-900" };
+}
+
+function getInitialStop(
+  params: Awaited<BusPageProps["searchParams"]>,
+  result: BusDeparturesResponse | null
+): PlannerLocation | null {
+  if (result) {
+    return {
+      type: result.scope.type,
+      id: result.scope.id,
+      code: result.scope.code,
+      name: result.scope.name,
+      localityName: result.scope.localityName,
+    };
+  }
+
+  const stopId = typeof params?.stopId === "string" ? params.stopId.trim() : "";
+  const groupId = typeof params?.groupId === "string" ? params.groupId.trim() : "";
+  const selectedType = typeof params?.selectedType === "string" ? params.selectedType.trim() : "";
+  const groupName = typeof params?.groupName === "string" ? params.groupName.trim() : "";
+  const stopName = typeof params?.stopName === "string" ? params.stopName.trim() : "";
+  const stopCode = typeof params?.stopCode === "string" ? params.stopCode.trim() : stopId || groupId;
+  const stopLocalityName =
+    typeof params?.stopLocalityName === "string" && params.stopLocalityName.trim().length > 0
+      ? params.stopLocalityName.trim()
+      : null;
+
+  if ((selectedType === "bus_stop_group" || groupId) && groupId && groupName) {
+    return {
+      type: "bus_stop_group",
+      id: groupId,
+      code: stopCode || groupId,
+      name: groupName,
+      localityName: stopLocalityName,
+    };
+  }
+
+  if (!stopId || !stopName) return null;
+
+  return {
+    type: "bus_stop",
+    id: stopId,
+    code: stopCode || stopId,
+    name: stopName,
+    localityName: stopLocalityName,
+  };
+}
+
+export default async function BusLocationPage({ searchParams }: BusPageProps) {
+  const params = (await searchParams) ?? {};
+  const stopId = typeof params.stopId === "string" ? params.stopId.trim() : "";
+  const groupId = typeof params.groupId === "string" ? params.groupId.trim() : "";
+  const date = typeof params.date === "string" && params.date.trim().length > 0 ? params.date : DEFAULT_BUS_DATE;
+  const query = typeof params.q === "string" ? params.q.trim() : "";
+
+  const result =
+    groupId.length > 0
+      ? await fetchJson<BusDeparturesResponse>(
+          `/bus/groups/${encodeURIComponent(groupId)}/departures?date=${encodeURIComponent(date)}&windowMinutes=1440&limit=500`
+        )
+      : stopId.length > 0
+      ? await fetchJson<BusDeparturesResponse>(
+          `/bus/departures/${encodeURIComponent(stopId)}?date=${encodeURIComponent(date)}&windowMinutes=1440&limit=500`
+        )
+      : { data: null, error: null };
+
+  const calendarByRoute = new Map<
+    string,
+    Awaited<ReturnType<typeof fetchJson<BusRouteCalendarResponse>>>
+  >();
+
+  if (result.data) {
+    const routeIds = Array.from(new Set(result.data.departures.map((departure) => departure.routeId)));
+    const calendarEntries = await Promise.all(
+      routeIds.map(async (routeId) => {
+        const calendar = await fetchJson<BusRouteCalendarResponse>(
+          `/bus/routes/${encodeURIComponent(routeId)}/calendar?date=${encodeURIComponent(date)}`
+        );
+        return [routeId, calendar] as const;
+      })
+    );
+
+    for (const [routeId, calendar] of calendarEntries) {
+      calendarByRoute.set(routeId, calendar);
+    }
+  }
+
+  const serviceSummaries: ServiceSummary[] = result.data
+    ? Array.from(
+        result.data.departures.reduce((map, departure) => {
+          const lineRef = departure.lineRef ?? getRouteCode(departure.routeId);
+          const key = [
+            departure.routeId,
+            lineRef,
+            departure.direction ?? "",
+            departure.destinationDisplay ?? "",
+          ].join("::");
+
+          const existing = map.get(key);
+          if (existing) {
+            existing.departures.push(departure);
+            return map;
+          }
+
+          const calendar = calendarByRoute.get(departure.routeId);
+          map.set(key, {
+            key,
+            routeId: departure.routeId,
+            lineRef,
+            direction: departure.direction ?? null,
+            destinationDisplay: departure.destinationDisplay ?? null,
+            operatorName:
+              departure.operator?.name ?? departure.operator?.operatorId ?? "Unknown operator",
+            departures: [departure],
+            calendarData: calendar?.data ?? null,
+            calendarError: calendar?.error ?? null,
+          });
+
+          return map;
+        }, new Map<string, ServiceSummary>())
+      )
+        .map(([, summary]) => ({
+          ...summary,
+          departures: [...summary.departures].sort(
+            (left, right) =>
+              new Date(left.departureTime).getTime() - new Date(right.departureTime).getTime()
+          ),
+        }))
+        .sort(
+          (left, right) =>
+            new Date(left.departures[0]?.departureTime ?? 0).getTime() -
+            new Date(right.departures[0]?.departureTime ?? 0).getTime()
+        )
+    : [];
+  const initialStop = getInitialStop(params, result.data);
+
+  return (
+    <AppShell activePath="boards">
+      <PageHeader
+        eyebrow="Bus board"
+        title={result.data?.scope.name ?? "Bus departures"}
+        description={
+          result.data?.scope.type === "bus_stop_group"
+            ? "Scheduled stop-group board for the full service day. This page aggregates the fixed-timetable services expected across the grouped bus-station stands, without live vehicle tracking."
+            : "Scheduled stop board for the full service day. This page shows the services expected at this stop from fixed timetable and calendar data, without live vehicle tracking."
+        }
+        backHref="/boards"
+        backLabel="Back"
+      />
+
+      {result.data ? (
+        <BoardVisitTracker
+          mode="bus"
+          location={{
+            type: result.data.scope.type,
+            id: result.data.scope.id,
+            code: result.data.scope.code,
+            name: result.data.scope.name,
+            localityName: result.data.scope.localityName,
+          }}
+          href={
+            result.data.scope.type === "bus_stop_group"
+              ? `/location-info/bus?groupId=${encodeURIComponent(result.data.scope.id)}&date=${encodeURIComponent(date)}&groupName=${encodeURIComponent(result.data.scope.name)}${result.data.scope.localityName ? `&stopLocalityName=${encodeURIComponent(result.data.scope.localityName)}` : ""}`
+              : `/location-info/bus?stopId=${encodeURIComponent(result.data.scope.code)}&date=${encodeURIComponent(date)}`
+          }
+        />
+      ) : null}
+
+      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
+        <div className="space-y-4">
+          {result.error ? (
+            <PanelCard eyebrow="Bus error" title="Unable to load the bus board">
+              <p className="text-sm text-rose-700">{result.error}</p>
+            </PanelCard>
+          ) : null}
+
+          {result.data ? (
+            result.data.departures.length === 0 ? (
+              <PanelCard eyebrow="No services" title="No scheduled services were found">
+                <p className="text-sm text-[var(--muted)]">
+                  No scheduled services were returned for this {result.data.scope.type === "bus_stop_group" ? "stop group" : "stop"} on the selected service date.
+                </p>
+              </PanelCard>
+            ) : (
+              <>
+                <PanelCard eyebrow="Service day" title="What serves this stop today">
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div className="app-stat-tile">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Services</div>
+                      <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">{serviceSummaries.length}</div>
+                    </div>
+                    <div className="app-stat-tile">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Departures</div>
+                      <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">{result.data.count}</div>
+                    </div>
+                    <div className="app-stat-tile">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">First bus</div>
+                      <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
+                        {formatShortTime(result.data.departures[0]?.departureTime ?? null)}
+                      </div>
+                    </div>
+                    <div className="app-stat-tile">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                        {result.data.scope.type === "bus_stop_group" ? "Stands" : "Board type"}
+                      </div>
+                      <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
+                        {result.data.scope.type === "bus_stop_group" ? result.data.scope.memberStopIds?.length ?? 0 : "Single"}
+                      </div>
+                    </div>
+                    <div className="app-stat-tile">
+                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Last bus</div>
+                      <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
+                        {formatShortTime(result.data.departures[result.data.departures.length - 1]?.departureTime ?? null)}
+                      </div>
+                    </div>
+                  </div>
+                </PanelCard>
+
+                {serviceSummaries.map((summary) => {
+                  const badge = getBusBadge(summary.calendarData);
+
+                  return (
+                    <PanelCard
+                      key={summary.key}
+                      eyebrow="Service"
+                      title={`${summary.lineRef} · ${summary.destinationDisplay ?? "Destination unavailable"}`}
+                    >
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="space-y-2">
+                          <div className="text-sm text-[var(--muted)]">
+                            {summary.operatorName}
+                            {summary.direction ? ` · ${summary.direction}` : ""}
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            <div className="app-stat-tile">
+                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">First</div>
+                              <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
+                                {formatShortTime(summary.departures[0]?.departureTime ?? null)}
+                              </div>
+                            </div>
+                            <div className="app-stat-tile">
+                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Last</div>
+                              <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
+                                {formatShortTime(summary.departures[summary.departures.length - 1]?.departureTime ?? null)}
+                              </div>
+                            </div>
+                            <div className="app-stat-tile">
+                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Calls</div>
+                              <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
+                                {summary.departures.length}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold ${badge.className}`}>
+                          {badge.label}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {summary.departures.slice(0, 12).map((departure) => (
+                          <span
+                            key={departure.scheduleId}
+                            className="rounded-full border border-[var(--outline)] bg-[var(--surface-accent)] px-3 py-1 text-sm font-semibold text-[var(--brand)] shadow-[var(--shadow-soft)]"
+                          >
+                            {formatShortTime(departure.departureTime)}
+                          </span>
+                        ))}
+                        {summary.departures.length > 12 ? (
+                          <span className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-1 text-sm font-semibold text-[var(--muted)]">
+                            +{summary.departures.length - 12} more
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {summary.calendarData ? (
+                        <div className="mt-4 rounded-2xl bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
+                          Runs {summary.calendarData.calendar.validFrom ? formatShortDate(summary.calendarData.calendar.validFrom) : "now"} to{" "}
+                          {summary.calendarData.calendar.validTo ? formatShortDate(summary.calendarData.calendar.validTo) : "open"}
+                        </div>
+                      ) : summary.calendarError ? (
+                        <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+                          Calendar lookup failed: {summary.calendarError}
+                        </div>
+                      ) : null}
+                    </PanelCard>
+                  );
+                })}
+              </>
+            )
+          ) : (
+            <PanelCard eyebrow="Bus board" title="Search for a stop">
+              <p className="text-sm text-[var(--muted)]">
+                Search by stop name or grouped hub name and pick the correct result from the suggestions to load the scheduled stop board.
+              </p>
+            </PanelCard>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          <PanelCard eyebrow="Controls" title="Load another stop">
+            <BusBoardControls initialStop={initialStop} initialDate={date} query={query} />
+          </PanelCard>
+
+          <PanelCard eyebrow="Data state" title="Scheduled fallback">
+            <div className="space-y-3 text-sm text-[var(--muted)]">
+              <p>Last updated {formatTimestamp(result.data?.dataState.lastUpdated ?? null)}.</p>
+              <p>Live bus positions and predicted arrivals are not used on this page yet.</p>
+              {result.data ? (
+                <p>
+                  Service date {result.data.window.serviceDate} · {result.data.count} scheduled departures returned for this {result.data.scope.type === "bus_stop_group" ? "stop group" : "stop"}.
+                </p>
+              ) : null}
+            </div>
+          </PanelCard>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

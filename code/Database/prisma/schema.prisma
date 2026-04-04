@@ -39,6 +39,21 @@ enum ConfidenceLevel {
   LOW
 }
 
+enum BusJourneyTimingSource {
+  VEHICLE_JOURNEY_LINKS
+  JOURNEY_PATTERN_LINKS
+  DERIVED_FROM_PATTERN_PEER
+  INTERPOLATED
+  UNUSABLE
+}
+
+enum BusJourneyTimingQuality {
+  EXACT
+  REPAIRED
+  ESTIMATED
+  INVALID
+}
+
 /**
  * =========================
  * Core Domain (normalised)
@@ -64,8 +79,7 @@ model BusRoute {
   operatorId String?
   operator   Operator? @relation(fields: [operatorId], references: [operatorId], onDelete: SetNull)
 
-  routeStops           RouteStop[]
-  busRouteStops        BusRouteStop[]
+  busJourneys          BusJourney[]
   busServiceCalendar   BusServiceCalendar?
   busServiceExceptions BusServiceException[]
   railServiceSchedules RailServiceSchedule[]
@@ -108,7 +122,6 @@ model Station {
   latitude  Float?
   longitude Float?
 
-  routeStops       RouteStop[]
   railServiceStops RailServiceStop[]
   serviceStatuses  ServiceStatus[]
   historicalPerf   HistoricalPerformance[]
@@ -133,7 +146,7 @@ model BusStop {
 
   locality Locality? @relation(fields: [localityId], references: [localityId], onDelete: SetNull)
 
-  busRouteStops BusRouteStop[]
+  busJourneyStops BusJourneyStop[]
   busSchedules  BusSchedule[]
 
   createdAt DateTime @default(now())
@@ -144,37 +157,63 @@ model BusStop {
 }
 
 /**
- * Rail route stop mapping (Route -> Station)
- * Used for RAIL mode only.
+ * Full-fidelity bus journey snapshot derived from one TransXChange VehicleJourney.
+ * This preserves journey-level identity that BusSchedule intentionally flattens away.
  */
-model RouteStop {
-  routeId   String
-  stationId String
-  stopOrder Int
+model BusJourney {
+  journeyId String @id @default(uuid())
+  journeyKey String @unique
 
-  route   BusRoute   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
-  station Station @relation(fields: [stationId], references: [stationId], onDelete: Cascade)
+  routeId String
+  route   BusRoute @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
 
-  @@id([routeId, stationId])
-  @@unique([routeId, stopOrder])
-  @@index([stationId])
+  vehicleJourneyCode String
+  journeyPatternRef  String
+  lineRef            String?
+  direction          String?
+  destinationDisplay String?
+
+  serviceDate   DateTime
+  departureTime DateTime
+  sourceFile    String
+
+  timingSource        BusJourneyTimingSource  @default(UNUSABLE)
+  timingQuality       BusJourneyTimingQuality @default(INVALID)
+  totalEdgeCount      Int                     @default(0)
+  positiveEdgeCount   Int                     @default(0)
+  nonPositiveEdgeCount Int                    @default(0)
+  timingRepairNote    String?
+
+  stops BusJourneyStop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([routeId])
+  @@index([serviceDate])
+  @@index([serviceDate, timingQuality])
+  @@index([departureTime])
+  @@index([sourceFile])
+  @@index([vehicleJourneyCode])
 }
 
-/**
- * Bus route stop mapping (Route -> BusStop)
- * Used for BUS mode only.
- */
-model BusRouteStop {
-  routeId   String
-  stopId    String
-  stopOrder Int
+model BusJourneyStop {
+  journeyStopId String @id @default(uuid())
+  journeyId     String
+  stopId        String
+  stopSeq       Int
+  arrivalTime   DateTime
+  departureTime DateTime
+  offsetSeconds Int
 
-  route   BusRoute   @relation(fields: [routeId], references: [routeId], onDelete: Cascade)
-  busStop BusStop @relation(fields: [stopId], references: [stopId], onDelete: Cascade)
+  journey BusJourney @relation(fields: [journeyId], references: [journeyId], onDelete: Cascade)
+  busStop  BusStop   @relation(fields: [stopId], references: [stopId], onDelete: Cascade)
 
-  @@id([routeId, stopId])
-  @@unique([routeId, stopOrder])
+  createdAt DateTime @default(now())
+
+  @@unique([journeyId, stopSeq])
   @@index([stopId])
+  @@index([departureTime])
 }
 
 /**
@@ -326,6 +365,7 @@ model BusSchedule {
   @@index([routeId])
   @@index([stopId])
   @@index([arrivalTime])
+  @@unique([routeId, stopId, arrivalTime, departureTime])
 }
 
 /**
