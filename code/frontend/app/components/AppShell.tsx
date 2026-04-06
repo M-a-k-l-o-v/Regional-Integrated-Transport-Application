@@ -67,7 +67,7 @@ export default function AppShell({ activePath, children }: AppShellProps) {
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
       {/* Desktop top nav */}
-      <header className="sticky top-0 z-50 hidden border-b border-[var(--outline)] bg-[var(--surface)]/80 backdrop-blur-xl md:block" role="banner">
+      <header className="sticky top-0 z-[800] hidden border-b border-[var(--outline)] bg-[var(--surface)]/80 backdrop-blur-xl md:block" role="banner">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <Link href="/home" className="text-base font-bold tracking-tight text-[var(--brand)]" aria-label="Lancashire Transport — Home">
             Lancashire Transport
