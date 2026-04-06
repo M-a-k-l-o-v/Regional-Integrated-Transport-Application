@@ -75,6 +75,7 @@ export const DEFAULT_RAIL_BOARD_LOCATIONS: PlannerLocation[] = [
 ];
 
 export type JourneyPreference = "fastest" | "balanced" | "fewest_changes";
+export type TransitModeFilter = "bus" | "rail";
 
 export type SearchResponse = {
   query: string;
@@ -94,9 +95,9 @@ export type HealthResponse = {
 };
 
 export type DataState = {
-  mode: "scheduled";
-  isLive: false;
-  fallback: true;
+  mode: "scheduled" | "live";
+  isLive: boolean;
+  fallback: boolean;
   lastUpdated: string | null;
 };
 
@@ -107,6 +108,8 @@ export type BusDeparturesResponse = {
     code: string;
     name: string;
     localityName: string | null;
+    latitude: number | null;
+    longitude: number | null;
     memberStopIds?: string[];
   };
   dataState: DataState;
@@ -136,6 +139,8 @@ export type RailDeparturesResponse = {
   station: {
     stationId: string;
     name: string;
+    latitude: number | null;
+    longitude: number | null;
   };
   dataState: DataState;
   window: {
@@ -213,11 +218,14 @@ export type JourneyPlanResponse = {
       to: PlannerLocation;
       departureTime: string | null;
       arrivalTime: string | null;
+      scheduledDepartureTime: string | null;
+      liveDelayMinutes: number | null;
       line: string | null;
       operator: string | null;
       routeId: string | null;
       scheduleId: string | null;
       isScheduled: true;
+      bankHolidayAdvisory?: boolean;
     }>;
   }>;
 };
@@ -254,6 +262,14 @@ export type JourneyLegDetailResponse = {
     weather: {
       available: boolean;
       message: string;
+      locationName: string | null;
+      description: string | null;
+      icon: string | null;
+      temperatureC: number | null;
+      feelsLikeC: number | null;
+      humidity: number | null;
+      windSpeedMps: number | null;
+      updatedAt: string | null;
     };
     disruptions: {
       available: boolean;
@@ -263,6 +279,7 @@ export type JourneyLegDetailResponse = {
         description: string;
         startTime: string | null;
         endTime: string | null;
+        source?: string | null;
       }>;
     };
     reliability: {
@@ -278,9 +295,217 @@ export type JourneyLegDetailResponse = {
       delayMinutes: number | null;
       cancellationFlag: boolean | null;
       lastUpdated: string | null;
+      source: string | null;
+      summary: string | null;
+      liveDepartureTime: string | null;
+      expectedDepartureTime: string | null;
+      platform: string | null;
+      monitoredVehicleCount: number | null;
+      lineVehicleCount: number | null;
     };
   };
 };
+
+export type WeatherCurrentResponse = JourneyLegDetailResponse["status"]["weather"];
+
+export type RailLiveDeparturesResponse = {
+  generatedAt: string | null;
+  locationName: string | null;
+  crs: string | null;
+  nrccMessages: string[];
+  trainServices: Array<{
+    std: string | null;
+    etd: string | null;
+    platform: string | null;
+    operator: string | null;
+    operatorCode: string | null;
+    serviceType: string | null;
+    serviceId: string | null;
+    rsid: string | null;
+    originName: string | null;
+    destinationName: string | null;
+  }>;
+  busServices: Array<{
+    std: string | null;
+    etd: string | null;
+    platform: string | null;
+    operator: string | null;
+    operatorCode: string | null;
+    serviceType: string | null;
+    serviceId: string | null;
+    rsid: string | null;
+    originName: string | null;
+    destinationName: string | null;
+  }>;
+};
+
+export type StationFacilities = {
+  crs: string;
+  name: string;
+  staffed: boolean;
+  ticketOffice: {
+    available: boolean;
+    hours: string | null;
+    ticketMachine: boolean;
+  };
+  accessibility: {
+    stepFreeAccess: "full" | "partial" | "none";
+    stepFreeNote: string | null;
+    ramp: boolean;
+    lift: boolean;
+    accessibleToilet: boolean;
+    inductionLoop: boolean;
+    tactileSurfaces: boolean;
+    wheelchairAvailable: boolean;
+    staffAssistance: boolean;
+    staffAssistanceNote: string | null;
+  };
+  parking: {
+    available: boolean;
+    spaces: number | null;
+    blueBadgeSpaces: number | null;
+    charges: string | null;
+    operator: string | null;
+  };
+  toilets: {
+    available: boolean;
+    accessible: boolean;
+    babyChange: boolean;
+  };
+  amenities: {
+    wifi: boolean;
+    waitingRoom: boolean;
+    seatedArea: boolean;
+    cafe: boolean;
+    shops: boolean;
+    bikeStorage: boolean;
+    bikeSpaces: number | null;
+    taxiRank: boolean;
+    carHire: boolean;
+    leftLuggage: boolean;
+    customerHelpPoint: boolean;
+  };
+  contact: {
+    phone: string | null;
+    address: string | null;
+  };
+};
+
+export type StationFacilitiesResponse = {
+  crs: string;
+  fetchedAt: string;
+  facilities: StationFacilities | null;
+};
+
+export type VmsSign = {
+  id: string;
+  road: string;
+  description: string;
+  latitude: number | null;
+  longitude: number | null;
+  direction: string | null;
+  junction: string | null;
+  message: string | null;
+  messageLines: string[];
+  setBy: string | null;
+  lastUpdated: string | null;
+  isBlank: boolean;
+};
+
+export type VmsResponse = {
+  road: string;
+  fetchedAt: string;
+  signs: VmsSign[];
+};
+
+export type BusLiveResponse = {
+  responseTimestamp: string | null;
+  validUntil: string | null;
+  vehicles: Array<{
+    recordedAtTime: string | null;
+    lineRef: string | null;
+    publishedLineName: string | null;
+    operatorRef: string | null;
+    directionRef: string | null;
+    originName: string | null;
+    destinationName: string | null;
+    originAimedDepartureTime: string | null;
+    monitored: boolean | null;
+    vehicleRef: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    bearing: number | null;
+    monitoredCallDelayMinutes: number | null;
+  }>;
+};
+
+function getLondonDateParts(value: Date = new Date()) {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+
+  const parts = formatter.formatToParts(value);
+  const read = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return {
+    year: read("year"),
+    month: read("month"),
+    day: read("day"),
+    hour: read("hour"),
+    minute: read("minute"),
+  };
+}
+
+export function getLondonTodayDate(): string {
+  const { year, month, day } = getLondonDateParts();
+  return `${year}-${month}-${day}`;
+}
+
+export function getLondonCurrentTime(): string {
+  const { hour, minute } = getLondonDateParts();
+  return `${hour}:${minute}`;
+}
+
+export function getLondonCurrentPlannerDefaults() {
+  return {
+    date: getLondonTodayDate(),
+    time: getLondonCurrentTime(),
+  };
+}
+
+export function getLondonGreeting(): string {
+  const hour = Number.parseInt(getLondonDateParts().hour, 10);
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+export function formatFreshnessLabel(value: string | null, nowMs: number = Date.now()): {
+  label: string;
+  tone: "fresh" | "aging" | "stale" | "unknown";
+} {
+  if (!value) {
+    return { label: "No timestamp", tone: "unknown" };
+  }
+
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) {
+    return { label: "Timestamp unavailable", tone: "unknown" };
+  }
+
+  const diffMinutes = Math.max(0, Math.floor((nowMs - timestamp) / 60000));
+  if (diffMinutes < 1) return { label: "Fresh now", tone: "fresh" };
+  if (diffMinutes < 3) return { label: `Updated ${diffMinutes}m ago`, tone: "fresh" };
+  if (diffMinutes < 8) return { label: `Aging · ${diffMinutes}m old`, tone: "aging" };
+  return { label: `Stale · ${diffMinutes}m old`, tone: "stale" };
+}
 
 type ApiResult<T> = {
   data: T | null;

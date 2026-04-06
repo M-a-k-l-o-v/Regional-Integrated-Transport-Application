@@ -20,17 +20,26 @@ function buildLeg(edge: TakenEdge, graph: TransitGraph): JourneyLegResponse {
     throw new Error(`Missing node metadata for edge ${edge.fromNodeId} -> ${edge.toNodeId}`);
   }
 
+  const delayMinutes = edge.liveDelayMinutes ?? null;
+  const scheduledDepartureTime =
+    delayMinutes !== null && edge.actualDepartureTimeMs !== null
+      ? formatPlannerIso(edge.actualDepartureTimeMs - delayMinutes * 60_000)
+      : null;
+
   return {
     mode: edge.mode,
     from: toResponseLocation(fromNode),
     to: toResponseLocation(toNode),
     departureTime: formatPlannerIso(edge.actualDepartureTimeMs),
     arrivalTime: formatPlannerIso(edge.actualArrivalTimeMs),
+    scheduledDepartureTime,
+    liveDelayMinutes: delayMinutes,
     line: edge.line,
     operator: edge.operator,
     routeId: edge.routeId,
     scheduleId: edge.scheduleId,
     isScheduled: true,
+    bankHolidayAdvisory: edge.bankHolidayAdvisory || undefined,
   };
 }
 

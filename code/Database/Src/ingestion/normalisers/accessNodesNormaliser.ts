@@ -3,6 +3,7 @@ import { parse } from "csv-parse/sync";
 export type NormalisedAccessNode = {
   stopId: string;              // ATCOCode (BusStop primary key)
   name: string;
+  indicator: string | null;    // NaPTAN Indicator (e.g. "Stand 1", "Stop A")
   latitude: number | null;
   longitude: number | null;
   localityId: string | null;   // NptgLocalityCode if present
@@ -37,6 +38,9 @@ export function normaliseAccessNodes(csvText: string): NormalisedAccessNode[] {
       const stopType =
         r.StopType ?? r.NodeType ?? r.StopClassification ?? null;
 
+      const indicator =
+        r.Indicator ?? r.indicator ?? null;
+
       if (!atco || !name) return null;
 
       /* ===== BUS STOP DOMAIN OBJECT =====
@@ -46,6 +50,7 @@ export function normaliseAccessNodes(csvText: string): NormalisedAccessNode[] {
       return {
         stopId: String(atco),
         name: String(name),
+        indicator: indicator ? String(indicator).trim() || null : null,
         latitude: latRaw ? Number(latRaw) : null,
         longitude: lonRaw ? Number(lonRaw) : null,
         localityId: locality ? String(locality) : null,

@@ -1,17 +1,22 @@
 import AppShell from "../../components/AppShell";
+import BoardAutoRefresh from "../../components/BoardAutoRefresh";
 import BoardVisitTracker from "../../components/BoardVisitTracker";
 import BusBoardControls from "../../components/BusBoardControls";
+import BusBoardStatusPanel from "../../components/BusBoardStatusPanel";
 import PageHeader from "../../components/PageHeader";
 import PanelCard from "../../components/PanelCard";
 import {
   BusDeparturesResponse,
+  BusLiveResponse,
   BusRouteCalendarResponse,
   DEFAULT_BUS_DATE,
   PlannerLocation,
+  WeatherCurrentResponse,
   fetchJson,
   formatShortDate,
   formatShortTime,
   formatTimestamp,
+  getLondonTodayDate,
   getRouteCode,
 } from "../../lib/transportApi";
 
@@ -41,6 +46,17 @@ type ServiceSummary = {
   departures: BusDeparturesResponse["departures"];
   calendarData: BusRouteCalendarResponse | null;
   calendarError: string | null;
+};
+
+type BusOperationalSnapshot = {
+  weather: WeatherCurrentResponse | null;
+  live: {
+    operatorCount: number;
+    vehicleCount: number;
+    monitoredVehicleCount: number;
+    lastUpdated: string | null;
+    matchedLines: string[];
+  } | null;
 };
 
 function getBusBadge(calendarData: BusRouteCalendarResponse | null) {
@@ -98,6 +114,65 @@ function getInitialStop(
     code: stopCode || stopId,
     name: stopName,
     localityName: stopLocalityName,
+  };
+}
+
+async function loadBusOperationalSnapshot(
+  result: BusDeparturesResponse | null,
+  serviceSummaries: ServiceSummary[]
+): Promise<BusOperationalSnapshot> {
+  if (!result) {
+    return { weather: null, live: null };
+  }
+
+  const liveOperators = Array.from(
+    new Set(result.departures.map((departure) => departure.operator?.operatorId).filter((value): value is string => Boolean(value)))
+  );
+  const serviceLabels = new Set(serviceSummaries.map((summary) => summary.lineRef.trim().toUpperCase()));
+
+  const [weatherResult, liveResults] = await Promise.all([
+    result.scope.latitude !== null && result.scope.longitude !== null
+      ? fetchJson<WeatherCurrentResponse>(
+          `/weather/current?lat=${encodeURIComponent(String(result.scope.latitude))}&lon=${encodeURIComponent(String(result.scope.longitude))}`
+        )
+      : Promise.resolve({ data: null, error: null }),
+    Promise.all(
+      liveOperators.slice(0, 4).map(async (operatorId) => {
+        const live = await fetchJson<BusLiveResponse>(`/bus/live/${encodeURIComponent(operatorId)}`);
+        return live.data;
+      })
+    ),
+  ]);
+
+  const matchingVehicles = liveResults
+    .flatMap((snapshot) => snapshot?.vehicles ?? [])
+    .filter((vehicle) => {
+      const liveLine = (vehicle.publishedLineName ?? vehicle.lineRef ?? "").trim().toUpperCase();
+      return liveLine.length > 0 && serviceLabels.has(liveLine);
+    });
+
+  return {
+    weather: weatherResult.data,
+    live: liveOperators.length > 0
+      ? {
+          operatorCount: liveOperators.length,
+          vehicleCount: matchingVehicles.length,
+          monitoredVehicleCount: matchingVehicles.filter((vehicle) => vehicle.monitored === true).length,
+          lastUpdated:
+            matchingVehicles
+              .map((vehicle) => vehicle.recordedAtTime)
+              .filter((value): value is string => Boolean(value))
+              .sort()
+              .at(-1) ?? null,
+          matchedLines: Array.from(
+            new Set(
+              matchingVehicles
+                .map((vehicle) => (vehicle.publishedLineName ?? vehicle.lineRef ?? "").trim())
+                .filter((value) => value.length > 0)
+            )
+          ).sort(),
+        }
+      : null,
   };
 }
 
@@ -188,6 +263,13 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
         )
     : [];
   const initialStop = getInitialStop(params, result.data);
+  const operationalSnapshot = await loadBusOperationalSnapshot(result.data, serviceSummaries);
+  const selectedServiceDate = result.data?.window.serviceDate ?? null;
+  const selectedDateIsToday = selectedServiceDate !== null && selectedServiceDate === getLondonTodayDate();
+  const liveOperatorIds = Array.from(
+    new Set(result.data?.departures.map((departure) => departure.operator?.operatorId).filter((value): value is string => Boolean(value)) ?? [])
+  );
+  const liveLineLabels = serviceSummaries.map((summary) => summary.lineRef);
 
   return (
     <AppShell activePath="boards">
@@ -196,8 +278,8 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
         title={result.data?.scope.name ?? "Bus departures"}
         description={
           result.data?.scope.type === "bus_stop_group"
-            ? "Scheduled stop-group board for the full service day. This page aggregates the fixed-timetable services expected across the grouped bus-station stands, without live vehicle tracking."
-            : "Scheduled stop board for the full service day. This page shows the services expected at this stop from fixed timetable and calendar data, without live vehicle tracking."
+            ? "Scheduled departures across all stands for the full service day."
+            : "Scheduled departures for the full service day."
         }
         backHref="/boards"
         backLabel="Back"
@@ -223,6 +305,8 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
 
       <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
         <div className="space-y-4">
+          {(groupId.length > 0 || stopId.length > 0) ? <BoardAutoRefresh intervalSeconds={90} /> : null}
+
           {result.error ? (
             <PanelCard eyebrow="Bus error" title="Unable to load the bus board">
               <p className="text-sm text-rose-700">{result.error}</p>
@@ -241,21 +325,21 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
                 <PanelCard eyebrow="Service day" title="What serves this stop today">
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="app-stat-tile">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Services</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Services</div>
                       <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">{serviceSummaries.length}</div>
                     </div>
                     <div className="app-stat-tile">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Departures</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Departures</div>
                       <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">{result.data.count}</div>
                     </div>
                     <div className="app-stat-tile">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">First bus</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">First bus</div>
                       <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
                         {formatShortTime(result.data.departures[0]?.departureTime ?? null)}
                       </div>
                     </div>
                     <div className="app-stat-tile">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                         {result.data.scope.type === "bus_stop_group" ? "Stands" : "Board type"}
                       </div>
                       <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
@@ -263,7 +347,7 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
                       </div>
                     </div>
                     <div className="app-stat-tile">
-                      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Last bus</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Last bus</div>
                       <div className="mt-1 text-2xl font-semibold text-[var(--brand-ink)]">
                         {formatShortTime(result.data.departures[result.data.departures.length - 1]?.departureTime ?? null)}
                       </div>
@@ -288,19 +372,19 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
                           </div>
                           <div className="grid gap-3 sm:grid-cols-3">
                             <div className="app-stat-tile">
-                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">First</div>
+                              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">First</div>
                               <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
                                 {formatShortTime(summary.departures[0]?.departureTime ?? null)}
                               </div>
                             </div>
                             <div className="app-stat-tile">
-                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Last</div>
+                              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Last</div>
                               <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
                                 {formatShortTime(summary.departures[summary.departures.length - 1]?.departureTime ?? null)}
                               </div>
                             </div>
                             <div className="app-stat-tile">
-                              <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Calls</div>
+                              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Calls</div>
                               <div className="mt-1 text-lg font-semibold text-[var(--brand-ink)]">
                                 {summary.departures.length}
                               </div>
@@ -358,16 +442,20 @@ export default async function BusLocationPage({ searchParams }: BusPageProps) {
             <BusBoardControls initialStop={initialStop} initialDate={date} query={query} />
           </PanelCard>
 
-          <PanelCard eyebrow="Data state" title="Scheduled fallback">
-            <div className="space-y-3 text-sm text-[var(--muted)]">
-              <p>Last updated {formatTimestamp(result.data?.dataState.lastUpdated ?? null)}.</p>
-              <p>Live bus positions and predicted arrivals are not used on this page yet.</p>
-              {result.data ? (
-                <p>
-                  Service date {result.data.window.serviceDate} · {result.data.count} scheduled departures returned for this {result.data.scope.type === "bus_stop_group" ? "stop group" : "stop"}.
-                </p>
-              ) : null}
-            </div>
+          <PanelCard eyebrow="More details" title="Live context and board information">
+            <BusBoardStatusPanel
+              latitude={result.data?.scope.latitude ?? null}
+              longitude={result.data?.scope.longitude ?? null}
+              operatorIds={liveOperatorIds}
+              lineLabels={liveLineLabels}
+              selectedServiceDate={selectedServiceDate}
+              scopeType={result.data?.scope.type ?? "bus_stop"}
+              dataStateLastUpdated={result.data?.dataState.lastUpdated ?? null}
+              serviceDate={result.data?.window.serviceDate ?? null}
+              scheduledDepartureCount={result.data?.count ?? 0}
+              initialWeather={operationalSnapshot.weather}
+              initialLive={operationalSnapshot.live}
+            />
           </PanelCard>
         </div>
       </div>

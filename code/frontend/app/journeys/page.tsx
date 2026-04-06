@@ -3,6 +3,8 @@ import JourneyPlannerForm from "../components/JourneyPlannerForm";
 import PageHeader from "../components/PageHeader";
 import PanelCard from "../components/PanelCard";
 import JourneyResultsExplorer from "./JourneyResultsExplorer";
+import RecentJourneyStrip from "./RecentJourneyStrip";
+import SaveRecentJourney from "./SaveRecentJourney";
 import { routeGeometryService } from "./RouteGeometryService";
 import { JourneyRouteShape } from "./types";
 import {
@@ -10,8 +12,10 @@ import {
   JourneyPlanResponse,
   JourneyPreference,
   PlannerLocation,
+  TransitModeFilter,
   buildJourneyLegDetailPath,
   fetchJson,
+  getLondonCurrentPlannerDefaults,
   postJson,
 } from "../lib/transportApi";
 
@@ -41,6 +45,32 @@ function formatLocationHeading(location: PlannerLocation | null): string {
 function parsePreference(value: string | undefined): JourneyPreference {
   if (value === "balanced" || value === "fewest_changes") return value;
   return "fastest";
+}
+
+function parseModes(raw: string | string[] | undefined): TransitModeFilter[] | undefined {
+  if (!raw) return undefined;
+  const values = Array.isArray(raw) ? raw : [raw];
+  const valid = values.filter((v): v is TransitModeFilter => v === "bus" || v === "rail");
+  return valid.length > 0 ? valid : undefined;
+}
+
+function buildJourneyHref(origin: PlannerLocation, destination: PlannerLocation, params: Record<string, string | undefined>): string {
+  const sp = new URLSearchParams();
+  sp.set("originType", origin.type);
+  sp.set("originId", origin.id);
+  sp.set("originName", origin.name);
+  sp.set("originCode", origin.code);
+  if (origin.localityName) sp.set("originLocalityName", origin.localityName);
+  sp.set("destinationType", destination.type);
+  sp.set("destinationId", destination.id);
+  sp.set("destinationName", destination.name);
+  sp.set("destinationCode", destination.code);
+  if (destination.localityName) sp.set("destinationLocalityName", destination.localityName);
+  if (params.preference) sp.set("preference", params.preference);
+  if (params.date) sp.set("date", params.date);
+  if (params.time) sp.set("time", params.time);
+  if (params.modes) sp.set("modes", params.modes);
+  return `/journeys?${sp.toString()}`;
 }
 
 function getLegKey(leg: JourneyPlanResponse["itineraries"][number]["legs"][number]): string | null {
@@ -126,11 +156,13 @@ async function buildRouteShapes(
 
 export default async function JourneysPage({ searchParams }: JourneysPageProps) {
   const params = (await searchParams) ?? {};
+  const plannerDefaults = getLondonCurrentPlannerDefaults();
   const origin = parseLocation(params, "origin");
   const destination = parseLocation(params, "destination");
   const preference = parsePreference(params.preference);
-  const date = params.date ?? "2026-05-04";
-  const time = params.time ?? "08:00";
+  const date = params.date ?? plannerDefaults.date;
+  const time = params.time ?? plannerDefaults.time;
+  const modes = parseModes(params.modes);
 
   const result =
     origin && destination
@@ -141,17 +173,23 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
           time,
           preference,
           maxItineraries: 8,
+          ...(modes ? { modes } : {}),
         })
       : { data: null, error: null };
 
-  const routeShapes = result.data ? await buildRouteShapes(result.data.itineraries, await loadLegDetails(result.data.itineraries)) : [];
+  const legDetailsMap = result.data ? await loadLegDetails(result.data.itineraries) : new Map();
+  const routeShapes = result.data ? await buildRouteShapes(result.data.itineraries, legDetailsMap) : [];
+  const legDetailsRecord: Record<string, JourneyLegDetailResponse> = {};
+  for (const [key, value] of legDetailsMap) {
+    legDetailsRecord[key] = value;
+  }
 
   return (
     <AppShell activePath="journeys">
       <PageHeader
         eyebrow="Journey results"
         title={origin && destination ? `${formatLocationHeading(origin)} to ${formatLocationHeading(destination)}` : "Scheduled planner results"}
-        description="Compare the main scheduled route on the map, switch to alternative options, and expand the list when you want more than the top few returned journeys."
+        description="Compare routes on the map and pick the best option."
         backHref="/home"
         backLabel="Back to planner"
       />
@@ -164,10 +202,8 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
         ) : null}
 
         {!origin || !destination ? (
-          <PanelCard eyebrow="Planner" title="Choose both ends of the journey first">
-            <p className="text-sm text-[var(--muted)]">
-              Use the planner form below to select an origin and a destination from the search suggestions.
-            </p>
+          <PanelCard eyebrow="Recent journeys" title="Pick up where you left off">
+            <RecentJourneyStrip />
           </PanelCard>
         ) : null}
 
@@ -179,12 +215,22 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
           </PanelCard>
         ) : null}
 
-        {result.data && result.data.itineraries.length > 0 ? (
-          <JourneyResultsExplorer
-            itineraries={result.data.itineraries}
-            routeShapes={routeShapes}
-            preference={preference}
-          />
+        {result.data && result.data.itineraries.length > 0 && origin && destination ? (
+          <>
+            <SaveRecentJourney
+              originName={origin.name}
+              originLocalityName={origin.localityName ?? null}
+              destinationName={destination.name}
+              destinationLocalityName={destination.localityName ?? null}
+              href={buildJourneyHref(origin, destination, params)}
+            />
+            <JourneyResultsExplorer
+              itineraries={result.data.itineraries}
+              routeShapes={routeShapes}
+              preference={preference}
+              legDetails={legDetailsRecord}
+            />
+          </>
         ) : null}
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)]">
@@ -195,15 +241,15 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
               initialDate={date}
               initialTime={time}
               initialPreference={preference}
+              initialModes={modes}
             />
           </PanelCard>
 
-          <PanelCard eyebrow="Scope" title="What is included in v1">
-            <ul className="space-y-3 text-sm text-[var(--muted)]">
-              <li>Bus routing uses `BusJourneyStop` as the source of truth.</li>
-              <li>Rail routing uses passenger-facing public calls with STP precedence.</li>
-              <li>Walking transfers are generated from nearby stop and station coordinates.</li>
-              <li>No live delays or live bus positions are used in route choice yet.</li>
+          <PanelCard eyebrow="About" title="How routes are planned">
+            <ul className="space-y-2 text-sm text-[var(--muted)]">
+              <li>Bus routes use scheduled timetable data.</li>
+              <li>Rail routes use passenger-facing departures.</li>
+              <li>Walking transfers connect nearby stops.</li>
             </ul>
           </PanelCard>
         </div>

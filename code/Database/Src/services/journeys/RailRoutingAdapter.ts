@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { LiveMovementStore } from "../../infrastructure/liveData/LiveMovementStore";
 import { getDayIndexMondayZero, getLocalDayRange, minutesToDate, parseRailTimeToMinutes, toNodeId } from "./helpers";
 import { GraphSlice, JourneyNode, TransitEdge } from "./types";
 
@@ -11,7 +12,10 @@ function getStpPriority(stpIndicator: string | null): number {
 }
 
 export class RailRoutingAdapter {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly liveMovementStore?: LiveMovementStore,
+  ) {}
 
   async build(dateString: string): Promise<GraphSlice> {
     const { dayStart, nextDayStart } = getLocalDayRange(dateString);
@@ -115,6 +119,20 @@ export class RailRoutingAdapter {
       }
     }
 
+    // ── Live data: bulk-load stanox codes for all stations in the graph ──────
+    const stanoxByStation = new Map<string, string>();
+    if (this.liveMovementStore && this.liveMovementStore.size > 0 && stationById.size > 0) {
+      const tiplocs = await this.prisma.railTiploc.findMany({
+        where: { crsCode: { in: Array.from(stationById.keys()) } },
+        select: { crsCode: true, stanox: true },
+      });
+      for (const tiploc of tiplocs) {
+        if (tiploc.crsCode && tiploc.stanox && !stanoxByStation.has(tiploc.crsCode)) {
+          stanoxByStation.set(tiploc.crsCode, tiploc.stanox);
+        }
+      }
+    }
+
     for (const schedule of effectiveSchedules) {
       latestUpdatedAtMs = latestUpdatedAtMs === null ? schedule.updatedAt.getTime() : Math.max(latestUpdatedAtMs, schedule.updatedAt.getTime());
       const orderedStops = stopsBySchedule.get(schedule.scheduleId) ?? [];
@@ -129,22 +147,38 @@ export class RailRoutingAdapter {
         const arrivalMinutes = parseRailTimeToMinutes(next.publicArrival ?? next.publicDeparture);
         if (departureMinutes === null || arrivalMinutes === null) continue;
 
-        const departureTime = minutesToDate(dayStart, departureMinutes);
-        const arrivalTime = minutesToDate(dayStart, arrivalMinutes);
-        if (arrivalTime.getTime() <= departureTime.getTime()) continue;
+        let departureTimeMs = minutesToDate(dayStart, departureMinutes).getTime();
+        let arrivalTimeMs = minutesToDate(dayStart, arrivalMinutes).getTime();
+        if (arrivalTimeMs <= departureTimeMs) continue;
+
+        // ── Apply live delay from STOMP movement store ────────────────────
+        let liveDelayMinutes: number | null = null;
+        if (this.liveMovementStore) {
+          const stanox = stanoxByStation.get(current.stationId);
+          if (stanox) {
+            const live = this.liveMovementStore.findDeparture(stanox, departureMinutes);
+            if (live?.timetableVariationMinutes) {
+              liveDelayMinutes = live.timetableVariationMinutes;
+              const delayMs = liveDelayMinutes * 60_000;
+              departureTimeMs += delayMs;
+              arrivalTimeMs += delayMs;
+            }
+          }
+        }
 
         transitEdges.push({
           mode: "rail",
           fromNodeId: toNodeId("station", current.stationId),
           toNodeId: toNodeId("station", next.stationId),
-          departureTimeMs: departureTime.getTime(),
-          arrivalTimeMs: arrivalTime.getTime(),
-          durationMinutes: Math.max(1, Math.ceil((arrivalTime.getTime() - departureTime.getTime()) / 60000)),
+          departureTimeMs,
+          arrivalTimeMs,
+          durationMinutes: Math.max(1, Math.ceil((arrivalTimeMs - departureTimeMs) / 60000)),
           serviceKey: `rail:${schedule.scheduleId}`,
           line: schedule.trainUid,
           operator: schedule.atocCode,
           routeId: null,
           scheduleId: schedule.scheduleId,
+          liveDelayMinutes,
         });
       }
     }

@@ -1,13 +1,21 @@
 import AppShell from "../../components/AppShell";
+import BoardAutoRefresh from "../../components/BoardAutoRefresh";
 import BoardVisitTracker from "../../components/BoardVisitTracker";
 import PageHeader from "../../components/PageHeader";
 import PanelCard from "../../components/PanelCard";
+import RailDepartureList from "../../components/RailDepartureList";
+import StationFacilitiesPanel from "../../components/StationFacilitiesPanel";
+import TrainBoardStatusPanel from "../../components/TrainBoardStatusPanel";
 import TrainBoardControls from "../../components/TrainBoardControls";
 import {
   DEFAULT_TRAIN_FROM,
   PlannerLocation,
   RailDeparturesResponse,
+  RailLiveDeparturesResponse,
+  StationFacilitiesResponse,
+  WeatherCurrentResponse,
   fetchJson,
+  getLondonTodayDate,
   formatShortTime,
   formatTimestamp,
 } from "../../lib/transportApi";
@@ -50,6 +58,31 @@ function getInitialStation(
   };
 }
 
+type TrainOperationalSnapshot = {
+  weather: WeatherCurrentResponse | null;
+  liveBoard: RailLiveDeparturesResponse | null;
+};
+
+async function loadTrainOperationalSnapshot(result: RailDeparturesResponse | null): Promise<TrainOperationalSnapshot> {
+  if (!result) {
+    return { weather: null, liveBoard: null };
+  }
+
+  const [weatherResult, liveBoardResult] = await Promise.all([
+    result.station.latitude !== null && result.station.longitude !== null
+      ? fetchJson<WeatherCurrentResponse>(
+          `/weather/current?lat=${encodeURIComponent(String(result.station.latitude))}&lon=${encodeURIComponent(String(result.station.longitude))}`
+        )
+      : Promise.resolve({ data: null, error: null }),
+    fetchJson<RailLiveDeparturesResponse>(`/rail/live/departures/${encodeURIComponent(result.station.stationId)}`),
+  ]);
+
+  return {
+    weather: weatherResult.data,
+    liveBoard: liveBoardResult.data,
+  };
+}
+
 export default async function TrainLocationPage({ searchParams }: TrainPageProps) {
   const params = (await searchParams) ?? {};
   const crs = typeof params.crs === "string" ? params.crs.trim().toUpperCase() : "";
@@ -62,13 +95,23 @@ export default async function TrainLocationPage({ searchParams }: TrainPageProps
           `/rail/departures/${encodeURIComponent(crs)}?from=${encodeURIComponent(from)}&windowMinutes=240&limit=20`
         )
       : { data: null, error: null };
+  const [operationalSnapshot, facilitiesResult] = await Promise.all([
+    loadTrainOperationalSnapshot(result.data),
+    crs.length === 3
+      ? fetchJson<StationFacilitiesResponse>(`/rail/stations/${encodeURIComponent(crs)}/facilities`)
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  const facilities = facilitiesResult.data?.facilities ?? null;
+  const selectedServiceDate = result.data?.window.serviceDate ?? null;
+  const liveSnapshotDate = operationalSnapshot.liveBoard?.generatedAt?.slice(0, 10) ?? null;
+  const selectedDateIsToday = selectedServiceDate !== null && selectedServiceDate === getLondonTodayDate();
 
   return (
     <AppShell activePath="boards">
       <PageHeader
         eyebrow="Rail board"
         title={result.data?.station.name ?? "Train departures"}
-        description="Passenger-facing scheduled rail departures. Operational-only locations are filtered out and STP overlay precedence is applied before the board is rendered."
+        description="Scheduled rail departures for the selected time window."
         backHref="/boards"
         backLabel="Back"
       />
@@ -89,6 +132,8 @@ export default async function TrainLocationPage({ searchParams }: TrainPageProps
 
       <div className="grid gap-6 xl:grid-cols-[1.45fr_0.9fr]">
         <div className="space-y-4">
+          {crs.length === 3 ? <BoardAutoRefresh intervalSeconds={90} /> : null}
+
           {result.error ? (
             <PanelCard eyebrow="Rail error" title="Unable to load the rail board">
               <p className="text-sm text-rose-700">{result.error}</p>
@@ -96,40 +141,7 @@ export default async function TrainLocationPage({ searchParams }: TrainPageProps
           ) : null}
 
           {result.data ? (
-            result.data.departures.length === 0 ? (
-              <PanelCard eyebrow="No departures" title="Nothing matched this time window">
-                <p className="text-sm text-[var(--muted)]">No departures were returned for the requested station and time window.</p>
-              </PanelCard>
-            ) : (
-              result.data.departures.map((departure) => (
-                <PanelCard
-                  key={`${departure.scheduleId}:${departure.stopId}`}
-                  eyebrow="Rail leg"
-                  title={departure.destination ?? "Destination unavailable"}
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                      <div className="app-stat-tile min-w-[118px]">
-                        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Departs</div>
-                        <div className="mt-1 text-3xl font-semibold text-[var(--brand-ink)]">
-                          {departure.scheduledDeparture ?? departure.scheduledDepartureRaw ?? "Unknown"}
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-lg font-semibold text-[var(--foreground)]">{departure.destination ?? "Destination unavailable"}</div>
-                        <div className="text-sm text-[var(--muted)]">
-                          {departure.platform ? `Platform ${departure.platform}` : "Platform TBC"}
-                          {departure.operatorCode ? ` · ${departure.operatorCode}` : ""}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 shadow-[var(--shadow-soft)]">
-                      Scheduled
-                    </div>
-                  </div>
-                </PanelCard>
-              ))
-            )
+            <RailDepartureList departures={result.data.departures} initialVisible={3} />
           ) : (
             <PanelCard eyebrow="Rail board" title="Search for a station">
               <p className="text-sm text-[var(--muted)]">Use the station search to load a passenger-facing scheduled rail board.</p>
@@ -146,17 +158,36 @@ export default async function TrainLocationPage({ searchParams }: TrainPageProps
             />
           </PanelCard>
 
-          <PanelCard eyebrow="Data state" title="Scheduled fallback">
-            <div className="space-y-3 text-sm text-[var(--muted)]">
-              <p>Last updated {formatTimestamp(result.data?.dataState.lastUpdated ?? null)}.</p>
-              <p>Live rail enrichment is not implemented yet, so this board is sourced from the timetable snapshot.</p>
-              {result.data ? (
-                <p>
-                  Window {formatShortTime(result.data.window.from)} to {formatShortTime(result.data.window.to)} · {result.data.count} departures returned.
-                </p>
-              ) : null}
-            </div>
+          <PanelCard eyebrow="More details" title="Live context and board information">
+            <TrainBoardStatusPanel
+              crs={crs}
+              stationName={result.data?.station.name ?? null}
+              latitude={result.data?.station.latitude ?? null}
+              longitude={result.data?.station.longitude ?? null}
+              selectedServiceDate={selectedServiceDate}
+              liveSnapshotDate={liveSnapshotDate}
+              dataStateLastUpdated={result.data?.dataState.lastUpdated ?? null}
+              windowFrom={result.data?.window.from ?? null}
+              windowTo={result.data?.window.to ?? null}
+              departureCount={result.data?.count ?? 0}
+              initialWeather={operationalSnapshot.weather}
+              initialLiveBoard={operationalSnapshot.liveBoard}
+            />
           </PanelCard>
+
+          {facilities ? (
+            <PanelCard
+              eyebrow="Station facilities"
+              title={`${facilities.name} facilities`}
+              description={facilities.staffed ? "Staffed station" : "Unstaffed station"}
+            >
+              <StationFacilitiesPanel facilities={facilities} />
+            </PanelCard>
+          ) : crs.length === 3 ? (
+            <PanelCard eyebrow="Station facilities" title="Facilities unavailable">
+              <p className="text-sm text-[var(--muted)]">Facility information is not yet available for this station.</p>
+            </PanelCard>
+          ) : null}
         </div>
       </div>
     </AppShell>

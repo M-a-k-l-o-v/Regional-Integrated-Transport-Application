@@ -115,13 +115,13 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
 
   return (
     <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-      <section className="rounded-[2rem] border border-[var(--outline)] bg-[linear-gradient(180deg,var(--surface-strong)_0%,var(--surface)_100%)] p-6 shadow-[var(--shadow-card)]">
+      <section className="rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
         <div className="space-y-5">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+            <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
               Board type
             </div>
-            <div className="mt-3 inline-flex rounded-full border border-[var(--outline)] bg-[var(--surface-alt)] p-1 shadow-[var(--shadow-soft)]">
+            <div className="mt-3 inline-flex rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] p-1">
               {(["bus", "rail"] as const).map((candidate) => {
                 const active = mode === candidate;
                 return (
@@ -143,7 +143,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
           </div>
 
           <label className="block space-y-2">
-            <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--brand-ink)]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
               Search locations
             </span>
             <input
@@ -151,11 +151,11 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={mode === "bus" ? "Search stop or bus station" : "Search station name"}
-              className="w-full rounded-[1.5rem] border border-[var(--outline)] bg-[var(--input)] px-5 py-3.5 text-[var(--foreground)] shadow-[var(--shadow-soft)] outline-none transition focus:border-[var(--brand)]"
+              className="w-full rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
             />
           </label>
 
-          <div className="rounded-[1.5rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-4 text-sm text-[var(--muted)]">
+          <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
             {loading
               ? "Searching location names…"
               : query.trim().length >= 2
@@ -166,22 +166,22 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
       </section>
 
       <div className="space-y-6">
-        <section className="rounded-[2rem] border border-[var(--outline)] bg-[linear-gradient(180deg,var(--surface-strong)_0%,var(--surface)_100%)] p-6 shadow-[var(--shadow-card)]">
+        <section className="rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 Recent
               </div>
-              <h2 className="mt-2 text-2xl font-semibold text-[var(--brand-ink)]">Recently checked boards</h2>
+              <h2 className="mt-1.5 text-lg font-bold text-[var(--foreground)]">Recently checked boards</h2>
             </div>
-            <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
               {recentForMode.length}
             </div>
           </div>
 
           <div className="mt-5 space-y-3">
             {recentForMode.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-4 text-sm text-[var(--muted)]">
+              <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
                 Open a {mode} board and it will appear here for quick return access.
               </div>
             ) : (
@@ -189,7 +189,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                 <Link
                   key={`${entry.mode}:${entry.location.type}:${entry.location.id}`}
                   href={entry.href}
-                  className="block rounded-[1.5rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-4 shadow-[var(--shadow-soft)] transition hover:border-[var(--brand)] hover:bg-[var(--surface-alt-hover)]"
+                  className="block rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3.5 transition hover:border-[var(--brand)] hover:shadow-[var(--shadow-soft)]"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -200,7 +200,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                         {getBoardSecondaryText(entry.location, entry.mode)}
                       </div>
                     </div>
-                    <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-alt)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-ink)]">
+                    <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
                       Recent
                     </div>
                   </div>
@@ -210,24 +210,24 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-[var(--outline)] bg-[linear-gradient(180deg,var(--surface-strong)_0%,var(--surface)_100%)] p-6 shadow-[var(--shadow-card)]">
+        <section className="rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 Browse
               </div>
-              <h2 className="mt-2 text-2xl font-semibold text-[var(--brand-ink)]">
+              <h2 className="mt-1.5 text-lg font-bold text-[var(--foreground)]">
                 {mode === "bus" ? "Bus board locations" : "Rail board locations"}
               </h2>
             </div>
-            <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
               {browseLocations.length}
             </div>
           </div>
 
           <div className="mt-5 grid gap-3">
             {browseLocations.length === 0 ? (
-              <div className="rounded-[1.5rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-4 text-sm text-[var(--muted)]">
+              <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
                 No matching {mode} boards were found for this location search.
               </div>
             ) : (
@@ -235,7 +235,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                 <Link
                   key={`${location.type}:${location.id}`}
                   href={buildBoardHref(location)}
-                  className="block rounded-[1.5rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-4 shadow-[var(--shadow-soft)] transition hover:border-[var(--brand)] hover:bg-[var(--surface-alt-hover)]"
+                  className="block rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3.5 transition hover:border-[var(--brand)] hover:shadow-[var(--shadow-soft)]"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -246,7 +246,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                         {getBoardSecondaryText(location, mode)}
                       </div>
                     </div>
-                    <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-alt)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-ink)]">
+                    <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
                       Open
                     </div>
                   </div>

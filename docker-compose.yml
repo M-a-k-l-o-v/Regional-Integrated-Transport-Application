@@ -1,0 +1,69 @@
+# Podman / Docker Compose — Lancashire Transport Application
+# Usage:  podman-compose up -d   (or docker compose up -d)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lancashire_transport
+      POSTGRES_USER: transport
+      POSTGRES_PASSWORD: transport
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transport"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./code/Database
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://transport:transport@postgres:5432/lancashire_transport
+      REDIS_URL: redis://redis:6379
+      NAPTAN_API_BASE_URL: https://naptan.api.dft.gov.uk
+      RAIL_TIMETABLE_PATH: /app/data/timetable.ndjson
+      TRANSPORT_SERVER_BASE_URL: http://transport.scc.lancs.ac.uk
+      NETWORK_RAIL_STOMP_ENABLED: "false"
+    env_file:
+      - ./code/Database/.env
+
+  frontend:
+    build:
+      context: ./code/frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://backend:3000
+
+volumes:
+  pgdata:

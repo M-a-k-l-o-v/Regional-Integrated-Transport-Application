@@ -1,5 +1,6 @@
 export type PlannerLocationType = "station" | "bus_stop" | "bus_stop_group";
 export type JourneyPreference = "fastest" | "balanced" | "fewest_changes";
+export type TransitMode = "bus" | "rail";
 
 export type AccessCandidate = {
   nodeId: string;
@@ -18,6 +19,7 @@ export type JourneyPlanRequest = {
   time: string;
   preference: JourneyPreference;
   maxItineraries: number;
+  modes?: TransitMode[];
 };
 
 export type JourneyNode = {
@@ -42,6 +44,11 @@ export type TransitEdge = {
   operator: string | null;
   routeId: string | null;
   scheduleId: string | null;
+  /** Set when live delay data was applied. Positive = late, negative = early. */
+  liveDelayMinutes?: number | null;
+  /** True when the route's XML declares a bank holiday non-operation for this date,
+   *  but we still show it because operators often run amended timetables anyway. */
+  bankHolidayAdvisory?: boolean;
 };
 
 export type TakenEdge = TransitEdge & {
@@ -92,11 +99,17 @@ export type JourneyLegResponse = {
   };
   departureTime: string | null;
   arrivalTime: string | null;
+  /** Original scheduled departure before live delay was applied. Null when no live data. */
+  scheduledDepartureTime: string | null;
+  /** Positive = late, negative = early, null = no live data. */
+  liveDelayMinutes: number | null;
   line: string | null;
   operator: string | null;
   routeId: string | null;
   scheduleId: string | null;
   isScheduled: true;
+  /** True when service may be affected by bank holiday timetable changes. */
+  bankHolidayAdvisory?: boolean;
 };
 
 export type JourneyItineraryResponse = {
@@ -110,9 +123,9 @@ export type JourneyItineraryResponse = {
 
 export type JourneyPlanResponse = {
   dataState: {
-    mode: "scheduled";
-    isLive: false;
-    fallback: true;
+    mode: "scheduled" | "live";
+    isLive: boolean;
+    fallback: boolean;
     lastUpdated: string | null;
   };
   query: {

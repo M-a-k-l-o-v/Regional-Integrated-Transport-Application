@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
+import { BusLiveDelayStore } from "../../infrastructure/liveData/BusLiveDelayStore";
+import { LiveMovementStore } from "../../infrastructure/liveData/LiveMovementStore";
 import { BusRoutingAdapter } from "./BusRoutingAdapter";
 import { RailRoutingAdapter } from "./RailRoutingAdapter";
 import { StationFrontageTransferBuilder } from "./StationFrontageTransferBuilder";
 import { WalkingTransferBuilder } from "./WalkingTransferBuilder";
-import { TransitEdge, TransitGraph } from "./types";
+import { TransitEdge, TransitGraph, TransitMode } from "./types";
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -19,22 +21,30 @@ export class TransitGraphBuilder {
   private readonly walkingTransferBuilder: WalkingTransferBuilder;
   private readonly stationFrontageTransferBuilder: StationFrontageTransferBuilder;
 
-  constructor(prisma: PrismaClient) {
-    this.busAdapter = new BusRoutingAdapter(prisma);
-    this.railAdapter = new RailRoutingAdapter(prisma);
+  constructor(
+    prisma: PrismaClient,
+    liveMovementStore?: LiveMovementStore,
+    busLiveDelayStore?: BusLiveDelayStore,
+  ) {
+    this.busAdapter = new BusRoutingAdapter(prisma, busLiveDelayStore);
+    this.railAdapter = new RailRoutingAdapter(prisma, liveMovementStore);
     this.walkingTransferBuilder = new WalkingTransferBuilder();
     this.stationFrontageTransferBuilder = new StationFrontageTransferBuilder(prisma);
   }
 
-  async build(dateString: string): Promise<TransitGraph> {
-    const cached = this.cache.get(dateString);
+  async build(dateString: string, modes?: TransitMode[]): Promise<TransitGraph> {
+    const cacheKey = modes ? `${dateString}:${[...modes].sort().join(",")}` : dateString;
+    const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.builtAtMs < CACHE_TTL_MS) {
       return cached.graph;
     }
 
+    const includeBus = !modes || modes.includes("bus");
+    const includeRail = !modes || modes.includes("rail");
+
     const [busSlice, railSlice] = await Promise.all([
-      this.busAdapter.build(dateString),
-      this.railAdapter.build(dateString),
+      includeBus ? this.busAdapter.build(dateString) : Promise.resolve({ nodes: [], transitEdges: [], latestUpdatedAtMs: null }),
+      includeRail ? this.railAdapter.build(dateString) : Promise.resolve({ nodes: [], transitEdges: [], latestUpdatedAtMs: null }),
     ]);
 
     const nodes = new Map([...busSlice.nodes, ...railSlice.nodes].map((node) => [node.nodeId, node]));
@@ -76,7 +86,7 @@ export class TransitGraphBuilder {
       latestUpdatedAtMs,
     };
 
-    this.cache.set(dateString, {
+    this.cache.set(cacheKey, {
       builtAtMs: Date.now(),
       graph,
     });

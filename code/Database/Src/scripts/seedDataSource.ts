@@ -15,6 +15,39 @@ async function main() {
     },
   });
 
+  await prisma.dataSource.upsert({
+    where: { sourceId: "weather" },
+    update: { enabled: true },
+    create: {
+      sourceId: "weather",
+      name: "Transport SCC Weather",
+      baseUrl: `${env.TRANSPORT_SERVER_BASE_URL}/weather`,
+      enabled: true,
+    },
+  });
+
+  await prisma.dataSource.upsert({
+    where: { sourceId: "rail_live_departures" },
+    update: { enabled: true },
+    create: {
+      sourceId: "rail_live_departures",
+      name: "Transport SCC Rail Live Departures",
+      baseUrl: `${env.TRANSPORT_SERVER_BASE_URL}/rail/departures`,
+      enabled: true,
+    },
+  });
+
+  await prisma.dataSource.upsert({
+    where: { sourceId: "bus_live_positions" },
+    update: { enabled: true },
+    create: {
+      sourceId: "bus_live_positions",
+      name: "Transport SCC Bus Live Positions",
+      baseUrl: `${env.TRANSPORT_SERVER_BASE_URL}/bus/live`,
+      enabled: true,
+    },
+  });
+
   // Rail timetable (local NDJSON ingestion)
   await prisma.dataSource.upsert({
     where: { sourceId: "rail_timetable" },
@@ -27,7 +60,9 @@ async function main() {
     },
   });
 
-  console.log("Seeded DataSources: transport-server, rail_timetable");
+  console.log(
+    "Seeded DataSources: transport-server, weather, rail_live_departures, bus_live_positions, rail_timetable"
+  );
 }
 
 main()

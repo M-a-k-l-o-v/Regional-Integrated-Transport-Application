@@ -9,12 +9,12 @@ export type BusStopGroupDefinition = {
   keywords: string[];
 };
 
-function getStandCode(stopId: string): string {
-  const trailingDigits = stopId.match(/(\d+)$/)?.[1] ?? stopId;
-  if (/^\d+$/.test(trailingDigits) && trailingDigits.length > 4) {
-    return String(Number.parseInt(trailingDigits.slice(-4), 10));
-  }
-  return /^\d+$/.test(trailingDigits) ? String(Number.parseInt(trailingDigits, 10)) : trailingDigits;
+// Stand label cache, populated from BusStop.indicator at startup.
+// Falls back to group name when no indicator is stored.
+let standLabelCache: Map<string, string> | null = null;
+
+export function setStandLabelCache(labels: Map<string, string>): void {
+  standLabelCache = labels;
 }
 
 const LANCASTER_BUS_STATION: BusStopGroupDefinition = {
@@ -136,7 +136,8 @@ export function getBusStopGroupForStop(stopId: string): BusStopGroupDefinition |
 export function formatBusStopGroupMemberName(stopId: string, fallbackName: string): string {
   const group = getBusStopGroupForStop(stopId);
   if (!group) return fallbackName;
-  return `${group.name} · Stand ${getStandCode(stopId)}`;
+  const indicator = standLabelCache?.get(stopId);
+  return indicator ? `${group.name} · ${indicator}` : group.name;
 }
 
 export function searchBusStopGroups(query: string): BusStopGroupDefinition[] {

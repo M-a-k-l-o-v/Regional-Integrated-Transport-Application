@@ -25,15 +25,18 @@ export const metadata: Metadata = {
 
 const timeThemeScript = `
 (() => {
+  const getTimeTheme = () => new Date().getHours() >= 18 || new Date().getHours() < 6 ? "night" : "day";
+
   const applyTheme = () => {
-    const hour = new Date().getHours();
-    const theme = hour >= 18 || hour < 6 ? "night" : "day";
+    const pref = localStorage.getItem("theme-preference");
+    const theme = pref === "light" ? "day" : pref === "dark" ? "night" : getTimeTheme();
     document.documentElement.dataset.theme = theme;
   };
 
   applyTheme();
   window.addEventListener("focus", applyTheme);
   document.addEventListener("visibilitychange", applyTheme);
+  window.addEventListener("storage", applyTheme);
   window.setInterval(applyTheme, 60000);
 })();
 `;

@@ -15,12 +15,6 @@ coverage/
 *.log
 .DS_Store
 
-# Personal working notes
-work-notes/*.md
-work-notes/previousNotes/*.md
-!work-notes/README.md
-!work-notes/project-context.md
-
 # Raw source datasets
 data/
 

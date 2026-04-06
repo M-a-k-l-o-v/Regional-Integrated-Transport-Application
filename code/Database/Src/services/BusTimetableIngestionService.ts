@@ -223,27 +223,165 @@ function collectDateRanges(node: any): any[] {
   return out;
 }
 
-function parseExceptionRangesFromOperatingProfile(operatingProfile: any): DateRangeOverride[] {
-  const out: DateRangeOverride[] = [];
-  const special = operatingProfile?.SpecialDaysOperation;
-  if (!special) return out;
+// ── UK bank holiday date resolver ──────────────────────────────────────────
+// TransXChange <BankHolidayOperation> uses named tags like <EasterMonday/>,
+// <GoodFriday/>, etc.  We convert them to concrete dates so that
+// BusServiceException rows can filter them at routing time.
+//
+// Easter is the only moveable feast; all others are fixed calendar dates
+// (with standard "substitute Monday" rules handled outside this function).
 
-  const addFromNode = (node: any, isRunning: boolean, reason: string) => {
-    for (const range of collectDateRanges(node)) {
-      const start = parseDateOnlyUtc(range?.StartDate);
-      const endBase = parseDateOnlyUtc(range?.EndDate ?? range?.StartDate);
-      if (!start || !endBase) continue;
-      out.push({
-        startDate: start,
-        endDate: toEndOfUtcDay(endBase),
-        isRunning,
-        reason,
-      });
+function easterSunday(year: number): Date {
+  // Anonymous Gregorian algorithm
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March, 4=April
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 86_400_000);
+}
+
+// Substitute Monday: if a fixed holiday falls on Sat → Mon; Sun → Mon (Tue if Mon is also a holiday).
+function substituteMonday(date: Date, otherHoliday?: Date): Date {
+  const dow = date.getUTCDay();
+  if (dow === 6) return addDays(date, 2); // Sat → Mon
+  if (dow === 0) {
+    const mon = addDays(date, 1);
+    if (otherHoliday && mon.getTime() === otherHoliday.getTime()) return addDays(date, 2);
+    return mon;
+  }
+  return date;
+}
+
+function resolveUkBankHolidayDates(year: number): Map<string, Date> {
+  const easter = easterSunday(year);
+  const christmas = new Date(Date.UTC(year, 11, 25));
+  const boxingDay = new Date(Date.UTC(year, 11, 26));
+
+  const map = new Map<string, Date>();
+  map.set("newyearsday", substituteMonday(new Date(Date.UTC(year, 0, 1))));
+  map.set("jan2ndscotland", new Date(Date.UTC(year, 0, 2))); // not standard E&W but some feeds use it
+  map.set("goodfriday", addDays(easter, -2));
+  map.set("eastermonday", addDays(easter, 1));
+  map.set("mayday", nthWeekday(year, 4, 1, 1)); // first Monday in May
+  map.set("earlymaybankhoiday", nthWeekday(year, 4, 1, 1)); // alias
+  map.set("earlymaybankhoiday", nthWeekday(year, 4, 1, 1));
+  map.set("springbank", lastWeekday(year, 4, 1)); // last Monday in May
+  map.set("springbankholiday", lastWeekday(year, 4, 1));
+  map.set("latespring", lastWeekday(year, 4, 1));
+  map.set("latemaybankhoiday", lastWeekday(year, 4, 1));
+  map.set("summerbank", lastWeekday(year, 7, 1)); // last Monday in August
+  map.set("summerbankholiday", lastWeekday(year, 7, 1));
+  map.set("latesummer", lastWeekday(year, 7, 1));
+  map.set("augustbankholiday", lastWeekday(year, 7, 1));
+  map.set("christmasday", substituteMonday(christmas, boxingDay));
+  map.set("boxingday", substituteMonday(boxingDay, christmas));
+  map.set("christmasdayholiday", substituteMonday(christmas, boxingDay));
+  map.set("boxingdayholiday", substituteMonday(boxingDay, christmas));
+  // Some TransXChange files use "Christmas" or "NewYearsEve" etc.
+  map.set("christmas", substituteMonday(christmas, boxingDay));
+  map.set("newyearseve", new Date(Date.UTC(year, 11, 31)));
+  return map;
+}
+
+function nthWeekday(year: number, month: number, dow: number, n: number): Date {
+  let d = new Date(Date.UTC(year, month, 1));
+  let count = 0;
+  while (count < n) {
+    if (d.getUTCDay() === dow) count++;
+    if (count < n) d = addDays(d, 1);
+  }
+  return d;
+}
+
+function lastWeekday(year: number, month: number, dow: number): Date {
+  // Start from end of month, walk backwards
+  let d = new Date(Date.UTC(year, month + 1, 0)); // last day of month
+  while (d.getUTCDay() !== dow) {
+    d = addDays(d, -1);
+  }
+  return d;
+}
+
+function parseBankHolidayExceptions(operatingProfile: any, validFrom: Date | null, validTo: Date | null): DateRangeOverride[] {
+  const out: DateRangeOverride[] = [];
+  const bhOp = operatingProfile?.BankHolidayOperation;
+  if (!bhOp) return out;
+
+  // Determine the year range to resolve holidays for.
+  const now = new Date();
+  const startYear = validFrom ? validFrom.getUTCFullYear() : now.getUTCFullYear();
+  const endYear = validTo ? validTo.getUTCFullYear() : now.getUTCFullYear() + 1;
+
+  const addHolidays = (node: any, isRunning: boolean, reason: string) => {
+    if (!node || typeof node !== "object") return;
+    const tagNames = Array.from(collectTagNames(node));
+    for (const tagName of tagNames) {
+      const normalised = tagName.toLowerCase().replace(/[^a-z0-9]/g, "");
+      for (let year = startYear; year <= endYear; year++) {
+        const holidayMap = resolveUkBankHolidayDates(year);
+        const holidayDate = holidayMap.get(normalised);
+        if (holidayDate) {
+          out.push({
+            startDate: holidayDate,
+            endDate: toEndOfUtcDay(holidayDate),
+            isRunning,
+            reason,
+          });
+        }
+      }
     }
   };
 
-  addFromNode(special?.DaysOfOperation, true, "special_days_operation");
-  addFromNode(special?.DaysOfNonOperation, false, "special_days_non_operation");
+  addHolidays(bhOp?.DaysOfOperation, true, "bank_holiday_operation");
+  addHolidays(bhOp?.DaysOfNonOperation, false, "bank_holiday_non_operation");
+
+  return out;
+}
+
+function parseExceptionRangesFromOperatingProfile(
+  operatingProfile: any,
+  validFrom: Date | null = null,
+  validTo: Date | null = null,
+): DateRangeOverride[] {
+  const out: DateRangeOverride[] = [];
+
+  // 1. SpecialDaysOperation (explicit date ranges)
+  const special = operatingProfile?.SpecialDaysOperation;
+  if (special) {
+    const addFromNode = (node: any, isRunning: boolean, reason: string) => {
+      for (const range of collectDateRanges(node)) {
+        const start = parseDateOnlyUtc(range?.StartDate);
+        const endBase = parseDateOnlyUtc(range?.EndDate ?? range?.StartDate);
+        if (!start || !endBase) continue;
+        out.push({
+          startDate: start,
+          endDate: toEndOfUtcDay(endBase),
+          isRunning,
+          reason,
+        });
+      }
+    };
+
+    addFromNode(special?.DaysOfOperation, true, "special_days_operation");
+    addFromNode(special?.DaysOfNonOperation, false, "special_days_non_operation");
+  }
+
+  // 2. BankHolidayOperation (named holiday tags → concrete dates)
+  out.push(...parseBankHolidayExceptions(operatingProfile, validFrom, validTo));
 
   return out;
 }
@@ -883,7 +1021,7 @@ export class BusTimetableIngestionService {
         const routeId = `bus:${operatorId}:${String(serviceCode)}`;
         const validity = parseServiceValidity(svc);
         const serviceWeekdays = parseWeekdayFlagsFromOperatingProfile(svc?.OperatingProfile);
-        const serviceExceptions = parseExceptionRangesFromOperatingProfile(svc?.OperatingProfile);
+        const serviceExceptions = parseExceptionRangesFromOperatingProfile(svc?.OperatingProfile, validity.validFrom, validity.validTo);
 
         await prisma.busRoute.upsert({
           where: { routeId },
@@ -999,13 +1137,16 @@ export class BusTimetableIngestionService {
         }
       }
 
+      // Clear ALL existing journeys for these routes on this service date,
+      // regardless of source file.  This prevents duplicates when the same
+      // route is present in multiple XML files (e.g. different schedule change
+      // batches).  The latest ingestion wins.
       const routesWithContextList = Array.from(routesWithContext);
       if (routesWithContextList.length > 0) {
         await prisma.busJourney.deleteMany({
           where: {
             routeId: { in: routesWithContextList },
             serviceDate: dayStart,
-            sourceFile,
           },
         });
       }
@@ -1055,7 +1196,7 @@ export class BusTimetableIngestionService {
             mergeWeekdayFlags(calendar.weekdays, vjWeekdays);
             calendar.hasWeekdayData = true;
           }
-          calendar.exceptions.push(...parseExceptionRangesFromOperatingProfile(vj?.OperatingProfile));
+          calendar.exceptions.push(...parseExceptionRangesFromOperatingProfile(vj?.OperatingProfile, calendar.validFrom, calendar.validTo));
         }
 
         const dep = vj.DepartureTime;
@@ -1066,10 +1207,11 @@ export class BusTimetableIngestionService {
         const lineRef = typeof vj.LineRef === "string" ? vj.LineRef.trim() || null : null;
         const destinationDisplay =
           typeof vj.DestinationDisplay === "string" ? vj.DestinationDisplay.trim() || null : ctx.destinationDisplay;
+        // journeyKey is content-based: same physical trip from different XML files
+        // produces the same key, so re-ingestion updates rather than duplicates.
         const journeyKey = buildJourneyKey([
           ctx.routeId,
           dayStart.toISOString(),
-          sourceFile,
           vehicleJourneyCode,
           jpRef,
           String(dep),

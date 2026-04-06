@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { JourneyNode, TransitEdge } from "./types";
+import { extractStationTokens, FRONTAGE_EXCLUDED_TERMS, FRONTAGE_TERMS, matchesStationFrontageStop } from "../stations/stationFrontageMatching";
 
 const DEFAULT_WALK_MINUTES = 4;
-const FRONTAGE_TERMS = ["rail station", "railway station", "rail station taxi rank"];
-const STOP_WORDS = new Set(["lancs", "north", "south", "east", "west", "central", "parkway", "road", "junction"]);
 
 type FrontageStop = {
   stopId: string;
@@ -45,7 +44,11 @@ export class StationFrontageTransferBuilder {
     });
 
     const usableFrontageStops: FrontageStop[] = frontageStops
-      .filter((stop) => busStopNodeIds.has(stop.stopId))
+      .filter((stop) => {
+        if (!busStopNodeIds.has(stop.stopId)) return false;
+        const lower = stop.name.toLowerCase();
+        return !FRONTAGE_EXCLUDED_TERMS.some((term) => lower.includes(term));
+      })
       .map((stop) => ({
         stopId: stop.stopId,
         name: stop.name,
@@ -95,15 +98,10 @@ export class StationFrontageTransferBuilder {
   }
 
   private extractTokens(name: string): string[] {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((token) => token.length >= 4 && !STOP_WORDS.has(token));
+    return extractStationTokens(name);
   }
 
   private matches(tokens: string[], stop: FrontageStop): boolean {
-    const haystack = `${stop.name} ${stop.localityName ?? ""}`.toLowerCase();
-    return tokens.some((token) => haystack.includes(token));
+    return matchesStationFrontageStop(tokens, stop.name, stop.localityName);
   }
 }

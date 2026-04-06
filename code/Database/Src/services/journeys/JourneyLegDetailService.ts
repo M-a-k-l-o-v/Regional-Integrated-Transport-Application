@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { formatBusStopGroupMemberName } from "../busStopGroups";
 import { getBusServiceLabel } from "./helpers";
+import { JourneyOperationalStatusService } from "./JourneyOperationalStatusService";
 
 type JourneyLegDetailRequest = {
   mode: "bus" | "rail";
@@ -28,6 +29,16 @@ function toIso(value: Date | null | undefined): string | null {
   return value ? value.toISOString() : null;
 }
 
+function normaliseRailPublicTime(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const hhmm = trimmed.match(/^(\d{2})(\d{2})$/);
+  if (hhmm) return `${hhmm[1]}:${hhmm[2]}`;
+  const colon = trimmed.match(/^(\d{2}):(\d{2})$/);
+  if (colon) return `${colon[1]}:${colon[2]}`;
+  return trimmed;
+}
+
 function slicePath<T>(items: T[], fromIndex: number, toIndex: number): T[] {
   if (fromIndex >= 0 && toIndex >= fromIndex) {
     return items.slice(fromIndex, toIndex + 1);
@@ -36,7 +47,10 @@ function slicePath<T>(items: T[], fromIndex: number, toIndex: number): T[] {
 }
 
 export class JourneyLegDetailService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly operationalStatusService: JourneyOperationalStatusService
+  ) {}
 
   async getDetail(request: JourneyLegDetailRequest) {
     if (request.mode === "bus") {
@@ -112,14 +126,22 @@ export class JourneyLegDetailService {
 
     const fromPoint = points[0];
     const toPoint = points[points.length - 1];
-    const routeStatus = await this.getRouteStatus(journey.routeId);
+    const routeStatus = await this.operationalStatusService.getBusStatus({
+      routeId: journey.routeId,
+      operatorRef: journey.route.operatorId ?? null,
+      lineRef: journey.lineRef,
+      points,
+    });
+
+    // isLive is true only when we have validated, in-area live data for this service
+    const hasLiveDelayData = routeStatus.delays.available && routeStatus.delays.source !== null && routeStatus.delays.source !== "database";
 
     return {
       dataState: {
-        mode: "scheduled" as const,
-        isLive: false,
-        fallback: true,
-        lastUpdated: toIso(journey.updatedAt),
+        mode: hasLiveDelayData ? ("live" as const) : ("scheduled" as const),
+        isLive: hasLiveDelayData,
+        fallback: !hasLiveDelayData,
+        lastUpdated: routeStatus.delays.lastUpdated ?? toIso(journey.updatedAt),
       },
       leg: {
         mode: "bus" as const,
@@ -191,13 +213,21 @@ export class JourneyLegDetailService {
 
     const fromPoint = points[0];
     const toPoint = points[points.length - 1];
+    const routeStatus = await this.operationalStatusService.getRailStatus({
+      fromCrs: fromPoint?.code ?? null,
+      scheduledDeparture: normaliseRailPublicTime(fromPoint?.departureTime ?? null),
+      destinationDisplay: toPoint?.name ?? null,
+      points,
+    });
+
+    const hasLiveDelayData = routeStatus.delays.available && routeStatus.delays.source === "rail_live_departures";
 
     return {
       dataState: {
-        mode: "scheduled" as const,
-        isLive: false,
-        fallback: true,
-        lastUpdated: toIso(schedule.updatedAt),
+        mode: hasLiveDelayData ? ("live" as const) : ("scheduled" as const),
+        isLive: hasLiveDelayData,
+        fallback: !hasLiveDelayData,
+        lastUpdated: routeStatus.delays.lastUpdated ?? toIso(schedule.updatedAt),
       },
       leg: {
         mode: "rail" as const,
@@ -217,111 +247,7 @@ export class JourneyLegDetailService {
         mappedPointCount: points.filter((point) => point.latitude !== null && point.longitude !== null).length,
         points,
       },
-      status: this.buildUnavailableStatus("Route status datasets are not linked to rail schedules yet."),
-    };
-  }
-
-  private async getRouteStatus(routeId: string | null) {
-    if (!routeId) {
-      return this.buildUnavailableStatus("Route-level status data is not available for this leg.");
-    }
-
-    const [reliability, delay, disruptions] = await Promise.all([
-      this.prisma.reliabilityScore.findFirst({
-        where: { routeId },
-        orderBy: { calculatedAt: "desc" },
-        select: {
-          score: true,
-          confidenceLevel: true,
-          calculatedAt: true,
-        },
-      }),
-      this.prisma.serviceStatus.findFirst({
-        where: { routeId },
-        orderBy: { lastUpdated: "desc" },
-        select: {
-          delayMinutes: true,
-          cancellationFlag: true,
-          lastUpdated: true,
-        },
-      }),
-      this.prisma.disruption.findMany({
-        where: {
-          routeId,
-        },
-        orderBy: { startTime: "desc" },
-        take: 5,
-        select: {
-          type: true,
-          description: true,
-          startTime: true,
-          endTime: true,
-        },
-      }),
-    ]);
-
-    return {
-      weather: {
-        available: false,
-        message: "Weather data has not been ingested yet for this area.",
-      },
-      disruptions: {
-        available: disruptions.length > 0,
-        message: disruptions.length > 0 ? null : "No disruption records have been ingested for this route yet.",
-        items: disruptions.map((item) => ({
-          type: item.type,
-          description: item.description,
-          startTime: toIso(item.startTime),
-          endTime: toIso(item.endTime),
-        })),
-      },
-      reliability: {
-        available: reliability !== null,
-        message: reliability ? null : "No reliability index has been calculated for this route yet.",
-        score: reliability?.score ?? null,
-        confidenceLevel: reliability?.confidenceLevel ?? null,
-        calculatedAt: toIso(reliability?.calculatedAt),
-      },
-      delays: {
-        available: delay !== null,
-        message: delay ? null : "No live or historical delay status has been ingested for this route yet.",
-        delayMinutes: delay?.delayMinutes ?? null,
-        cancellationFlag: delay?.cancellationFlag ?? null,
-        lastUpdated: toIso(delay?.lastUpdated),
-      },
-    };
-  }
-
-  private buildUnavailableStatus(message: string) {
-    return {
-      weather: {
-        available: false,
-        message: "Weather data has not been ingested yet for this area.",
-      },
-      disruptions: {
-        available: false,
-        message,
-        items: [] as Array<{
-          type: string;
-          description: string;
-          startTime: string | null;
-          endTime: string | null;
-        }>,
-      },
-      reliability: {
-        available: false,
-        message,
-        score: null as number | null,
-        confidenceLevel: null as string | null,
-        calculatedAt: null as string | null,
-      },
-      delays: {
-        available: false,
-        message,
-        delayMinutes: null as number | null,
-        cancellationFlag: null as boolean | null,
-        lastUpdated: null as string | null,
-      },
+      status: routeStatus,
     };
   }
 }

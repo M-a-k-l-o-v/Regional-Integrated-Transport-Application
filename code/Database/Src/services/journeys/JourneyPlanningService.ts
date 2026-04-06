@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { getBusStopGroup } from "../busStopGroups";
+import { getBusStopGroup, getBusStopGroupForStop } from "../busStopGroups";
+import { extractStationTokens, FRONTAGE_EXCLUDED_TERMS, FRONTAGE_TERMS, matchesStationFrontageStop } from "../stations/stationFrontageMatching";
 import { haversineDistanceMetres, parsePlannerDateTime, scoreLabel, toNodeId } from "./helpers";
 import { JourneyResponseMapper } from "./JourneyResponseMapper";
 import { TransitGraphBuilder } from "./TransitGraphBuilder";
@@ -18,7 +19,7 @@ import {
 
 const MAX_SEARCH_HOURS = 12;
 const MAX_TRANSFERS = 4;
-const MAX_LABEL_EXPANSIONS = 20000;
+const MAX_LABEL_EXPANSIONS = 100000;
 const MAX_LABELS_PER_NODE = 48;
 const ACCESS_RADIUS_METRES = 1500;
 const ACCESS_WALK_SPEED_METRES_PER_SECOND = 1.3;
@@ -107,13 +108,17 @@ export class JourneyPlanningService {
   private readonly graphBuilder: TransitGraphBuilder;
   private readonly responseMapper = new JourneyResponseMapper();
 
-  constructor(private readonly prisma: PrismaClient) {
-    this.graphBuilder = new TransitGraphBuilder(prisma);
+  constructor(
+    private readonly prisma: PrismaClient,
+    liveMovementStore?: import("../../infrastructure/liveData/LiveMovementStore").LiveMovementStore,
+    busLiveDelayStore?: import("../../infrastructure/liveData/BusLiveDelayStore").BusLiveDelayStore,
+  ) {
+    this.graphBuilder = new TransitGraphBuilder(prisma, liveMovementStore, busLiveDelayStore);
   }
 
   async plan(request: JourneyPlanRequest): Promise<JourneyPlanResponse> {
     const departureDateTime = parsePlannerDateTime(request.date, request.time);
-    const graph = await this.graphBuilder.build(request.date);
+    const graph = await this.graphBuilder.build(request.date, request.modes);
     const origin = await this.resolveLocation(request.origin, graph);
     const destination = await this.resolveLocation(request.destination, graph);
 
@@ -140,11 +145,16 @@ export class JourneyPlanningService {
         )
       : [];
 
+    // Check if any itinerary leg has live delay data applied
+    const hasAnyLiveData = itineraries.some((itin) =>
+      itin.legs.some((leg) => leg.liveDelayMinutes !== null)
+    );
+
     return {
       dataState: {
-        mode: "scheduled",
-        isLive: false,
-        fallback: true,
+        mode: hasAnyLiveData ? "live" : "scheduled",
+        isLive: hasAnyLiveData,
+        fallback: !hasAnyLiveData,
         lastUpdated: graph.latestUpdatedAtMs ? new Date(graph.latestUpdatedAtMs).toISOString() : null,
       },
       query: {
@@ -211,9 +221,8 @@ export class JourneyPlanningService {
             ? current
             : this.appendDestinationWalk(current, current.nodeId, destinationNodeId, destinationWalkMinutes);
         destinationLabels.push(completed);
-        if (destinationLabels.length >= maxItineraries * 24) {
-          continue;
-        }
+        // Don't expand further from a destination node — the journey has arrived.
+        continue;
       }
 
       for (const edge of graph.walkingOutgoing.get(current.nodeId) ?? []) {
@@ -236,13 +245,24 @@ export class JourneyPlanningService {
       }
     }
 
+    // Normalise stop IDs for dedup: if a stop belongs to a bus stop group,
+    // use the group ID so that boarding at different stands of the same
+    // station produces an identical signature.
+    const normaliseStopForDedup = (stopId: string): string => {
+      const group = getBusStopGroupForStop(stopId);
+      return group ? group.groupId : stopId;
+    };
+
     const seen = new Set<string>();
     const deduped = destinationLabels
       .sort((left, right) => scoreLabel(left, preference) - scoreLabel(right, preference))
       .map((label) => this.responseMapper.mapItinerary(label, graph))
       .filter((itinerary) => {
-        const signature = itinerary.legs
-          .map((leg) => `${leg.mode}:${leg.from.id}:${leg.to.id}:${leg.departureTime}:${leg.arrivalTime}:${leg.line ?? ""}:${leg.routeId ?? ""}`)
+        // Build signature from transit legs only — walk legs are just connecting
+        // tissue whose times vary by stand within a bus station group.
+        const transitLegs = itinerary.legs.filter((leg) => leg.mode !== "walk");
+        const signature = transitLegs
+          .map((leg) => `${leg.mode}:${normaliseStopForDedup(leg.from.id)}:${normaliseStopForDedup(leg.to.id)}:${leg.departureTime}:${leg.line ?? ""}:${leg.routeId ?? ""}`)
           .join("|");
         if (seen.has(signature)) return false;
         seen.add(signature);
@@ -250,14 +270,19 @@ export class JourneyPlanningService {
       });
     const ranked = this.rankReturnedItineraries(deduped, origin);
 
-    const selected: typeof ranked = [];
-    const leftovers: typeof ranked = [];
+    // Quality gate: drop routes absurdly slower than the best option.
+    const bestMinutes = ranked.length > 0 ? ranked[0].totalMinutes : Infinity;
+    const maxAcceptableMinutes = Math.max(bestMinutes * 3, bestMinutes + 60);
+    const viable = ranked.filter((itinerary) => itinerary.totalMinutes <= maxAcceptableMinutes);
+
+    const selected: typeof viable = [];
+    const leftovers: typeof viable = [];
     const usedBoardingPatterns = new Set<string>();
 
-    for (const itinerary of ranked) {
+    for (const itinerary of viable) {
       const firstTransitLeg = itinerary.legs.find((leg) => leg.mode !== "walk") ?? itinerary.legs[0] ?? null;
       const patternKey = firstTransitLeg
-        ? `${firstTransitLeg.mode}:${firstTransitLeg.from.id}:${firstTransitLeg.line ?? firstTransitLeg.routeId ?? ""}`
+        ? `${firstTransitLeg.mode}:${normaliseStopForDedup(firstTransitLeg.from.id)}:${firstTransitLeg.line ?? firstTransitLeg.routeId ?? ""}`
         : "walk-only";
 
       if (!usedBoardingPatterns.has(patternKey)) {
@@ -590,23 +615,17 @@ export class JourneyPlanningService {
   }
 
   private async findStationFrontageStops(stationName: string) {
-    const tokens = stationName
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((token) => token.length >= 4 && !["lancs", "north", "south", "east", "west"].includes(token));
+    const tokens = extractStationTokens(stationName);
 
     if (tokens.length === 0) {
       return [];
     }
 
-    const frontageTerms = ["rail station", "railway station", "rail station taxi rank", "station"];
-
     const stops = await this.prisma.busStop.findMany({
       where: {
         AND: [
           {
-            OR: frontageTerms.map((term) => ({
+            OR: FRONTAGE_TERMS.map((term) => ({
               name: { contains: term, mode: "insensitive" as const },
             })),
           },
@@ -627,7 +646,14 @@ export class JourneyPlanningService {
       take: 8,
     });
 
-    return stops.filter((stop) => stop.latitude !== null && stop.longitude !== null);
+    return stops.filter(
+      (stop): stop is typeof stop & { latitude: number; longitude: number } => {
+        if (stop.latitude === null || stop.longitude === null) return false;
+        const lower = stop.name.toLowerCase();
+        if (FRONTAGE_EXCLUDED_TERMS.some((term) => lower.includes(term))) return false;
+        return matchesStationFrontageStop(tokens, stop.name, null);
+      }
+    );
   }
 
   private buildSyntheticWalkEdge(

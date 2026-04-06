@@ -115,12 +115,12 @@ export default function LocationSearchField({
 
   return (
     <label className="relative block space-y-2">
-      <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--brand-ink)]">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">{label}</span>
       <input
         type="text"
         value={query}
         placeholder={placeholder}
-        className="w-full rounded-[1.6rem] border border-[var(--outline)] bg-[var(--input)] px-5 py-3.5 text-base text-[var(--foreground)] shadow-[var(--shadow-soft)] outline-none transition focus:border-[var(--brand)]"
+        className="w-full rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
         onFocus={() => setOpen(true)}
         onBlur={() => {
           blurTimeoutRef.current = window.setTimeout(() => setOpen(false), 120);
@@ -136,7 +136,7 @@ export default function LocationSearchField({
       />
 
       {open ? (
-        <div className="absolute left-0 right-0 top-full z-20 mt-3 overflow-hidden rounded-[1.6rem] border border-[var(--outline)] bg-[linear-gradient(180deg,var(--surface-strong)_0%,var(--surface)_100%)] shadow-[var(--shadow-card)]">
+        <div className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-xl border border-[var(--outline)] bg-[var(--surface)] shadow-[var(--shadow-card)]">
           {loading ? (
             <div className="px-4 py-3 text-sm text-[var(--muted)]">Searching…</div>
           ) : results.length === 0 ? (
@@ -146,7 +146,7 @@ export default function LocationSearchField({
               <button
                 key={`${result.type}:${result.id}`}
                 type="button"
-                className="flex w-full items-start justify-between gap-3 border-b border-[var(--outline-soft)] px-4 py-3 text-left transition last:border-b-0 hover:bg-[var(--surface-alt)]"
+                className="flex w-full items-start justify-between gap-3 border-b border-[var(--outline-soft)] px-4 py-3 text-left transition last:border-b-0 hover:bg-[var(--surface-soft)]"
                 onMouseDown={(event) => {
                   event.preventDefault();
                   if (blurTimeoutRef.current) {
@@ -161,7 +161,7 @@ export default function LocationSearchField({
                     {[result.localityName, result.type === "bus_stop_group" ? null : result.code].filter(Boolean).join(" · ")}
                   </div>
                 </div>
-                <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--brand-ink)]">
+                <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
                   {result.type === "station" ? "Rail" : result.type === "bus_stop_group" ? "Bus hub" : "Bus"}
                 </div>
               </button>

@@ -2,10 +2,18 @@ import express from "express";
 import cors from "cors";
 import { prisma } from "./infrastructure/orm/prisma/client";
 import { z } from "zod";
+import { env } from "./config/env";
 import { JourneyPlanningService } from "./services/journeys/JourneyPlanningService";
 import { JourneyLegDetailService } from "./services/journeys/JourneyLegDetailService";
+import { JourneyOperationalStatusService } from "./services/journeys/JourneyOperationalStatusService";
 import { getBusServiceLabel } from "./services/journeys/helpers";
 import { getBusStopGroup, searchBusStopGroups } from "./services/busStopGroups";
+import { TransportServerClient } from "./infrastructure/apiClients/TransportServerClient";
+import { NationalHighwaysClient } from "./infrastructure/apiClients/NationalHighwaysClient";
+import { StationFacilitiesService } from "./services/stations/StationFacilitiesService";
+import { LiveMovementStore } from "./infrastructure/liveData/LiveMovementStore";
+import { BusLiveDelayStore } from "./infrastructure/liveData/BusLiveDelayStore";
+import { cacheGet, cacheSet } from "./infrastructure/cache/RedisCache";
 
 function parsePositiveInt(value: unknown, fallback: number): number {
   if (value === undefined || value === null || value === "") return fallback;
@@ -152,6 +160,7 @@ const journeyPlanRequestSchema = z.object({
   time: z.string().regex(/^\d{2}:\d{2}$/),
   preference: z.enum(["fastest", "balanced", "fewest_changes"]).default("fastest"),
   maxItineraries: z.coerce.number().int().min(1).max(8).default(3),
+  modes: z.array(z.enum(["bus", "rail"])).min(1).optional(),
 });
 
 const journeyLegDetailRequestSchema = z.object({
@@ -161,12 +170,20 @@ const journeyLegDetailRequestSchema = z.object({
   toId: z.string().min(1),
 });
 
-export function createApp() {
+export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLiveDelayStore?: BusLiveDelayStore } = {}) {
+  const { liveMovementStore, busLiveDelayStore } = opts;
   const app = express();
   app.use(cors());
   app.use(express.json());
-  const journeyPlanningService = new JourneyPlanningService(prisma);
-  const journeyLegDetailService = new JourneyLegDetailService(prisma);
+  const transportServerClient = new TransportServerClient(
+    env.TRANSPORT_SERVER_BASE_URL,
+    env.TRANSPORT_SERVER_TIMEOUT_MS
+  );
+  const journeyOperationalStatusService = new JourneyOperationalStatusService(prisma, transportServerClient);
+  const journeyPlanningService = new JourneyPlanningService(prisma, liveMovementStore, busLiveDelayStore);
+  const journeyLegDetailService = new JourneyLegDetailService(prisma, journeyOperationalStatusService);
+  const nationalHighwaysClient = new NationalHighwaysClient(env.NATIONAL_HIGHWAYS_API_KEY);
+  const stationFacilitiesService = new StationFacilitiesService();
 
   app.get("/", (_req, res) => {
     res.json({ message: "Backend is running" });
@@ -176,6 +193,66 @@ export function createApp() {
     res.json({ ok: true });
   });
 
+  app.get("/weather/current", async (req, res) => {
+    const lat = typeof req.query.lat === "string" ? Number(req.query.lat) : Number.NaN;
+    const lon = typeof req.query.lon === "string" ? Number(req.query.lon) : Number.NaN;
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return res.status(400).json({ error: "lat and lon query parameters are required numbers" });
+    }
+
+    const weatherCacheKey = `weather:${lat.toFixed(3)}:${lon.toFixed(3)}`;
+    const cachedWeather = await cacheGet(weatherCacheKey);
+    if (cachedWeather) return res.json(JSON.parse(cachedWeather));
+
+    try {
+      const weather = await transportServerClient.getWeather(lat, lon);
+      await cacheSet(weatherCacheKey, JSON.stringify(weather), 300); // 5 min
+      return res.json(weather);
+    } catch (error) {
+      return res.status(502).json({
+        error: error instanceof Error ? error.message : "Weather lookup failed",
+      });
+    }
+  });
+
+  app.get("/rail/live/departures/:crs", async (req, res) => {
+    const crs = req.params.crs?.trim().toUpperCase();
+    if (!crs || crs.length !== 3) {
+      return res.status(400).json({ error: "crs must be a 3-letter CRS code" });
+    }
+
+    const liveBoardCacheKey = `rail:live:${crs}`;
+    const cachedBoard = await cacheGet(liveBoardCacheKey);
+    if (cachedBoard) return res.json(JSON.parse(cachedBoard));
+
+    try {
+      const board = await transportServerClient.getRailDepartures(crs);
+      await cacheSet(liveBoardCacheKey, JSON.stringify(board), 30); // 30 sec
+      return res.json(board);
+    } catch (error) {
+      return res.status(502).json({
+        error: error instanceof Error ? error.message : "Rail live departures lookup failed",
+      });
+    }
+  });
+
+  app.get("/bus/live/:operatorRef", async (req, res) => {
+    const operatorRef = req.params.operatorRef?.trim().toUpperCase();
+    if (!operatorRef) {
+      return res.status(400).json({ error: "operatorRef is required" });
+    }
+
+    try {
+      const liveBus = await transportServerClient.getBusLive(operatorRef);
+      return res.json(liveBus);
+    } catch (error) {
+      return res.status(502).json({
+        error: error instanceof Error ? error.message : "Bus live positions lookup failed",
+      });
+    }
+  });
+
   app.get("/search", async (req, res) => {
     const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
     if (q.length < 2) {
@@ -183,8 +260,12 @@ export function createApp() {
     }
 
     const limit = Math.min(parsePositiveInt(req.query.limit, 20), 500);
-    const perTypeLimit = Math.max(limit, Math.ceil(limit * 1.5));
     const scheduledOnly = req.query.scheduledOnly === "true";
+    const searchCacheKey = `search:${q.toLowerCase()}:${limit}:${scheduledOnly}`;
+    const cached = await cacheGet(searchCacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    const perTypeLimit = Math.max(limit, Math.ceil(limit * 1.5));
     const qLower = q.toLowerCase();
     const groupedStops = searchBusStopGroups(q);
     const groupedMemberStopIds = new Set(groupedStops.flatMap((group) => group.memberStopIds));
@@ -307,11 +388,9 @@ export function createApp() {
 
     const results = mixed.slice(0, limit);
 
-    return res.json({
-      query: q,
-      count: results.length,
-      results,
-    });
+    const payload = { query: q, count: results.length, results };
+    await cacheSet(searchCacheKey, JSON.stringify(payload), 300); // 5 min
+    return res.json(payload);
   });
 
   app.post("/journeys/plan", async (req, res) => {
@@ -372,6 +451,8 @@ export function createApp() {
       code: string;
       name: string;
       localityName: string | null;
+      latitude: number | null;
+      longitude: number | null;
       memberStopIds: string[];
     };
     req: express.Request;
@@ -560,6 +641,8 @@ export function createApp() {
         code: scope.code,
         name: scope.name,
         localityName: scope.localityName,
+        latitude: scope.latitude,
+        longitude: scope.longitude,
         memberStopIds: scope.type === "bus_stop_group" ? scope.memberStopIds : undefined,
       },
       dataState: buildScheduledDataState(latestDepartureUpdate),
@@ -593,6 +676,8 @@ export function createApp() {
       select: {
         stopId: true,
         name: true,
+        latitude: true,
+        longitude: true,
         locality: {
           select: {
             name: true,
@@ -612,6 +697,8 @@ export function createApp() {
         code: stop.stopId,
         name: stop.name,
         localityName: stop.locality?.name ?? null,
+        latitude: stop.latitude,
+        longitude: stop.longitude,
         memberStopIds: [stop.stopId],
       },
       req,
@@ -630,6 +717,29 @@ export function createApp() {
       return res.status(404).json({ error: `Bus stop group not found: ${groupId}` });
     }
 
+    const groupStops = await prisma.busStop.findMany({
+      where: {
+        stopId: { in: group.memberStopIds },
+      },
+      select: {
+        latitude: true,
+        longitude: true,
+      },
+    });
+
+    const mappedGroupStops = groupStops.filter(
+      (stop): stop is { latitude: number; longitude: number } =>
+        stop.latitude !== null && stop.longitude !== null
+    );
+    const groupLatitude =
+      mappedGroupStops.length > 0
+        ? mappedGroupStops.reduce((sum, stop) => sum + stop.latitude, 0) / mappedGroupStops.length
+        : null;
+    const groupLongitude =
+      mappedGroupStops.length > 0
+        ? mappedGroupStops.reduce((sum, stop) => sum + stop.longitude, 0) / mappedGroupStops.length
+        : null;
+
     return loadBusDepartures({
       scope: {
         type: "bus_stop_group",
@@ -637,6 +747,8 @@ export function createApp() {
         code: group.code,
         name: group.name,
         localityName: group.localityName,
+        latitude: groupLatitude,
+        longitude: groupLongitude,
         memberStopIds: group.memberStopIds,
       },
       req,
@@ -742,7 +854,7 @@ export function createApp() {
 
     const station = await prisma.station.findUnique({
       where: { stationId: crs },
-      select: { stationId: true, name: true },
+      select: { stationId: true, name: true, latitude: true, longitude: true },
     });
 
     if (!station) {
@@ -940,21 +1052,194 @@ export function createApp() {
 
     const windowEnd = new Date(from.getTime() + windowMinutes * 60 * 1000);
 
+    // Overlay live movement data if the STOMP stream is active
+    let stationStanox: string | null = null;
+    let liveOverlayCount = 0;
+    if (liveMovementStore && liveMovementStore.size > 0) {
+      const tiploc = await prisma.railTiploc.findFirst({
+        where: { crsCode: crs },
+        select: { stanox: true },
+      });
+      stationStanox = tiploc?.stanox ?? null;
+    }
+
+    const mappedDepartures = departures.map(({ _sortMinutes, _updatedAt, ...row }) => {
+      const base = {
+        ...row,
+        destination: destinationByScheduleId.get(row.scheduleId) ?? null,
+        liveDelay: null as null | {
+          timetableVariationMinutes: number | null;
+          variationStatus: string | null;
+          platform: string | null;
+          actualTimestamp: string | null;
+        },
+      };
+
+      if (stationStanox && liveMovementStore) {
+        const movement = liveMovementStore.findDeparture(stationStanox, _sortMinutes);
+        if (movement) {
+          liveOverlayCount += 1;
+          base.liveDelay = {
+            timetableVariationMinutes: movement.timetableVariationMinutes,
+            variationStatus: movement.variationStatus,
+            platform: movement.platform ?? row.platform,
+            actualTimestamp: movement.actualTimestampMs
+              ? new Date(movement.actualTimestampMs).toISOString()
+              : null,
+          };
+        }
+      }
+
+      return base;
+    });
+
+    const isLive = liveOverlayCount > 0;
+
     return res.json({
       station,
-      dataState: buildScheduledDataState(latestRailUpdate),
+      dataState: isLive
+        ? { mode: "live" as const, isLive: true, fallback: false, lastUpdated: new Date().toISOString(), liveOverlayCount }
+        : buildScheduledDataState(latestRailUpdate),
       window: {
         from: from.toISOString(),
         to: windowEnd.toISOString(),
         windowMinutes,
         serviceDate: serviceDate.toISOString().slice(0, 10),
       },
-      count: departures.length,
-      departures: departures.map(({ _sortMinutes, _updatedAt, ...row }) => ({
-        ...row,
-        destination: destinationByScheduleId.get(row.scheduleId) ?? null,
+      count: mappedDepartures.length,
+      departures: mappedDepartures,
+    });
+  });
+
+  // ── Rail delay stats (FR-06) ─────────────────────────────────────────────
+  // GET /rail/delay-stats/:stanox  — aggregated delay distribution for a station
+  // GET /rail/delay-log            — raw movement log (paginated)
+  app.get("/rail/delay-stats/:stanox", async (req, res) => {
+    const stanox = req.params.stanox?.trim();
+    if (!stanox) return res.status(400).json({ error: "stanox required" });
+
+    const days = Math.min(parsePositiveInt(req.query.days, 7), 90);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const logs = await prisma.railMovementLog.findMany({
+      where: {
+        stanox,
+        eventType: "DEPARTURE",
+        receivedAt: { gte: since },
+        timetableVariationMinutes: { not: null },
+      },
+      select: { timetableVariationMinutes: true, variationStatus: true, receivedAt: true },
+      orderBy: { receivedAt: "asc" },
+    });
+
+    const total = logs.length;
+    if (total === 0) {
+      return res.json({ stanox, days, total: 0, onTime: 0, late: 0, early: 0, avgDelayMinutes: null, buckets: [] });
+    }
+
+    const counts = { onTime: 0, late: 0, early: 0 };
+    let delaySum = 0;
+    const buckets = new Map<string, { date: string; count: number; avgDelay: number; sum: number }>();
+
+    for (const log of logs) {
+      const v = log.timetableVariationMinutes as number;
+      delaySum += v;
+      if (v <= 0) counts.early += 1;
+      else if (v <= 1) counts.onTime += 1;
+      else counts.late += 1;
+
+      const date = log.receivedAt.toISOString().slice(0, 10);
+      const bucket = buckets.get(date) ?? { date, count: 0, avgDelay: 0, sum: 0 };
+      bucket.count += 1;
+      bucket.sum += v;
+      bucket.avgDelay = Math.round((bucket.sum / bucket.count) * 10) / 10;
+      buckets.set(date, bucket);
+    }
+
+    return res.json({
+      stanox,
+      days,
+      total,
+      onTime: counts.onTime,
+      late: counts.late,
+      early: counts.early,
+      avgDelayMinutes: Math.round((delaySum / total) * 10) / 10,
+      buckets: Array.from(buckets.values()),
+    });
+  });
+
+  app.get("/rail/delay-log", async (req, res) => {
+    const stanox = typeof req.query.stanox === "string" ? req.query.stanox.trim() : undefined;
+    const limit = Math.min(parsePositiveInt(req.query.limit, 100), 500);
+    const offset = parsePositiveInt(req.query.offset, 0) - 1 || 0;
+    const days = Math.min(parsePositiveInt(req.query.days, 1), 30);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const logs = await prisma.railMovementLog.findMany({
+      where: {
+        ...(stanox ? { stanox } : {}),
+        receivedAt: { gte: since },
+      },
+      orderBy: { receivedAt: "desc" },
+      take: limit,
+      skip: offset,
+      select: {
+        id: true,
+        trainId: true,
+        stanox: true,
+        eventType: true,
+        timetableVariationMinutes: true,
+        variationStatus: true,
+        platform: true,
+        actualTimestampMs: true,
+        receivedAt: true,
+      },
+    });
+
+    return res.json({
+      count: logs.length,
+      logs: logs.map((l) => ({
+        ...l,
+        actualTimestampMs: l.actualTimestampMs !== null ? Number(l.actualTimestampMs) : null,
       })),
     });
+  });
+
+  // ── Road VMS (Variable Message Signs) ────────────────────────────────────
+  app.get("/road/vms", async (req, res) => {
+    const road = typeof req.query.road === "string" && req.query.road.trim().length > 0
+      ? req.query.road.trim().toUpperCase()
+      : "M6";
+
+    const cacheKey = `vms:${road}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    try {
+      const snapshot = await nationalHighwaysClient.getVmsSigns(road);
+      await cacheSet(cacheKey, JSON.stringify(snapshot), 300); // 5 min TTL
+      return res.json(snapshot);
+    } catch (error) {
+      return res.status(502).json({
+        error: error instanceof Error ? error.message : "VMS data fetch failed",
+      });
+    }
+  });
+
+  // ── Station facilities ───────────────────────────────────────────────────
+  app.get("/rail/stations/:crs/facilities", async (req, res) => {
+    const crs = req.params.crs.trim().toUpperCase();
+    if (crs.length < 2 || crs.length > 4) {
+      return res.status(400).json({ error: "Invalid CRS code" });
+    }
+
+    const cacheKey = `station-facilities:${crs}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+
+    const snapshot = stationFacilitiesService.getFacilities(crs);
+    await cacheSet(cacheKey, JSON.stringify(snapshot), 3600); // 1 hour TTL
+    return res.json(snapshot);
   });
 
   return app;

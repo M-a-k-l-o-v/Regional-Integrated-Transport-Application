@@ -19,7 +19,7 @@ export default async function BoardsPage({ searchParams }: BoardsPageProps) {
       <PageHeader
         eyebrow="Boards"
         title="Open a bus or rail board by location"
-        description="Pick the board type first, return to recently checked locations, or search by place name to open another scheduled board."
+        description="Browse bus and rail departure boards by location."
       />
 
       <BoardsDirectory initialMode={initialMode} />

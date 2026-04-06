@@ -12,15 +12,15 @@ type ModeTabsProps = {
 
 export default function ModeTabs({ tabs }: ModeTabsProps) {
   return (
-    <div className="inline-flex flex-wrap rounded-full border border-[var(--outline)] bg-[var(--surface-alt)] p-1 shadow-[var(--shadow-soft)]">
+    <div className="inline-flex flex-wrap rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] p-1">
       {tabs.map((tab) => (
         <Link
           key={tab.href}
           href={tab.href}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+          className={`flex min-h-11 items-center rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
             tab.active
-              ? "bg-[var(--brand)] text-white shadow-[var(--shadow-soft)]"
-              : "text-[var(--brand-ink)] hover:bg-[var(--surface-alt-hover)]"
+              ? "bg-[var(--brand)] text-white"
+              : "text-[var(--foreground)] hover:bg-[var(--surface-alt)]"
           }`}
         >
           {tab.label}

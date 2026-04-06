@@ -34,28 +34,28 @@ export default function TrainBoardControls({
       />
 
       <label className="block space-y-2">
-        <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--brand-ink)]">
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
           Depart after
         </span>
         <input
           type="datetime-local"
           name="from"
           defaultValue={initialFrom.replace(".000Z", "").replace(/Z$/, "")}
-          className="w-full rounded-[1.5rem] border border-[var(--outline)] bg-[var(--input)] px-5 py-3.5 text-[var(--foreground)] shadow-[var(--shadow-soft)] outline-none transition focus:border-[var(--brand)]"
+          className="w-full rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
         />
       </label>
 
       <button
         type="submit"
         disabled={!canSubmit}
-        className="inline-flex rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)] transition hover:bg-[var(--brand-ink)] disabled:cursor-not-allowed disabled:bg-zinc-300"
+        className="flex h-11 w-full items-center justify-center rounded-xl bg-[var(--brand)] text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Load rail board
       </button>
 
       {!canSubmit ? (
-        <p className="rounded-[1.35rem] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
-          Pick a station from the search suggestions. The page resolves the internal CRS code behind the scenes.
+        <p className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
+          Pick a station from the search suggestions.
         </p>
       ) : null}
     </form>

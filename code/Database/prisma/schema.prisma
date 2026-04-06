@@ -139,6 +139,7 @@ model Station {
 model BusStop {
   stopId     String  @id // ATCOCode
   name       String
+  indicator  String? // NaPTAN Indicator field (e.g. "Stand 1", "Stop A")
   latitude   Float?
   longitude  Float?
   localityId String?
@@ -343,6 +344,26 @@ model RailServiceStop {
   @@index([tiplocCode])
   @@index([stationId])
   @@index([locationType])
+}
+
+/**
+ * Persistent log of TRUST type-0003 movement messages received via STOMP.
+ * Used for delay trend analysis and per-station reliability scoring (FR-06).
+ */
+model RailMovementLog {
+  id                        String   @id @default(uuid())
+  trainId                   String
+  stanox                    String
+  eventType                 String   // DEPARTURE | ARRIVAL | PASSING
+  timetableVariationMinutes Int?
+  variationStatus           String?  // ON TIME | LATE | EARLY | OFF ROUTE
+  platform                  String?
+  actualTimestampMs         BigInt?
+  receivedAt                DateTime @default(now())
+
+  @@index([stanox])
+  @@index([receivedAt])
+  @@index([trainId])
 }
 
 /**
