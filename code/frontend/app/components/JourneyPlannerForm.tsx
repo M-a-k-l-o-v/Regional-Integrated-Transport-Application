@@ -128,16 +128,13 @@ export default function JourneyPlannerForm({
             <button
               key={option.value}
               type="button"
-              className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
-                active
-                  ? both
-                    ? "border-[var(--outline)] bg-[var(--surface)] text-[var(--foreground)]"
-                    : "border-[var(--brand)] bg-[var(--brand)] text-white"
-                  : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)]"
-              }`}
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${active && !both
+                ? "border-[var(--brand)] bg-[var(--brand)] text-white"
+                : "border-[var(--outline)] bg-[var(--surface)] text-[var(--foreground)]"
+                }`}
               onClick={() => {
                 if (active && modes.length === 1) return;
-                setModes(active ? modes.filter((m) => m !== option.value) : [...modes, option.value]);
+                setModes([option.value]);
               }}
             >
               {option.icon}
@@ -147,11 +144,10 @@ export default function JourneyPlannerForm({
         })}
         <button
           type="button"
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
-            modes.length === ALL_MODES.length
-              ? "border-[var(--brand)] bg-[var(--brand)] text-white"
-              : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)]"
-          }`}
+          className={`inline-flex min-h-11 items-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${modes.length === ALL_MODES.length
+            ? "border-[var(--brand)] bg-[var(--brand)] text-white"
+            : "border-[var(--outline)] bg-[var(--surface)] text-[var(--foreground)]"
+            }`}
           onClick={() => setModes([...ALL_MODES])}
         >
           Both
@@ -194,11 +190,10 @@ export default function JourneyPlannerForm({
             <button
               key={option.value}
               type="button"
-              className={`min-h-11 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
-                active
-                  ? "border-[var(--brand)] bg-[var(--brand-light)] text-[var(--brand)]"
-                  : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-soft)]"
-              }`}
+              className={`min-h-11 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${active
+                ? "border-[var(--brand)] bg-[var(--brand-light)] text-[var(--brand)]"
+                : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-soft)]"
+                }`}
               onClick={() => setPreference(option.value)}
             >
               {option.label}
