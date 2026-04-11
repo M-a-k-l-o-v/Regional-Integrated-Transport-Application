@@ -1,9 +1,9 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
-export const DEFAULT_BUS_DATE = "2026-05-04";
-export const DEFAULT_TRAIN_FROM = "2026-05-04T04:00";
-export const DEFAULT_PLANNER_DATE = "2026-05-04";
-export const DEFAULT_PLANNER_TIME = "08:00";
+export const DEFAULT_BUS_DATE = getLondonTodayDate();
+export const DEFAULT_TRAIN_FROM = getLondonNowTimestamp();
+export const DEFAULT_PLANNER_DATE = getLondonTodayDate();
+export const DEFAULT_PLANNER_TIME = getLondonCurrentTime();
 
 export type BoardMode = "bus" | "rail";
 
@@ -471,6 +471,11 @@ export function getLondonTodayDate(): string {
 export function getLondonCurrentTime(): string {
   const { hour, minute } = getLondonDateParts();
   return `${hour}:${minute}`;
+}
+
+export function getLondonNowTimestamp(): string {
+  const { date, time } = getLondonCurrentPlannerDefaults();
+  return `${date}T${time}`
 }
 
 export function getLondonCurrentPlannerDefaults() {
