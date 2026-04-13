@@ -1,0 +1,1103 @@
+timestamp,source,error_message
+2026-03-09T00:01:24.656032,rail_stomp,Connection failed: 
+2026-03-09T00:02:58.682691,rail_stomp,Connection failed: 
+2026-03-09T00:04:32.645497,rail_stomp,Connection failed: 
+2026-03-09T00:06:06.618894,rail_stomp,Connection failed: 
+2026-03-09T00:07:40.623196,rail_stomp,Connection failed: 
+2026-03-09T00:09:14.566390,rail_stomp,Connection failed: 
+2026-03-09T00:10:48.656134,rail_stomp,Connection failed: 
+2026-03-09T00:12:22.621088,rail_stomp,Connection failed: 
+2026-03-09T00:13:56.609165,rail_stomp,Connection failed: 
+2026-03-09T00:15:30.580835,rail_stomp,Connection failed: 
+2026-03-09T00:17:04.609953,rail_stomp,Connection failed: 
+2026-03-09T00:18:38.569661,rail_stomp,Connection failed: 
+2026-03-09T00:20:12.532650,rail_stomp,Connection failed: 
+2026-03-09T00:21:46.534002,rail_stomp,Connection failed: 
+2026-03-09T00:23:20.591132,rail_stomp,Connection failed: 
+2026-03-09T00:24:54.573389,rail_stomp,Connection failed: 
+2026-03-09T00:26:28.538387,rail_stomp,Connection failed: 
+2026-03-09T00:28:02.515728,rail_stomp,Connection failed: 
+2026-03-09T00:29:36.517773,rail_stomp,Connection failed: 
+2026-03-09T00:31:10.476199,rail_stomp,Connection failed: 
+2026-03-09T00:32:44.649037,rail_stomp,Connection failed: 
+2026-03-09T00:34:18.590624,rail_stomp,Connection failed: 
+2026-03-09T00:35:52.802911,rail_stomp,Connection failed: 
+2026-03-09T00:37:26.790101,rail_stomp,Connection failed: 
+2026-03-09T00:39:00.755543,rail_stomp,Connection failed: 
+2026-03-09T00:40:34.755490,rail_stomp,Connection failed: 
+2026-03-09T00:42:08.723593,rail_stomp,Connection failed: 
+2026-03-09T00:43:42.699733,rail_stomp,Connection failed: 
+2026-03-09T00:45:17.808724,rail_stomp,Connection failed: 
+2026-03-09T00:46:51.825608,rail_stomp,Connection failed: 
+2026-03-09T00:48:25.811618,rail_stomp,Connection failed: 
+2026-03-09T00:49:59.837634,rail_stomp,Connection failed: 
+2026-03-09T00:51:33.832250,rail_stomp,Connection failed: 
+2026-03-09T00:53:07.828493,rail_stomp,Connection failed: 
+2026-03-09T00:54:41.817071,rail_stomp,Connection failed: 
+2026-03-09T00:56:15.843273,rail_stomp,Connection failed: 
+2026-03-09T00:57:49.822946,rail_stomp,Connection failed: 
+2026-03-09T00:59:23.782452,rail_stomp,Connection failed: 
+2026-03-09T01:00:57.786879,rail_stomp,Connection failed: 
+2026-03-09T01:02:31.806584,rail_stomp,Connection failed: 
+2026-03-09T01:04:05.836384,rail_stomp,Connection failed: 
+2026-03-09T01:05:39.856179,rail_stomp,Connection failed: 
+2026-03-09T01:07:13.811870,rail_stomp,Connection failed: 
+2026-03-09T01:08:47.785406,rail_stomp,Connection failed: 
+2026-03-09T01:10:21.749504,rail_stomp,Connection failed: 
+2026-03-09T01:11:55.769348,rail_stomp,Connection failed: 
+2026-03-09T01:13:29.764655,rail_stomp,Connection failed: 
+2026-03-09T01:15:03.721504,rail_stomp,Connection failed: 
+2026-03-09T01:16:37.729819,rail_stomp,Connection failed: 
+2026-03-09T01:18:11.765246,rail_stomp,Connection failed: 
+2026-03-09T01:19:45.722242,rail_stomp,Connection failed: 
+2026-03-09T01:21:19.675085,rail_stomp,Connection failed: 
+2026-03-09T01:22:53.671672,rail_stomp,Connection failed: 
+2026-03-09T01:24:27.636222,rail_stomp,Connection failed: 
+2026-03-09T01:26:01.632866,rail_stomp,Connection failed: 
+2026-03-09T01:27:35.636602,rail_stomp,Connection failed: 
+2026-03-09T01:29:09.667037,rail_stomp,Connection failed: 
+2026-03-09T01:30:43.635612,rail_stomp,Connection failed: 
+2026-03-09T01:32:17.629751,rail_stomp,Connection failed: 
+2026-03-09T01:33:51.664690,rail_stomp,Connection failed: 
+2026-03-09T01:35:25.643506,rail_stomp,Connection failed: 
+2026-03-09T01:36:59.624626,rail_stomp,Connection failed: 
+2026-03-09T01:38:33.644125,rail_stomp,Connection failed: 
+2026-03-09T01:40:07.660672,rail_stomp,Connection failed: 
+2026-03-09T01:41:41.673838,rail_stomp,Connection failed: 
+2026-03-09T01:43:15.626666,rail_stomp,Connection failed: 
+2026-03-09T01:44:49.643047,rail_stomp,Connection failed: 
+2026-03-09T01:46:23.715845,rail_stomp,Connection failed: 
+2026-03-09T01:47:57.725360,rail_stomp,Connection failed: 
+2026-03-09T01:49:31.750963,rail_stomp,Connection failed: 
+2026-03-09T01:51:05.793667,rail_stomp,Connection failed: 
+2026-03-09T01:52:39.776153,rail_stomp,Connection failed: 
+2026-03-09T01:54:13.799626,rail_stomp,Connection failed: 
+2026-03-09T01:55:47.804100,rail_stomp,Connection failed: 
+2026-03-09T01:57:21.808215,rail_stomp,Connection failed: 
+2026-03-09T01:58:55.748167,rail_stomp,Connection failed: 
+2026-03-09T02:00:29.757292,rail_stomp,Connection failed: 
+2026-03-09T02:02:03.728698,rail_stomp,Connection failed: 
+2026-03-09T02:03:37.755332,rail_stomp,Connection failed: 
+2026-03-09T02:05:11.713662,rail_stomp,Connection failed: 
+2026-03-09T02:06:45.744038,rail_stomp,Connection failed: 
+2026-03-09T02:08:19.714838,rail_stomp,Connection failed: 
+2026-03-09T02:09:53.736209,rail_stomp,Connection failed: 
+2026-03-09T02:11:27.731984,rail_stomp,Connection failed: 
+2026-03-09T02:13:01.719385,rail_stomp,Connection failed: 
+2026-03-09T02:14:35.664777,rail_stomp,Connection failed: 
+2026-03-09T02:16:09.612155,rail_stomp,Connection failed: 
+2026-03-09T02:17:43.622027,rail_stomp,Connection failed: 
+2026-03-09T02:19:17.622229,rail_stomp,Connection failed: 
+2026-03-09T02:20:51.587810,rail_stomp,Connection failed: 
+2026-03-09T02:22:25.567638,rail_stomp,Connection failed: 
+2026-03-09T02:23:59.542385,rail_stomp,Connection failed: 
+2026-03-09T02:25:33.530551,rail_stomp,Connection failed: 
+2026-03-09T02:27:07.538323,rail_stomp,Connection failed: 
+2026-03-09T02:28:41.521508,rail_stomp,Connection failed: 
+2026-03-09T02:30:15.550856,rail_stomp,Connection failed: 
+2026-03-09T02:31:49.542520,rail_stomp,Connection failed: 
+2026-03-09T02:33:23.533459,rail_stomp,Connection failed: 
+2026-03-09T02:34:57.548214,rail_stomp,Connection failed: 
+2026-03-09T02:36:31.515563,rail_stomp,Connection failed: 
+2026-03-09T02:38:05.475079,rail_stomp,Connection failed: 
+2026-03-09T02:39:39.478599,rail_stomp,Connection failed: 
+2026-03-09T02:41:13.502100,rail_stomp,Connection failed: 
+2026-03-09T02:42:47.439634,rail_stomp,Connection failed: 
+2026-03-09T02:44:21.475463,rail_stomp,Connection failed: 
+2026-03-09T02:45:55.491737,rail_stomp,Connection failed: 
+2026-03-09T02:47:29.496618,rail_stomp,Connection failed: 
+2026-03-09T02:49:03.547850,rail_stomp,Connection failed: 
+2026-03-09T02:50:37.585346,rail_stomp,Connection failed: 
+2026-03-09T02:52:11.567437,rail_stomp,Connection failed: 
+2026-03-09T02:53:45.554985,rail_stomp,Connection failed: 
+2026-03-09T02:55:19.574129,rail_stomp,Connection failed: 
+2026-03-09T02:56:53.546586,rail_stomp,Connection failed: 
+2026-03-09T02:58:27.535204,rail_stomp,Connection failed: 
+2026-03-09T03:00:01.509714,rail_stomp,Connection failed: 
+2026-03-09T03:01:35.530196,rail_stomp,Connection failed: 
+2026-03-09T03:03:09.529663,rail_stomp,Connection failed: 
+2026-03-09T03:04:43.537322,rail_stomp,Connection failed: 
+2026-03-09T03:06:17.569316,rail_stomp,Connection failed: 
+2026-03-09T03:07:51.601052,rail_stomp,Connection failed: 
+2026-03-09T03:09:25.599548,rail_stomp,Connection failed: 
+2026-03-09T03:10:59.614223,rail_stomp,Connection failed: 
+2026-03-09T03:12:33.623081,rail_stomp,Connection failed: 
+2026-03-09T03:14:07.615224,rail_stomp,Connection failed: 
+2026-03-09T03:15:41.615926,rail_stomp,Connection failed: 
+2026-03-09T03:17:15.582849,rail_stomp,Connection failed: 
+2026-03-09T03:18:49.606465,rail_stomp,Connection failed: 
+2026-03-09T03:20:23.616057,rail_stomp,Connection failed: 
+2026-03-09T03:21:57.669834,rail_stomp,Connection failed: 
+2026-03-09T03:23:31.698557,rail_stomp,Connection failed: 
+2026-03-09T03:25:05.705402,rail_stomp,Connection failed: 
+2026-03-09T03:26:39.713634,rail_stomp,Connection failed: 
+2026-03-09T03:28:13.685205,rail_stomp,Connection failed: 
+2026-03-09T03:29:47.703345,rail_stomp,Connection failed: 
+2026-03-09T03:31:21.700117,rail_stomp,Connection failed: 
+2026-03-09T03:32:55.710310,rail_stomp,Connection failed: 
+2026-03-09T03:34:29.716971,rail_stomp,Connection failed: 
+2026-03-09T03:36:03.724139,rail_stomp,Connection failed: 
+2026-03-09T03:37:37.691914,rail_stomp,Connection failed: 
+2026-03-09T03:39:11.707751,rail_stomp,Connection failed: 
+2026-03-09T03:40:45.689595,rail_stomp,Connection failed: 
+2026-03-09T03:42:19.688224,rail_stomp,Connection failed: 
+2026-03-09T03:43:53.666890,rail_stomp,Connection failed: 
+2026-03-09T03:45:27.680203,rail_stomp,Connection failed: 
+2026-03-09T03:47:01.662011,rail_stomp,Connection failed: 
+2026-03-09T03:48:35.686431,rail_stomp,Connection failed: 
+2026-03-09T03:50:09.685985,rail_stomp,Connection failed: 
+2026-03-09T03:51:43.667288,rail_stomp,Connection failed: 
+2026-03-09T03:53:17.640216,rail_stomp,Connection failed: 
+2026-03-09T03:54:51.601718,rail_stomp,Connection failed: 
+2026-03-09T03:56:25.647813,rail_stomp,Connection failed: 
+2026-03-09T03:57:59.596564,rail_stomp,Connection failed: 
+2026-03-09T03:59:33.599099,rail_stomp,Connection failed: 
+2026-03-09T04:01:07.561213,rail_stomp,Connection failed: 
+2026-03-09T04:02:41.552669,rail_stomp,Connection failed: 
+2026-03-09T04:04:15.565726,rail_stomp,Connection failed: 
+2026-03-09T04:05:49.482909,rail_stomp,Connection failed: 
+2026-03-09T04:07:23.470614,rail_stomp,Connection failed: 
+2026-03-09T04:08:57.449129,rail_stomp,Connection failed: 
+2026-03-09T04:10:31.444209,rail_stomp,Connection failed: 
+2026-03-09T04:12:05.416678,rail_stomp,Connection failed: 
+2026-03-09T04:13:39.445463,rail_stomp,Connection failed: 
+2026-03-09T04:15:13.422608,rail_stomp,Connection failed: 
+2026-03-09T04:16:47.392525,rail_stomp,Connection failed: 
+2026-03-09T04:18:21.390899,rail_stomp,Connection failed: 
+2026-03-09T04:19:55.407951,rail_stomp,Connection failed: 
+2026-03-09T04:21:29.352660,rail_stomp,Connection failed: 
+2026-03-09T04:23:03.328318,rail_stomp,Connection failed: 
+2026-03-09T04:24:37.338749,rail_stomp,Connection failed: 
+2026-03-09T04:26:11.387999,rail_stomp,Connection failed: 
+2026-03-09T04:27:45.329032,rail_stomp,Connection failed: 
+2026-03-09T04:29:19.355842,rail_stomp,Connection failed: 
+2026-03-09T04:30:53.376374,rail_stomp,Connection failed: 
+2026-03-09T04:32:27.397208,rail_stomp,Connection failed: 
+2026-03-09T04:34:01.404129,rail_stomp,Connection failed: 
+2026-03-09T04:35:35.447073,rail_stomp,Connection failed: 
+2026-03-09T04:37:09.466860,rail_stomp,Connection failed: 
+2026-03-09T04:38:43.432594,rail_stomp,Connection failed: 
+2026-03-09T04:40:17.414779,rail_stomp,Connection failed: 
+2026-03-09T04:41:51.375619,rail_stomp,Connection failed: 
+2026-03-09T04:43:25.352841,rail_stomp,Connection failed: 
+2026-03-09T04:44:59.301838,rail_stomp,Connection failed: 
+2026-03-09T04:46:33.320442,rail_stomp,Connection failed: 
+2026-03-09T04:48:07.335076,rail_stomp,Connection failed: 
+2026-03-09T04:49:41.360104,rail_stomp,Connection failed: 
+2026-03-09T04:51:15.362841,rail_stomp,Connection failed: 
+2026-03-09T04:52:49.380605,rail_stomp,Connection failed: 
+2026-03-09T04:54:23.435813,rail_stomp,Connection failed: 
+2026-03-09T04:55:57.429673,rail_stomp,Connection failed: 
+2026-03-09T04:57:31.473284,rail_stomp,Connection failed: 
+2026-03-09T04:59:05.453799,rail_stomp,Connection failed: 
+2026-03-09T05:00:39.643180,rail_stomp,Connection failed: 
+2026-03-09T05:02:13.596422,rail_stomp,Connection failed: 
+2026-03-09T05:03:47.598615,rail_stomp,Connection failed: 
+2026-03-09T05:05:21.555873,rail_stomp,Connection failed: 
+2026-03-09T05:06:55.557705,rail_stomp,Connection failed: 
+2026-03-09T05:08:29.564328,rail_stomp,Connection failed: 
+2026-03-09T05:10:03.605873,rail_stomp,Connection failed: 
+2026-03-09T05:11:37.614785,rail_stomp,Connection failed: 
+2026-03-09T05:13:11.632840,rail_stomp,Connection failed: 
+2026-03-09T05:14:45.620756,rail_stomp,Connection failed: 
+2026-03-09T05:16:19.586641,rail_stomp,Connection failed: 
+2026-03-09T05:17:53.598191,rail_stomp,Connection failed: 
+2026-03-09T05:19:27.568156,rail_stomp,Connection failed: 
+2026-03-09T05:21:01.586889,rail_stomp,Connection failed: 
+2026-03-09T05:22:35.576479,rail_stomp,Connection failed: 
+2026-03-09T05:24:09.554699,rail_stomp,Connection failed: 
+2026-03-09T05:25:43.578676,rail_stomp,Connection failed: 
+2026-03-09T05:27:17.607083,rail_stomp,Connection failed: 
+2026-03-09T05:28:51.580476,rail_stomp,Connection failed: 
+2026-03-09T05:30:25.582609,rail_stomp,Connection failed: 
+2026-03-09T05:31:59.592346,rail_stomp,Connection failed: 
+2026-03-09T05:33:33.582582,rail_stomp,Connection failed: 
+2026-03-09T05:35:07.565634,rail_stomp,Connection failed: 
+2026-03-09T05:36:41.569081,rail_stomp,Connection failed: 
+2026-03-09T05:38:15.541297,rail_stomp,Connection failed: 
+2026-03-09T05:39:49.516286,rail_stomp,Connection failed: 
+2026-03-09T05:41:23.516031,rail_stomp,Connection failed: 
+2026-03-09T05:42:57.506044,rail_stomp,Connection failed: 
+2026-03-09T05:44:31.495574,rail_stomp,Connection failed: 
+2026-03-09T05:46:05.497376,rail_stomp,Connection failed: 
+2026-03-09T05:47:39.546122,rail_stomp,Connection failed: 
+2026-03-09T05:49:13.579483,rail_stomp,Connection failed: 
+2026-03-09T05:50:47.552315,rail_stomp,Connection failed: 
+2026-03-09T05:52:21.559405,rail_stomp,Connection failed: 
+2026-03-09T05:53:55.543954,rail_stomp,Connection failed: 
+2026-03-09T05:55:29.499660,rail_stomp,Connection failed: 
+2026-03-09T05:57:03.423264,rail_stomp,Connection failed: 
+2026-03-09T05:58:37.432939,rail_stomp,Connection failed: 
+2026-03-09T06:00:11.398040,rail_stomp,Connection failed: 
+2026-03-09T06:01:45.363168,rail_stomp,Connection failed: 
+2026-03-09T06:03:19.342521,rail_stomp,Connection failed: 
+2026-03-09T06:04:53.367152,rail_stomp,Connection failed: 
+2026-03-09T06:06:27.359959,rail_stomp,Connection failed: 
+2026-03-09T06:08:01.361355,rail_stomp,Connection failed: 
+2026-03-09T06:09:35.408784,rail_stomp,Connection failed: 
+2026-03-09T06:11:09.431030,rail_stomp,Connection failed: 
+2026-03-09T06:12:43.431607,rail_stomp,Connection failed: 
+2026-03-09T06:14:17.460978,rail_stomp,Connection failed: 
+2026-03-09T06:15:51.472877,rail_stomp,Connection failed: 
+2026-03-09T06:17:25.462182,rail_stomp,Connection failed: 
+2026-03-09T06:18:59.498756,rail_stomp,Connection failed: 
+2026-03-09T06:20:33.506350,rail_stomp,Connection failed: 
+2026-03-09T06:22:07.513795,rail_stomp,Connection failed: 
+2026-03-09T06:23:41.457132,rail_stomp,Connection failed: 
+2026-03-09T06:25:15.436191,rail_stomp,Connection failed: 
+2026-03-09T06:26:49.472065,rail_stomp,Connection failed: 
+2026-03-09T06:28:23.500157,rail_stomp,Connection failed: 
+2026-03-09T06:29:57.492764,rail_stomp,Connection failed: 
+2026-03-09T06:31:31.512640,rail_stomp,Connection failed: 
+2026-03-09T06:33:05.508325,rail_stomp,Connection failed: 
+2026-03-09T06:34:39.518668,rail_stomp,Connection failed: 
+2026-03-09T06:36:13.555040,rail_stomp,Connection failed: 
+2026-03-09T06:37:47.539767,rail_stomp,Connection failed: 
+2026-03-09T06:39:21.543829,rail_stomp,Connection failed: 
+2026-03-09T06:40:55.507200,rail_stomp,Connection failed: 
+2026-03-09T06:42:29.532250,rail_stomp,Connection failed: 
+2026-03-09T06:44:03.480118,rail_stomp,Connection failed: 
+2026-03-09T06:45:37.445404,rail_stomp,Connection failed: 
+2026-03-09T06:47:11.411892,rail_stomp,Connection failed: 
+2026-03-09T06:48:45.435511,rail_stomp,Connection failed: 
+2026-03-09T06:50:19.466278,rail_stomp,Connection failed: 
+2026-03-09T06:51:53.443635,rail_stomp,Connection failed: 
+2026-03-09T06:53:27.464694,rail_stomp,Connection failed: 
+2026-03-09T06:55:01.481131,rail_stomp,Connection failed: 
+2026-03-09T06:56:35.487414,rail_stomp,Connection failed: 
+2026-03-09T06:58:09.485227,rail_stomp,Connection failed: 
+2026-03-09T06:59:43.500062,rail_stomp,Connection failed: 
+2026-03-09T07:01:17.483498,rail_stomp,Connection failed: 
+2026-03-09T07:02:51.488081,rail_stomp,Connection failed: 
+2026-03-09T07:04:25.423980,rail_stomp,Connection failed: 
+2026-03-09T07:05:59.449600,rail_stomp,Connection failed: 
+2026-03-09T07:07:33.435453,rail_stomp,Connection failed: 
+2026-03-09T07:09:07.392492,rail_stomp,Connection failed: 
+2026-03-09T07:10:41.384221,rail_stomp,Connection failed: 
+2026-03-09T07:12:15.398261,rail_stomp,Connection failed: 
+2026-03-09T07:13:49.371698,rail_stomp,Connection failed: 
+2026-03-09T07:15:23.348570,rail_stomp,Connection failed: 
+2026-03-09T07:16:57.362126,rail_stomp,Connection failed: 
+2026-03-09T07:18:31.346168,rail_stomp,Connection failed: 
+2026-03-09T07:20:05.347584,rail_stomp,Connection failed: 
+2026-03-09T07:21:39.314087,rail_stomp,Connection failed: 
+2026-03-09T07:23:13.291378,rail_stomp,Connection failed: 
+2026-03-09T07:24:47.242285,rail_stomp,Connection failed: 
+2026-03-09T07:26:21.223302,rail_stomp,Connection failed: 
+2026-03-09T07:27:55.235249,rail_stomp,Connection failed: 
+2026-03-09T07:29:29.259813,rail_stomp,Connection failed: 
+2026-03-09T07:31:03.197391,rail_stomp,Connection failed: 
+2026-03-09T07:32:37.200754,rail_stomp,Connection failed: 
+2026-03-09T07:34:11.196010,rail_stomp,Connection failed: 
+2026-03-09T07:35:45.153152,rail_stomp,Connection failed: 
+2026-03-09T07:37:21.011476,rail_stomp,Connection failed: 
+2026-03-09T07:38:55.028987,rail_stomp,Connection failed: 
+2026-03-09T07:40:29.017211,rail_stomp,Connection failed: 
+2026-03-09T07:42:03.017743,rail_stomp,Connection failed: 
+2026-03-09T07:43:37.054254,rail_stomp,Connection failed: 
+2026-03-09T07:45:11.050825,rail_stomp,Connection failed: 
+2026-03-09T07:46:45.063327,rail_stomp,Connection failed: 
+2026-03-09T07:48:19.015060,rail_stomp,Connection failed: 
+2026-03-09T07:49:53.011255,rail_stomp,Connection failed: 
+2026-03-09T07:51:27.044194,rail_stomp,Connection failed: 
+2026-03-09T07:53:01.039266,rail_stomp,Connection failed: 
+2026-03-09T07:54:35.029803,rail_stomp,Connection failed: 
+2026-03-09T07:56:09.054864,rail_stomp,Connection failed: 
+2026-03-09T07:57:43.056049,rail_stomp,Connection failed: 
+2026-03-09T07:59:17.017599,rail_stomp,Connection failed: 
+2026-03-09T08:00:51.036906,rail_stomp,Connection failed: 
+2026-03-09T08:02:25.033260,rail_stomp,Connection failed: 
+2026-03-09T08:03:58.986507,rail_stomp,Connection failed: 
+2026-03-09T08:05:32.972383,rail_stomp,Connection failed: 
+2026-03-09T08:07:06.979523,rail_stomp,Connection failed: 
+2026-03-09T08:08:40.959670,rail_stomp,Connection failed: 
+2026-03-09T08:10:14.971044,rail_stomp,Connection failed: 
+2026-03-09T08:11:48.985482,rail_stomp,Connection failed: 
+2026-03-09T08:13:23.000244,rail_stomp,Connection failed: 
+2026-03-09T08:14:56.986743,rail_stomp,Connection failed: 
+2026-03-09T08:16:30.992029,rail_stomp,Connection failed: 
+2026-03-09T08:18:04.990323,rail_stomp,Connection failed: 
+2026-03-09T08:19:38.947435,rail_stomp,Connection failed: 
+2026-03-09T08:21:12.937386,rail_stomp,Connection failed: 
+2026-03-09T08:22:46.915864,rail_stomp,Connection failed: 
+2026-03-09T08:24:20.897267,rail_stomp,Connection failed: 
+2026-03-09T08:25:54.895814,rail_stomp,Connection failed: 
+2026-03-09T08:27:28.930281,rail_stomp,Connection failed: 
+2026-03-09T08:29:02.908473,rail_stomp,Connection failed: 
+2026-03-09T08:30:36.880129,rail_stomp,Connection failed: 
+2026-03-09T08:32:10.866489,rail_stomp,Connection failed: 
+2026-03-09T08:33:44.853480,rail_stomp,Connection failed: 
+2026-03-09T08:35:18.901085,rail_stomp,Connection failed: 
+2026-03-09T08:36:52.866501,rail_stomp,Connection failed: 
+2026-03-09T08:38:26.903757,rail_stomp,Connection failed: 
+2026-03-09T08:40:00.900816,rail_stomp,Connection failed: 
+2026-03-09T08:41:37.337906,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7af460>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:41:45.902373,rail_stomp,Connection failed: 
+2026-03-09T08:41:53.430714,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.7 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7af9b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:41:55.536434,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7af8a0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:42:00.507811,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7af790>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T08:42:09.588255,weather,"Blackpool: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.82&lon=-3.05 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7af350>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:42:22.646664,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7aebe0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T08:42:25.748273,weather,"Blackburn: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.69&lon=-2.63 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7ae690>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:42:30.518479,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NewConnectionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to establish a new connection: [WinError 10053] An established connection was aborted by the software in your host machine""))"
+2026-03-09T08:42:30.518759,weather,"Burnley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.79&lon=-2.25 (Caused by NewConnectionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to establish a new connection: [WinError 10053] An established connection was aborted by the software in your host machine""))"
+2026-03-09T08:42:31.336539,rail_stomp,Connection failed: 
+2026-03-09T08:42:31.522301,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:31.522487,weather,"Clitheroe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.87&lon=-2.38 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:32.121383,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:32.524668,weather,"Morecambe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.07&lon=-2.87 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:32.524784,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:33.530141,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:33.530409,weather,"Carnforth: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.12&lon=-2.77 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:34.123737,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:34.533555,weather,"Nelson: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.85&lon=-2.17 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:34.533780,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:35.536460,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:35.536638,weather,"Chorley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.49 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:36.126103,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:36.539773,weather,"Fylde: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.9 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:37.565130,weather,"Darwen: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.65&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:40.207487,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T08:42:57.250563,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ed260>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T08:44:05.319407,rail_stomp,Connection failed: 
+2026-03-09T08:45:39.342576,rail_stomp,Connection failed: 
+2026-03-09T08:47:13.334019,rail_stomp,Connection failed: 
+2026-03-09T08:48:47.309009,rail_stomp,Connection failed: 
+2026-03-09T08:50:21.290197,rail_stomp,Connection failed: 
+2026-03-09T08:51:55.297278,rail_stomp,Connection failed: 
+2026-03-09T08:53:29.214518,rail_stomp,Connection failed: 
+2026-03-09T08:55:03.187130,rail_stomp,Connection failed: 
+2026-03-09T08:56:37.143768,rail_stomp,Connection failed: 
+2026-03-09T08:58:11.150510,rail_stomp,Connection failed: 
+2026-03-09T08:59:45.165896,rail_stomp,Connection failed: 
+2026-03-09T09:01:19.142433,rail_stomp,Connection failed: 
+2026-03-09T09:02:53.158905,rail_stomp,Connection failed: 
+2026-03-09T09:04:27.158595,rail_stomp,Connection failed: 
+2026-03-09T09:06:01.137966,rail_stomp,Connection failed: 
+2026-03-09T09:07:35.087625,rail_stomp,Connection failed: 
+2026-03-09T09:09:09.105924,rail_stomp,Connection failed: 
+2026-03-09T09:10:43.049197,rail_stomp,Connection failed: 
+2026-03-09T09:12:17.051814,rail_stomp,Connection failed: 
+2026-03-09T09:13:51.050217,rail_stomp,Connection failed: 
+2026-03-09T09:15:25.079792,rail_stomp,Connection failed: 
+2026-03-09T09:16:59.069804,rail_stomp,Connection failed: 
+2026-03-09T09:18:33.004910,rail_stomp,Connection failed: 
+2026-03-09T09:20:07.021303,rail_stomp,Connection failed: 
+2026-03-09T09:21:41.055756,rail_stomp,Connection failed: 
+2026-03-09T09:23:15.062476,rail_stomp,Connection failed: 
+2026-03-09T09:24:49.008729,rail_stomp,Connection failed: 
+2026-03-09T09:26:22.985775,rail_stomp,Connection failed: 
+2026-03-09T09:27:56.991519,rail_stomp,Connection failed: 
+2026-03-09T09:29:30.953418,rail_stomp,Connection failed: 
+2026-03-09T09:31:04.934207,rail_stomp,Connection failed: 
+2026-03-09T09:32:38.905416,rail_stomp,Connection failed: 
+2026-03-09T09:34:12.869371,rail_stomp,Connection failed: 
+2026-03-09T09:35:46.881869,rail_stomp,Connection failed: 
+2026-03-09T09:37:20.900848,rail_stomp,Connection failed: 
+2026-03-09T09:38:54.842905,rail_stomp,Connection failed: 
+2026-03-09T09:40:28.876237,rail_stomp,Connection failed: 
+2026-03-09T09:42:02.878919,rail_stomp,Connection failed: 
+2026-03-09T09:43:36.884098,rail_stomp,Connection failed: 
+2026-03-09T09:45:10.858944,rail_stomp,Connection failed: 
+2026-03-09T09:46:44.855961,rail_stomp,Connection failed: 
+2026-03-09T09:48:18.847939,rail_stomp,Connection failed: 
+2026-03-09T09:49:52.895014,rail_stomp,Connection failed: 
+2026-03-09T09:51:26.846544,rail_stomp,Connection failed: 
+2026-03-09T09:53:00.888601,rail_stomp,Connection failed: 
+2026-03-09T09:54:34.891608,rail_stomp,Connection failed: 
+2026-03-09T09:56:08.876790,rail_stomp,Connection failed: 
+2026-03-09T09:57:42.844571,rail_stomp,Connection failed: 
+2026-03-09T09:59:16.787728,rail_stomp,Connection failed: 
+2026-03-09T10:00:50.797309,rail_stomp,Connection failed: 
+2026-03-09T10:02:24.775445,rail_stomp,Connection failed: 
+2026-03-09T10:03:58.796208,rail_stomp,Connection failed: 
+2026-03-09T10:05:32.767871,rail_stomp,Connection failed: 
+2026-03-09T10:07:06.802400,rail_stomp,Connection failed: 
+2026-03-09T10:08:40.766841,rail_stomp,Connection failed: 
+2026-03-09T10:10:14.762210,rail_stomp,Connection failed: 
+2026-03-09T10:11:48.733252,rail_stomp,Connection failed: 
+2026-03-09T10:13:22.683973,rail_stomp,Connection failed: 
+2026-03-09T10:14:56.694078,rail_stomp,Connection failed: 
+2026-03-09T10:16:30.695456,rail_stomp,Connection failed: 
+2026-03-09T10:18:04.702251,rail_stomp,Connection failed: 
+2026-03-09T10:19:38.672615,rail_stomp,Connection failed: 
+2026-03-09T10:21:12.671749,rail_stomp,Connection failed: 
+2026-03-09T10:22:46.654508,rail_stomp,Connection failed: 
+2026-03-09T10:24:20.628577,rail_stomp,Connection failed: 
+2026-03-09T10:25:54.616885,rail_stomp,Connection failed: 
+2026-03-09T10:27:28.641510,rail_stomp,Connection failed: 
+2026-03-09T10:29:02.619264,rail_stomp,Connection failed: 
+2026-03-09T10:30:36.594445,rail_stomp,Connection failed: 
+2026-03-09T10:32:10.605285,rail_stomp,Connection failed: 
+2026-03-09T10:33:44.616197,rail_stomp,Connection failed: 
+2026-03-09T10:35:18.619655,rail_stomp,Connection failed: 
+2026-03-09T10:36:52.644811,rail_stomp,Connection failed: 
+2026-03-09T10:38:26.654007,rail_stomp,Connection failed: 
+2026-03-09T10:40:00.609955,rail_stomp,Connection failed: 
+2026-03-09T10:41:34.600732,rail_stomp,Connection failed: 
+2026-03-09T10:43:08.530145,rail_stomp,Connection failed: 
+2026-03-09T10:44:42.548378,rail_stomp,Connection failed: 
+2026-03-09T10:46:16.476070,rail_stomp,Connection failed: 
+2026-03-09T10:47:50.457714,rail_stomp,Connection failed: 
+2026-03-09T10:49:24.566761,rail_stomp,Connection failed: 
+2026-03-09T10:50:58.543335,rail_stomp,Connection failed: 
+2026-03-09T10:52:32.514222,rail_stomp,Connection failed: 
+2026-03-09T10:54:06.532562,rail_stomp,Connection failed: 
+2026-03-09T10:55:40.572231,rail_stomp,Connection failed: 
+2026-03-09T10:57:14.576305,rail_stomp,Connection failed: 
+2026-03-09T10:58:48.527945,rail_stomp,Connection failed: 
+2026-03-09T11:00:22.495114,rail_stomp,Connection failed: 
+2026-03-09T11:01:56.475972,rail_stomp,Connection failed: 
+2026-03-09T11:03:30.363712,rail_stomp,Connection failed: 
+2026-03-09T11:05:04.372795,rail_stomp,Connection failed: 
+2026-03-09T11:06:38.356153,rail_stomp,Connection failed: 
+2026-03-09T11:08:12.350376,rail_stomp,Connection failed: 
+2026-03-09T11:09:46.364781,rail_stomp,Connection failed: 
+2026-03-09T11:11:20.384751,rail_stomp,Connection failed: 
+2026-03-09T11:12:54.339908,rail_stomp,Connection failed: 
+2026-03-09T11:14:28.308889,rail_stomp,Connection failed: 
+2026-03-09T11:16:02.363014,rail_stomp,Connection failed: 
+2026-03-09T11:17:36.376533,rail_stomp,Connection failed: 
+2026-03-09T11:19:10.354419,rail_stomp,Connection failed: 
+2026-03-09T11:20:44.348590,rail_stomp,Connection failed: 
+2026-03-09T11:22:07.749074,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7ac050>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T11:22:29.408683,rail_stomp,Connection failed: 
+2026-03-09T11:24:03.462417,rail_stomp,Connection failed: 
+2026-03-09T11:25:37.399207,rail_stomp,Connection failed: 
+2026-03-09T11:27:11.397593,rail_stomp,Connection failed: 
+2026-03-09T11:28:45.402613,rail_stomp,Connection failed: 
+2026-03-09T11:30:19.380598,rail_stomp,Connection failed: 
+2026-03-09T11:31:53.350707,rail_stomp,Connection failed: 
+2026-03-09T11:33:27.331513,rail_stomp,Connection failed: 
+2026-03-09T11:35:01.364585,rail_stomp,Connection failed: 
+2026-03-09T11:36:35.375012,rail_stomp,Connection failed: 
+2026-03-09T11:38:09.420263,rail_stomp,Connection failed: 
+2026-03-09T11:39:43.414804,rail_stomp,Connection failed: 
+2026-03-09T11:41:17.367386,rail_stomp,Connection failed: 
+2026-03-09T11:42:51.361536,rail_stomp,Connection failed: 
+2026-03-09T11:44:25.397515,rail_stomp,Connection failed: 
+2026-03-09T11:45:59.390371,rail_stomp,Connection failed: 
+2026-03-09T11:47:33.391145,rail_stomp,Connection failed: 
+2026-03-09T11:49:07.413760,rail_stomp,Connection failed: 
+2026-03-09T11:50:41.431550,rail_stomp,Connection failed: 
+2026-03-09T11:52:15.412729,rail_stomp,Connection failed: 
+2026-03-09T11:53:49.375755,rail_stomp,Connection failed: 
+2026-03-09T11:55:23.363132,rail_stomp,Connection failed: 
+2026-03-09T11:56:57.357744,rail_stomp,Connection failed: 
+2026-03-09T11:58:31.360311,rail_stomp,Connection failed: 
+2026-03-09T12:00:05.413707,rail_stomp,Connection failed: 
+2026-03-09T12:01:39.404276,rail_stomp,Connection failed: 
+2026-03-09T12:03:13.407682,rail_stomp,Connection failed: 
+2026-03-09T12:04:47.402243,rail_stomp,Connection failed: 
+2026-03-09T12:06:21.398887,rail_stomp,Connection failed: 
+2026-03-09T12:07:55.428263,rail_stomp,Connection failed: 
+2026-03-09T12:09:29.456928,rail_stomp,Connection failed: 
+2026-03-09T12:11:03.425088,rail_stomp,Connection failed: 
+2026-03-09T12:12:37.430676,rail_stomp,Connection failed: 
+2026-03-09T12:14:11.411955,rail_stomp,Connection failed: 
+2026-03-09T12:15:45.368771,rail_stomp,Connection failed: 
+2026-03-09T12:17:19.338798,rail_stomp,Connection failed: 
+2026-03-09T12:18:53.383756,rail_stomp,Connection failed: 
+2026-03-09T12:20:27.409881,rail_stomp,Connection failed: 
+2026-03-09T12:22:01.370091,rail_stomp,Connection failed: 
+2026-03-09T12:23:35.365701,rail_stomp,Connection failed: 
+2026-03-09T12:25:09.351675,rail_stomp,Connection failed: 
+2026-03-09T12:26:43.362298,rail_stomp,Connection failed: 
+2026-03-09T12:28:17.394796,rail_stomp,Connection failed: 
+2026-03-09T12:29:51.431343,rail_stomp,Connection failed: 
+2026-03-09T12:31:25.455868,rail_stomp,Connection failed: 
+2026-03-09T12:32:59.433578,rail_stomp,Connection failed: 
+2026-03-09T12:34:33.434513,rail_stomp,Connection failed: 
+2026-03-09T12:36:07.450638,rail_stomp,Connection failed: 
+2026-03-09T12:37:41.440520,rail_stomp,Connection failed: 
+2026-03-09T12:39:15.476129,rail_stomp,Connection failed: 
+2026-03-09T12:40:49.504025,rail_stomp,Connection failed: 
+2026-03-09T12:42:23.492764,rail_stomp,Connection failed: 
+2026-03-09T12:43:57.454805,rail_stomp,Connection failed: 
+2026-03-09T12:45:31.453515,rail_stomp,Connection failed: 
+2026-03-09T12:47:05.478378,rail_stomp,Connection failed: 
+2026-03-09T12:48:39.458988,rail_stomp,Connection failed: 
+2026-03-09T12:50:13.475204,rail_stomp,Connection failed: 
+2026-03-09T12:51:47.439074,rail_stomp,Connection failed: 
+2026-03-09T12:53:21.469745,rail_stomp,Connection failed: 
+2026-03-09T12:54:55.454447,rail_stomp,Connection failed: 
+2026-03-09T12:56:29.469505,rail_stomp,Connection failed: 
+2026-03-09T12:58:03.475815,rail_stomp,Connection failed: 
+2026-03-09T12:59:37.461132,rail_stomp,Connection failed: 
+2026-03-09T13:01:11.495932,rail_stomp,Connection failed: 
+2026-03-09T13:02:45.492020,rail_stomp,Connection failed: 
+2026-03-09T13:04:19.495327,rail_stomp,Connection failed: 
+2026-03-09T13:05:53.460351,rail_stomp,Connection failed: 
+2026-03-09T13:07:27.452364,rail_stomp,Connection failed: 
+2026-03-09T13:09:01.487446,rail_stomp,Connection failed: 
+2026-03-09T13:10:35.522244,rail_stomp,Connection failed: 
+2026-03-09T13:12:09.496726,rail_stomp,Connection failed: 
+2026-03-09T13:13:43.520523,rail_stomp,Connection failed: 
+2026-03-09T13:15:17.456294,rail_stomp,Connection failed: 
+2026-03-09T13:16:51.399754,rail_stomp,Connection failed: 
+2026-03-09T13:18:25.381877,rail_stomp,Connection failed: 
+2026-03-09T13:19:59.343513,rail_stomp,Connection failed: 
+2026-03-09T13:21:33.336302,rail_stomp,Connection failed: 
+2026-03-09T13:23:07.362394,rail_stomp,Connection failed: 
+2026-03-09T13:24:41.387292,rail_stomp,Connection failed: 
+2026-03-09T13:26:15.355229,rail_stomp,Connection failed: 
+2026-03-09T13:27:49.324022,rail_stomp,Connection failed: 
+2026-03-09T13:29:23.282678,rail_stomp,Connection failed: 
+2026-03-09T13:30:57.293430,rail_stomp,Connection failed: 
+2026-03-09T13:32:31.296518,rail_stomp,Connection failed: 
+2026-03-09T13:34:05.278064,rail_stomp,Connection failed: 
+2026-03-09T13:35:39.258042,rail_stomp,Connection failed: 
+2026-03-09T13:37:13.230280,rail_stomp,Connection failed: 
+2026-03-09T13:38:47.197048,rail_stomp,Connection failed: 
+2026-03-09T13:40:21.212315,rail_stomp,Connection failed: 
+2026-03-09T13:41:55.222827,rail_stomp,Connection failed: 
+2026-03-09T13:42:51.467599,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7ac9e0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T13:43:08.561927,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7acc00>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T13:43:15.129377,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7ad480>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T13:43:25.729800,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7ad7b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T13:43:29.348367,rail_stomp,Connection failed: 
+2026-03-09T13:43:30.878379,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by NewConnectionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to establish a new connection: [WinError 10053] An established connection was aborted by the software in your host machine""))"
+2026-03-09T13:43:30.878710,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NewConnectionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to establish a new connection: [WinError 10053] An established connection was aborted by the software in your host machine""))"
+2026-03-09T13:43:31.882123,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:32.883815,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:32.884552,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:33.886990,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:34.886917,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/KKM (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:34.888642,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:35.891514,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:36.918988,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MBR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:36.919291,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:37.978946,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:39.075344,departures,"CNF: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNF (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:41.230215,departures,"BBN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BBN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:43:58.388930,departures,"DWN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/DWN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ee690>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T13:44:45.359382,rail_stomp,Connection failed: 
+2026-03-09T13:44:50.060091,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NewConnectionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to establish a new connection: [WinError 10065] A socket operation was attempted to an unreachable host""))"
+2026-03-09T13:44:51.062970,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:52.064887,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:53.066766,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:54.069183,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:55.071672,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:56.073604,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:44:57.081801,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:45:15.131717,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:45:16.166767,rail_stomp,Connection failed: 
+2026-03-09T13:46:08.515362,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:09.121672,rail_stomp,Connection failed: 
+2026-03-09T13:46:09.518019,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:10.520795,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:11.523832,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:12.526725,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:13.529594,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:14.531702,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:46:15.533306,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T13:47:43.104245,rail_stomp,Connection failed: 
+2026-03-09T13:49:17.100726,rail_stomp,Connection failed: 
+2026-03-09T13:50:51.078829,rail_stomp,Connection failed: 
+2026-03-09T13:52:25.104470,rail_stomp,Connection failed: 
+2026-03-09T13:53:59.048827,rail_stomp,Connection failed: 
+2026-03-09T13:55:33.093413,rail_stomp,Connection failed: 
+2026-03-09T13:57:07.064792,rail_stomp,Connection failed: 
+2026-03-09T13:58:41.043176,rail_stomp,Connection failed: 
+2026-03-09T14:00:15.000696,rail_stomp,Connection failed: 
+2026-03-09T14:01:49.009551,rail_stomp,Connection failed: 
+2026-03-09T14:03:22.998708,rail_stomp,Connection failed: 
+2026-03-09T14:04:56.976654,rail_stomp,Connection failed: 
+2026-03-09T14:06:30.995145,rail_stomp,Connection failed: 
+2026-03-09T14:08:05.016015,rail_stomp,Connection failed: 
+2026-03-09T14:09:39.026786,rail_stomp,Connection failed: 
+2026-03-09T14:11:12.966530,rail_stomp,Connection failed: 
+2026-03-09T14:12:46.992166,rail_stomp,Connection failed: 
+2026-03-09T14:14:20.956031,rail_stomp,Connection failed: 
+2026-03-09T14:15:54.969168,rail_stomp,Connection failed: 
+2026-03-09T14:17:28.958249,rail_stomp,Connection failed: 
+2026-03-09T14:19:02.958801,rail_stomp,Connection failed: 
+2026-03-09T14:20:36.917273,rail_stomp,Connection failed: 
+2026-03-09T14:22:10.951705,rail_stomp,Connection failed: 
+2026-03-09T14:23:44.905942,rail_stomp,Connection failed: 
+2026-03-09T14:25:18.918323,rail_stomp,Connection failed: 
+2026-03-09T14:26:52.903642,rail_stomp,Connection failed: 
+2026-03-09T14:28:26.896234,rail_stomp,Connection failed: 
+2026-03-09T14:30:00.912795,rail_stomp,Connection failed: 
+2026-03-09T14:31:34.866725,rail_stomp,Connection failed: 
+2026-03-09T14:32:01.246434,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:32:32.320224,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:32:40.288468,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:32:57.349672,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:33:03.390180,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:33:14.501390,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e789590>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T14:33:19.840347,rail_stomp,Connection failed: 
+2026-03-09T14:33:24.815565,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:25.528439,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7897b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T14:33:26.144206,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e7898c0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T14:33:26.679089,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:27.291979,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.7 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:27.841117,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:28.358793,weather,"Blackpool: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.82&lon=-3.05 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:28.925220,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:29.443217,weather,"Blackburn: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.69&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:30.074674,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:30.593319,weather,"Burnley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.79&lon=-2.25 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:31.596600,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e789d00>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T14:33:31.677472,weather,"Clitheroe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.87&lon=-2.38 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:32.828319,weather,"Morecambe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.07&lon=-2.87 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:33.749124,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:33.910612,weather,"Carnforth: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.12&lon=-2.77 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:34.994874,weather,"Nelson: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.85&lon=-2.17 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:35.901597,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/KKM (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:36.079408,weather,"Chorley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.49 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:37.162602,weather,"Fylde: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.9 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:38.001921,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MBR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:38.244075,weather,"Darwen: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.65&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:40.155181,departures,"CNF: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNF (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:42.305924,departures,"BBN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BBN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:44.455954,departures,"DWN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/DWN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:46.613701,departures,"ACR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/ACR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:48.767709,departures,"BUB: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BUB (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:50.850040,departures,"BNC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BNC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:51.037440,rail_stomp,Connection failed: 
+2026-03-09T14:33:52.934302,departures,"NEL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/NEL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:55.091081,departures,"CNE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:57.242446,departures,"CLH: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CLH (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:33:59.394547,departures,"LAY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:01.481785,departures,"BAI: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BAI (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:03.564912,departures,"LOT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LOT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:05.714514,departures,"CRL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CRL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:07.864343,departures,"ADS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/ADS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:09.950871,departures,"BSV: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BSV (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:12.102657,departures,"RWC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/RWC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:14.254138,departures,"LGO: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LGO (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:16.411910,departures,"WHL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/WHL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:24.519996,departures,"PLE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PLE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T14:34:42.835467,departures,"CHT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:34:59.931575,departures,"MIL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:35:01.126127,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:35:10.484421,rail_stomp,Connection failed: 
+2026-03-09T14:35:32.174851,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:35:39.873345,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:36:03.224356,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:36:34.251795,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:36:44.543872,rail_stomp,Connection failed: 
+2026-03-09T14:37:05.330257,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:37:17.013186,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:37:34.077115,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:37:36.368482,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:37:51.093720,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:37:54.913430,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:38:07.397781,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:38:08.141849,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:38:18.537063,rail_stomp,Connection failed: 
+2026-03-09T14:38:25.184833,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:38:38.449840,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=30)"
+2026-03-09T14:38:42.237435,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:38:54.293131,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:38:59.280088,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:39:10.343241,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Read timed out. (read timeout=15)"
+2026-03-09T14:39:52.519044,rail_stomp,Connection failed: 
+2026-03-09T14:41:26.489169,rail_stomp,Connection failed: 
+2026-03-09T14:43:00.472427,rail_stomp,Connection failed: 
+2026-03-09T14:44:34.489342,rail_stomp,Connection failed: 
+2026-03-09T14:46:08.467520,rail_stomp,Connection failed: 
+2026-03-09T14:47:42.472045,rail_stomp,Connection failed: 
+2026-03-09T14:49:16.527889,rail_stomp,Connection failed: 
+2026-03-09T14:50:50.522341,rail_stomp,Connection failed: 
+2026-03-09T14:52:24.542757,rail_stomp,Connection failed: 
+2026-03-09T14:53:58.564692,rail_stomp,Connection failed: 
+2026-03-09T14:55:32.542360,rail_stomp,Connection failed: 
+2026-03-09T14:57:06.616839,rail_stomp,Connection failed: 
+2026-03-09T14:58:40.589420,rail_stomp,Connection failed: 
+2026-03-09T15:00:14.567877,rail_stomp,Connection failed: 
+2026-03-09T15:01:48.533585,rail_stomp,Connection failed: 
+2026-03-09T15:03:22.489768,rail_stomp,Connection failed: 
+2026-03-09T15:04:56.530289,rail_stomp,Connection failed: 
+2026-03-09T15:06:30.528987,rail_stomp,Connection failed: 
+2026-03-09T15:08:04.522369,rail_stomp,Connection failed: 
+2026-03-09T15:09:38.514414,rail_stomp,Connection failed: 
+2026-03-09T15:11:12.528240,rail_stomp,Connection failed: 
+2026-03-09T15:12:46.514181,rail_stomp,Connection failed: 
+2026-03-09T15:14:20.526144,rail_stomp,Connection failed: 
+2026-03-09T15:15:54.481997,rail_stomp,Connection failed: 
+2026-03-09T15:17:28.483042,rail_stomp,Connection failed: 
+2026-03-09T15:19:02.441821,rail_stomp,Connection failed: 
+2026-03-09T15:20:36.418689,rail_stomp,Connection failed: 
+2026-03-09T15:22:10.415758,rail_stomp,Connection failed: 
+2026-03-09T15:23:44.389188,rail_stomp,Connection failed: 
+2026-03-09T15:25:18.336920,rail_stomp,Connection failed: 
+2026-03-09T15:26:52.408629,rail_stomp,Connection failed: 
+2026-03-09T15:28:26.383468,rail_stomp,Connection failed: 
+2026-03-09T15:30:00.368041,rail_stomp,Connection failed: 
+2026-03-09T15:31:34.654803,rail_stomp,Connection failed: 
+2026-03-09T15:33:08.660012,rail_stomp,Connection failed: 
+2026-03-09T15:34:42.637526,rail_stomp,Connection failed: 
+2026-03-09T15:36:16.618728,rail_stomp,Connection failed: 
+2026-03-09T15:37:50.601129,rail_stomp,Connection failed: 
+2026-03-09T15:39:24.554733,rail_stomp,Connection failed: 
+2026-03-09T15:40:58.527443,rail_stomp,Connection failed: 
+2026-03-09T15:42:32.547308,rail_stomp,Connection failed: 
+2026-03-09T15:44:06.578485,rail_stomp,Connection failed: 
+2026-03-09T15:45:40.576306,rail_stomp,Connection failed: 
+2026-03-09T15:47:14.566580,rail_stomp,Connection failed: 
+2026-03-09T15:48:48.600149,rail_stomp,Connection failed: 
+2026-03-09T15:50:22.605075,rail_stomp,Connection failed: 
+2026-03-09T15:51:56.612366,rail_stomp,Connection failed: 
+2026-03-09T15:53:30.606262,rail_stomp,Connection failed: 
+2026-03-09T15:55:04.591064,rail_stomp,Connection failed: 
+2026-03-09T15:56:38.590134,rail_stomp,Connection failed: 
+2026-03-09T15:58:12.611711,rail_stomp,Connection failed: 
+2026-03-09T15:59:46.648028,rail_stomp,Connection failed: 
+2026-03-09T16:01:20.647907,rail_stomp,Connection failed: 
+2026-03-09T16:02:54.639945,rail_stomp,Connection failed: 
+2026-03-09T16:04:28.608424,rail_stomp,Connection failed: 
+2026-03-09T16:06:02.635982,rail_stomp,Connection failed: 
+2026-03-09T16:07:36.631868,rail_stomp,Connection failed: 
+2026-03-09T16:09:10.617548,rail_stomp,Connection failed: 
+2026-03-09T16:10:44.580743,rail_stomp,Connection failed: 
+2026-03-09T16:12:18.577654,rail_stomp,Connection failed: 
+2026-03-09T16:13:52.557001,rail_stomp,Connection failed: 
+2026-03-09T16:15:26.582383,rail_stomp,Connection failed: 
+2026-03-09T16:17:00.531624,rail_stomp,Connection failed: 
+2026-03-09T16:18:34.571019,rail_stomp,Connection failed: 
+2026-03-09T16:20:08.555906,rail_stomp,Connection failed: 
+2026-03-09T16:21:42.543609,rail_stomp,Connection failed: 
+2026-03-09T16:23:16.571533,rail_stomp,Connection failed: 
+2026-03-09T16:24:50.570041,rail_stomp,Connection failed: 
+2026-03-09T16:26:24.592127,rail_stomp,Connection failed: 
+2026-03-09T16:27:58.605810,rail_stomp,Connection failed: 
+2026-03-09T16:29:32.587802,rail_stomp,Connection failed: 
+2026-03-09T16:31:06.543690,rail_stomp,Connection failed: 
+2026-03-09T16:32:40.525924,rail_stomp,Connection failed: 
+2026-03-09T16:34:14.495022,rail_stomp,Connection failed: 
+2026-03-09T16:35:48.476909,rail_stomp,Connection failed: 
+2026-03-09T16:37:23.019686,rail_stomp,Connection failed: 
+2026-03-09T16:38:57.031006,rail_stomp,Connection failed: 
+2026-03-09T16:40:30.992255,rail_stomp,Connection failed: 
+2026-03-09T16:42:04.985100,rail_stomp,Connection failed: 
+2026-03-09T16:43:38.968155,rail_stomp,Connection failed: 
+2026-03-09T16:45:12.959973,rail_stomp,Connection failed: 
+2026-03-09T16:46:46.879915,rail_stomp,Connection failed: 
+2026-03-09T16:48:20.884659,rail_stomp,Connection failed: 
+2026-03-09T16:49:54.892668,rail_stomp,Connection failed: 
+2026-03-09T16:51:28.890358,rail_stomp,Connection failed: 
+2026-03-09T16:53:02.874710,rail_stomp,Connection failed: 
+2026-03-09T16:54:36.868173,rail_stomp,Connection failed: 
+2026-03-09T16:56:10.876107,rail_stomp,Connection failed: 
+2026-03-09T16:57:44.828257,rail_stomp,Connection failed: 
+2026-03-09T16:59:09.986176,bus,"CCOA: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+2026-03-09T16:59:18.839657,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36f020>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T16:59:21.900864,rail_stomp,Connection failed: 
+2026-03-09T16:59:32.124485,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36dae0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T16:59:36.002212,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36fdf0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T16:59:53.158189,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36fce0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T16:59:54.281693,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36ecf0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T17:00:10.331665,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ec270>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:00:16.354883,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ec8d0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T17:00:27.429321,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ef9b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:00:56.179908,rail_stomp,Connection failed: 
+2026-03-09T17:02:30.121996,rail_stomp,Connection failed: 
+2026-03-09T17:04:04.185446,rail_stomp,Connection failed: 
+2026-03-09T17:05:38.189886,rail_stomp,Connection failed: 
+2026-03-09T17:07:12.178078,rail_stomp,Connection failed: 
+2026-03-09T17:08:46.173778,rail_stomp,Connection failed: 
+2026-03-09T17:10:20.174219,rail_stomp,Connection failed: 
+2026-03-09T17:11:54.121432,rail_stomp,Connection failed: 
+2026-03-09T17:13:28.163838,rail_stomp,Connection failed: 
+2026-03-09T17:15:02.156122,rail_stomp,Connection failed: 
+2026-03-09T17:16:36.149875,rail_stomp,Connection failed: 
+2026-03-09T17:18:10.161979,rail_stomp,Connection failed: 
+2026-03-09T17:19:44.193347,rail_stomp,Connection failed: 
+2026-03-09T17:21:18.161633,rail_stomp,Connection failed: 
+2026-03-09T17:22:52.114047,rail_stomp,Connection failed: 
+2026-03-09T17:24:26.088291,rail_stomp,Connection failed: 
+2026-03-09T17:26:00.068391,rail_stomp,Connection failed: 
+2026-03-09T17:27:34.064630,rail_stomp,Connection failed: 
+2026-03-09T17:29:08.062371,rail_stomp,Connection failed: 
+2026-03-09T17:30:42.081303,rail_stomp,Connection failed: 
+2026-03-09T17:32:16.041891,rail_stomp,Connection failed: 
+2026-03-09T17:33:50.008885,rail_stomp,Connection failed: 
+2026-03-09T17:35:24.000173,rail_stomp,Connection failed: 
+2026-03-09T17:36:58.025333,rail_stomp,Connection failed: 
+2026-03-09T17:38:32.007840,rail_stomp,Connection failed: 
+2026-03-09T17:40:06.004027,rail_stomp,Connection failed: 
+2026-03-09T17:41:39.969225,rail_stomp,Connection failed: 
+2026-03-09T17:43:13.969612,rail_stomp,Connection failed: 
+2026-03-09T17:44:48.002042,rail_stomp,Connection failed: 
+2026-03-09T17:45:51.367688,bus,"ARCT: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))"
+2026-03-09T17:46:13.523930,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ef460>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T17:46:14.668606,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:15.830902,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:16.979753,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:18.172168,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:19.270811,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:20.370870,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:21.229700,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:22.232449,rail_stomp,Connection failed: 
+2026-03-09T17:46:23.404074,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:25.408408,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:27.413363,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:29.416078,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:31.452197,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/KKM (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:34.509347,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MBR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:46:51.641749,departures,"CNF: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNF (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e539150>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:46:52.532742,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e539370>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:47:08.745181,departures,"BBN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BBN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e5399d0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:47:25.359954,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ed040>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T17:47:36.187639,rail_stomp,Connection failed: 
+2026-03-09T17:48:06.995638,rail_stomp,Connection failed: 
+2026-03-09T17:48:24.644210,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:25.646298,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:26.648421,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:27.650566,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:28.653089,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:29.655935,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:30.658832,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:31.661851,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T17:48:37.803814,rail_stomp,Connection failed: 
+2026-03-09T17:50:11.846783,rail_stomp,Connection failed: 
+2026-03-09T17:51:45.867887,rail_stomp,Connection failed: 
+2026-03-09T17:53:19.874386,rail_stomp,Connection failed: 
+2026-03-09T17:54:53.849064,rail_stomp,Connection failed: 
+2026-03-09T17:56:27.836928,rail_stomp,Connection failed: 
+2026-03-09T17:58:01.803421,rail_stomp,Connection failed: 
+2026-03-09T17:59:35.826696,rail_stomp,Connection failed: 
+2026-03-09T18:01:09.746163,rail_stomp,Connection failed: 
+2026-03-09T18:02:43.764167,rail_stomp,Connection failed: 
+2026-03-09T18:04:17.770876,rail_stomp,Connection failed: 
+2026-03-09T18:05:51.741817,rail_stomp,Connection failed: 
+2026-03-09T18:07:25.739852,rail_stomp,Connection failed: 
+2026-03-09T18:08:59.786001,rail_stomp,Connection failed: 
+2026-03-09T18:10:33.791712,rail_stomp,Connection failed: 
+2026-03-09T18:12:07.773033,rail_stomp,Connection failed: 
+2026-03-09T18:13:41.737350,rail_stomp,Connection failed: 
+2026-03-09T18:15:15.712863,rail_stomp,Connection failed: 
+2026-03-09T18:16:49.697756,rail_stomp,Connection failed: 
+2026-03-09T18:18:23.709308,rail_stomp,Connection failed: 
+2026-03-09T18:20:00.832015,rail_stomp,Connection failed: 
+2026-03-09T18:20:14.857724,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ef9b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T18:20:27.482868,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ecaf0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T18:20:32.022320,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4eff00>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T18:20:49.198746,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ec380>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T18:20:49.684798,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ec6b0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T18:21:06.352521,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36fce0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T18:21:35.079862,rail_stomp,Connection failed: 
+2026-03-09T18:23:09.074864,rail_stomp,Connection failed: 
+2026-03-09T18:24:43.064019,rail_stomp,Connection failed: 
+2026-03-09T18:26:17.071329,rail_stomp,Connection failed: 
+2026-03-09T18:27:51.044961,rail_stomp,Connection failed: 
+2026-03-09T18:29:25.068235,rail_stomp,Connection failed: 
+2026-03-09T18:30:59.070077,rail_stomp,Connection failed: 
+2026-03-09T18:32:33.071356,rail_stomp,Connection failed: 
+2026-03-09T18:34:07.048728,rail_stomp,Connection failed: 
+2026-03-09T18:35:41.036914,rail_stomp,Connection failed: 
+2026-03-09T18:37:15.024975,rail_stomp,Connection failed: 
+2026-03-09T18:38:49.062857,rail_stomp,Connection failed: 
+2026-03-09T18:40:23.066474,rail_stomp,Connection failed: 
+2026-03-09T18:41:57.055659,rail_stomp,Connection failed: 
+2026-03-09T18:43:30.990795,rail_stomp,Connection failed: 
+2026-03-09T18:45:04.988815,rail_stomp,Connection failed: 
+2026-03-09T18:46:39.030422,rail_stomp,Connection failed: 
+2026-03-09T18:48:13.003042,rail_stomp,Connection failed: 
+2026-03-09T18:49:46.973315,rail_stomp,Connection failed: 
+2026-03-09T18:51:20.983049,rail_stomp,Connection failed: 
+2026-03-09T18:52:54.975810,rail_stomp,Connection failed: 
+2026-03-09T18:54:28.962810,rail_stomp,Connection failed: 
+2026-03-09T18:56:02.969558,rail_stomp,Connection failed: 
+2026-03-09T18:57:36.970087,rail_stomp,Connection failed: 
+2026-03-09T18:59:10.972058,rail_stomp,Connection failed: 
+2026-03-09T19:00:45.024667,rail_stomp,Connection failed: 
+2026-03-09T19:02:18.990166,rail_stomp,Connection failed: 
+2026-03-09T19:03:53.020060,rail_stomp,Connection failed: 
+2026-03-09T19:05:26.981379,rail_stomp,Connection failed: 
+2026-03-09T19:07:00.999373,rail_stomp,Connection failed: 
+2026-03-09T19:08:35.036286,rail_stomp,Connection failed: 
+2026-03-09T19:10:09.019516,rail_stomp,Connection failed: 
+2026-03-09T19:11:43.000997,rail_stomp,Connection failed: 
+2026-03-09T19:13:17.011529,rail_stomp,Connection failed: 
+2026-03-09T19:14:50.973890,rail_stomp,Connection failed: 
+2026-03-09T19:16:24.976002,rail_stomp,Connection failed: 
+2026-03-09T19:17:58.991560,rail_stomp,Connection failed: 
+2026-03-09T19:19:32.958858,rail_stomp,Connection failed: 
+2026-03-09T19:21:06.944345,rail_stomp,Connection failed: 
+2026-03-09T19:22:40.928467,rail_stomp,Connection failed: 
+2026-03-09T19:24:14.911385,rail_stomp,Connection failed: 
+2026-03-09T19:25:48.912277,rail_stomp,Connection failed: 
+2026-03-09T19:27:22.954631,rail_stomp,Connection failed: 
+2026-03-09T19:28:56.940249,rail_stomp,Connection failed: 
+2026-03-09T19:30:30.977061,rail_stomp,Connection failed: 
+2026-03-09T19:32:04.984509,rail_stomp,Connection failed: 
+2026-03-09T19:33:39.010223,rail_stomp,Connection failed: 
+2026-03-09T19:35:12.968508,rail_stomp,Connection failed: 
+2026-03-09T19:36:46.953263,rail_stomp,Connection failed: 
+2026-03-09T19:38:20.969911,rail_stomp,Connection failed: 
+2026-03-09T19:39:54.964535,rail_stomp,Connection failed: 
+2026-03-09T19:41:28.934130,rail_stomp,Connection failed: 
+2026-03-09T19:43:02.929970,rail_stomp,Connection failed: 
+2026-03-09T19:44:36.922356,rail_stomp,Connection failed: 
+2026-03-09T19:46:10.937173,rail_stomp,Connection failed: 
+2026-03-09T19:47:44.894303,rail_stomp,Connection failed: 
+2026-03-09T19:49:18.927335,rail_stomp,Connection failed: 
+2026-03-09T19:50:52.917577,rail_stomp,Connection failed: 
+2026-03-09T19:52:26.917293,rail_stomp,Connection failed: 
+2026-03-09T19:54:00.943065,rail_stomp,Connection failed: 
+2026-03-09T19:55:34.901281,rail_stomp,Connection failed: 
+2026-03-09T19:57:08.952859,rail_stomp,Connection failed: 
+2026-03-09T19:58:42.973123,rail_stomp,Connection failed: 
+2026-03-09T20:00:16.970567,rail_stomp,Connection failed: 
+2026-03-09T20:01:50.965023,rail_stomp,Connection failed: 
+2026-03-09T20:03:24.994951,rail_stomp,Connection failed: 
+2026-03-09T20:04:58.997448,rail_stomp,Connection failed: 
+2026-03-09T20:06:32.967557,rail_stomp,Connection failed: 
+2026-03-09T20:08:06.980078,rail_stomp,Connection failed: 
+2026-03-09T20:09:41.000097,rail_stomp,Connection failed: 
+2026-03-09T20:11:14.946143,rail_stomp,Connection failed: 
+2026-03-09T20:12:48.950632,rail_stomp,Connection failed: 
+2026-03-09T20:14:20.313353,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36fbd0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T20:14:23.087668,rail_stomp,Connection failed: 
+2026-03-09T20:14:42.514476,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36dae0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T20:15:04.568104,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36f680>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:04.632451,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36f020>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T20:15:08.623193,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e36f8a0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:20.674782,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.7 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e5398c0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:25.713158,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e539260>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:26.699808,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e5396a0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T20:15:36.720625,weather,"Blackpool: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.82&lon=-3.05 (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e538e20>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:42.770678,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e5385a0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:42.803057,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e538050>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=15)'))"
+2026-03-09T20:15:48.812561,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e5387c0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T20:16:08.418957,rail_stomp,Connection failed: 
+2026-03-09T20:18:04.469240,rail_stomp,Connection failed: 
+2026-03-09T20:19:38.513080,rail_stomp,Connection failed: 
+2026-03-09T20:21:12.502216,rail_stomp,Connection failed: 
+2026-03-09T20:22:46.496762,rail_stomp,Connection failed: 
+2026-03-09T20:24:20.523043,rail_stomp,Connection failed: 
+2026-03-09T20:25:54.502633,rail_stomp,Connection failed: 
+2026-03-09T20:27:28.478819,rail_stomp,Connection failed: 
+2026-03-09T20:29:02.498549,rail_stomp,Connection failed: 
+2026-03-09T20:30:36.500099,rail_stomp,Connection failed: 
+2026-03-09T20:32:10.482123,rail_stomp,Connection failed: 
+2026-03-09T20:33:44.472388,rail_stomp,Connection failed: 
+2026-03-09T20:35:18.499363,rail_stomp,Connection failed: 
+2026-03-09T20:36:52.410343,rail_stomp,Connection failed: 
+2026-03-09T20:38:26.395377,rail_stomp,Connection failed: 
+2026-03-09T20:40:00.515030,rail_stomp,Connection failed: 
+2026-03-09T20:41:34.514807,rail_stomp,Connection failed: 
+2026-03-09T20:43:08.521706,rail_stomp,Connection failed: 
+2026-03-09T20:44:42.544801,rail_stomp,Connection failed: 
+2026-03-09T20:46:16.563798,rail_stomp,Connection failed: 
+2026-03-09T20:46:33.100783,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:34.183219,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.7 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:35.318039,weather,"Blackpool: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.82&lon=-3.05 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:36.400448,weather,"Blackburn: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.69&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:37.497601,weather,"Burnley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.79&lon=-2.25 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:38.595199,weather,"Clitheroe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.87&lon=-2.38 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:39.693581,weather,"Morecambe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.07&lon=-2.87 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:40.307051,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:40.791363,weather,"Carnforth: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.12&lon=-2.77 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:41.889616,weather,"Nelson: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.85&lon=-2.17 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:42.372842,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:42.970508,weather,"Chorley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.49 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:43.924202,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:44.068647,weather,"Fylde: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.9 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:44.438434,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:45.082128,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:45.082505,weather,"Darwen: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.65&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:46.242745,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:46.597362,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:47.405280,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:47.640075,rail_stomp,Connection failed: 
+2026-03-09T20:46:48.486075,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:48.752074,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:49.645789,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:50.745221,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:50.906644,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/KKM (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:51.827487,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:53.004876,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MBR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:55.164048,departures,"CNF: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNF (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:57.245377,departures,"BBN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BBN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:46:59.327340,departures,"DWN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/DWN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:01.410948,departures,"ACR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/ACR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:03.492436,departures,"BUB: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BUB (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:05.590874,departures,"BNC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BNC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:07.741746,departures,"NEL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/NEL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:09.807621,departures,"CNE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CNE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:11.891542,departures,"CLH: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CLH (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:14.045463,departures,"LAY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:16.131221,departures,"BAI: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BAI (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:18.146978,departures,"LOT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LOT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:18.906756,rail_stomp,Connection failed: 
+2026-03-09T20:47:20.300351,departures,"CRL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CRL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:22.453508,departures,"ADS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/ADS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:24.614435,departures,"BSV: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BSV (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:26.774155,departures,"RWC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/RWC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:28.856009,departures,"LGO: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LGO (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:30.953587,departures,"WHL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/WHL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:33.035656,departures,"PLE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PLE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:35.196136,departures,"CHT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/CHT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:37.340949,departures,"MIL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MIL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:47:56.513396,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:00.032070,rail_stomp,Connection failed: 
+2026-03-09T20:48:02.903765,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:14.964196,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:26.026251,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:27.030215,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:28.032684,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:29.035787,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:30.038370,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:48:30.841526,rail_stomp,Connection failed: 
+2026-03-09T20:48:31.040133,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:23.783859,rail_stomp,Connection failed: 
+2026-03-09T20:49:34.466351,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:35.470008,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:36.472221,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:37.477440,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:38.530075,bus,"CCOA: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/CCOA (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:39.350366,departures,"LAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/LAN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:50.594868,bus,"HOSK: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/HOSK (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:50.595265,departures,"PRE: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PRE (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:51.598657,bus,"PRST: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/PRST (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:52.598248,departures,"BPN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPN (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:52.600682,bus,"BNGS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BNGS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:49:54.596443,rail_stomp,Connection failed: 
+2026-03-09T20:49:54.600900,departures,"BPS: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/BPS (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:50:07.580625,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:50:07.581009,departures,"PFY: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/PFY (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:50:09.583936,departures,"KKM: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/KKM (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:50:22.650131,departures,"MBR: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /rail/departures/MBR (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T20:51:28.628076,rail_stomp,Connection failed: 
+2026-03-09T20:53:02.605467,rail_stomp,Connection failed: 
+2026-03-09T20:54:36.624080,rail_stomp,Connection failed: 
+2026-03-09T20:56:10.650825,rail_stomp,Connection failed: 
+2026-03-09T20:57:44.625061,rail_stomp,Connection failed: 
+2026-03-09T20:59:18.632031,rail_stomp,Connection failed: 
+2026-03-09T21:00:52.647753,rail_stomp,Connection failed: 
+2026-03-09T21:02:26.614993,rail_stomp,Connection failed: 
+2026-03-09T21:04:00.603289,rail_stomp,Connection failed: 
+2026-03-09T21:05:34.624271,rail_stomp,Connection failed: 
+2026-03-09T21:07:08.662237,rail_stomp,Connection failed: 
+2026-03-09T21:08:42.657914,rail_stomp,Connection failed: 
+2026-03-09T21:09:10.015888,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54d2389e0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T21:09:32.241105,bus,"BLAC: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/BLAC (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ed260>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T21:09:54.447043,bus,"SSTL: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/SSTL (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4ed370>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T21:10:16.600260,bus,"TRAN: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/TRAN (Caused by ConnectTimeoutError(<HTTPConnection(host='transport.scc.lancs.ac.uk', port=80) at 0x1b54e4edae0>, 'Connection to transport.scc.lancs.ac.uk timed out. (connect timeout=30)'))"
+2026-03-09T21:10:17.004353,rail_stomp,Connection failed: 
+2026-03-09T21:12:05.226792,weather,"Lancaster: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.05&lon=-2.8 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:06.229577,weather,"Preston: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.7 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:07.232340,weather,"Blackpool: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.82&lon=-3.05 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:16.297815,weather,"Blackburn: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.69&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:17.304611,weather,"Burnley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.79&lon=-2.25 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:18.307419,weather,"Clitheroe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.87&lon=-2.38 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:19.309591,weather,"Morecambe: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.07&lon=-2.87 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:20.311922,weather,"Carnforth: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=54.12&lon=-2.77 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:20.502601,rail_stomp,Connection failed: 
+2026-03-09T21:12:28.391742,weather,"Nelson: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.85&lon=-2.17 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:28.392106,road_vms,"HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /road/vms (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:29.396020,weather,"Chorley: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.49 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:30.398511,weather,"Fylde: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.76&lon=-2.9 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:31.400895,weather,"Darwen: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /weather?lat=53.65&lon=-2.63 (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:12:32.021382,bus,"ARCT: HTTPConnectionPool(host='transport.scc.lancs.ac.uk', port=80): Max retries exceeded with url: /bus/live/ARCT (Caused by NameResolutionError(""HTTPConnection(host='transport.scc.lancs.ac.uk', port=80): Failed to resolve 'transport.scc.lancs.ac.uk' ([Errno 11001] getaddrinfo failed)""))"
+2026-03-09T21:13:54.836135,rail_stomp,Connection failed: 
+2026-03-09T21:15:28.806700,rail_stomp,Connection failed: 
+2026-03-09T21:17:02.825215,rail_stomp,Connection failed: 
+2026-03-09T21:18:36.838518,rail_stomp,Connection failed: 
+2026-03-09T21:20:10.856782,rail_stomp,Connection failed: 
+2026-03-09T21:21:44.830746,rail_stomp,Connection failed: 
+2026-03-09T21:23:18.807118,rail_stomp,Connection failed: 

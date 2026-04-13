@@ -1,0 +1,171 @@
+@startuml Backend1_Entities
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Core Domain" {
+  class Operator {
+    +operatorId : String <<PK>>
+    +name : String
+    +contactInfo : String
+  }
+
+  class Route {
+    +routeId : String <<PK>>
+    +mode : String
+    +operatorId : String <<FK>>
+  }
+
+  class Station {
+    +stationId : String <<PK>>
+    +name : String
+    +latitude : Float
+    +longitude : Float
+  }
+
+  class RouteStop {
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +stopOrder : Integer
+  }
+
+  class Schedule {
+    +scheduleId : String <<PK>>
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +arrivalTime : DateTime
+    +departureTime : DateTime
+  }
+
+  class ServiceStatus {
+    +statusId : String <<PK>>
+    +routeId : String <<FK>>
+    +delayMinutes : Integer
+    +cancellationFlag : Boolean
+    +lastUpdated : DateTime
+  }
+
+  class Disruption {
+    +disruptionId : String <<PK>>
+    +routeId : String <<FK>>
+    +type : String
+    +description : String
+    +startTime : DateTime
+    +endTime : DateTime
+  }
+}
+
+package "Ingestion & Sources" {
+  class DataSource {
+    +sourceId : String <<PK>>
+    +name : String
+    +baseUrl : String
+    +rateLimitPolicy : String
+    +enabled : Boolean
+  }
+
+  class APIHealth {
+    +apiHealthId : String <<PK>>
+    +sourceId : String <<FK>>
+    +status : String
+    +responseTimeMs : Integer
+    +lastChecked : DateTime
+  }
+
+  class JobRun {
+    +jobRunId : String <<PK>>
+    +jobName : String
+    +startedAt : DateTime
+    +finishedAt : DateTime
+    +status : String
+    +recordsProcessed : Integer
+    +errorMessage : String
+  }
+
+  class ExternalRouteSnapshot {
+    +snapshotId : String <<PK>>
+    +sourceId : String <<FK>>
+    +externalRouteKey : String
+    +retrievedAt : DateTime
+    +payloadHash : String
+    +normalisedJson : Text
+  }
+}
+
+package "Verification & Reliability" {
+  class RouteVerification {
+    +verificationId : String <<PK>>
+    +routeId : String <<FK>>
+    +primarySourceId : String <<FK>>
+    +confidenceScore : Float
+    +lastVerified : DateTime
+    +notes : String
+  }
+
+  class ReliabilityScore {
+    +scoreId : String <<PK>>
+    +routeId : String <<FK>>
+    +score : Float
+    +confidenceLevel : String
+    +calculatedAt : DateTime
+  }
+
+  class HistoricalPerformance {
+    +perfId : String <<PK>>
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +serviceDate : Date
+    +delayMinutes : Integer
+    +cancelled : Boolean
+    +sourceId : String <<FK>>
+  }
+}
+
+' =====================
+' Relationships
+' =====================
+
+Operator "1" -- "0..*" Route
+
+Route "1" -- "0..*" RouteStop
+Station "1" -- "0..*" RouteStop
+
+Route "1" -- "0..*" Schedule
+Station "1" -- "0..*" Schedule
+
+Route "1" -- "0..*" ServiceStatus
+Route "1" -- "0..*" Disruption
+
+DataSource "1" -- "0..*" APIHealth
+DataSource "1" -- "0..*" JobRun
+DataSource "1" -- "0..*" ExternalRouteSnapshot
+
+Route "1" -- "0..*" RouteVerification
+DataSource "1" -- "0..*" RouteVerification
+
+Route "1" -- "0..*" ReliabilityScore
+Route "1" -- "0..*" HistoricalPerformance
+Station "0..1" -- "0..*" HistoricalPerformance
+DataSource "1" -- "0..*" HistoricalPerformance
+
+' =====================
+' FORCE VERTICAL STACKING
+' =====================
+
+Operator -[hidden]down- Route
+Route -[hidden]down- Station
+Station -[hidden]down- RouteStop
+RouteStop -[hidden]down- Schedule
+Schedule -[hidden]down- ServiceStatus
+ServiceStatus -[hidden]down- Disruption
+
+DataSource -[hidden]down- APIHealth
+APIHealth -[hidden]down- JobRun
+JobRun -[hidden]down- ExternalRouteSnapshot
+
+RouteVerification -[hidden]down- ReliabilityScore
+ReliabilityScore -[hidden]down- HistoricalPerformance
+
+@enduml

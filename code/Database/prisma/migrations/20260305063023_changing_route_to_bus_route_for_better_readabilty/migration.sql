@@ -1,0 +1,4 @@
+-- Historical cleanup migration.
+-- The original SQL recreated RouteStop and referenced BusRoute before the physical
+-- Route table had been renamed, which breaks clean bootstrap on a fresh database.
+-- RouteStop is not part of the active model anymore, so this migration is now a no-op.

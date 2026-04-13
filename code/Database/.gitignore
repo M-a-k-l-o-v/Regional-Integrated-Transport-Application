@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+coverage/
+*.tsbuildinfo
+
+# Logs / OS artifacts
+*.log
+.DS_Store
+
+# Raw source datasets
+data/
+
+# DB snapshots:
+# - ignore all dumps by default
+# - keep only a single baseline snapshot + checksum tracked
+db/snapshots/*.dump
+!db/snapshots/.gitkeep
+!db/snapshots/transport_latest.dump
+!db/snapshots/transport_latest.dump.sha256

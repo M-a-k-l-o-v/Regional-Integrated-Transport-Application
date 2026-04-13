@@ -1,0 +1,117 @@
+@startuml Backend1_DB_Relational
+top to bottom direction
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+title Database Table Relational Diagram (Backend Role 1)
+
+package "Core tables" {
+  class Station {
+    +stationId : String <<PK>>
+    +name : String
+    +latitude : Float
+    +longitude : Float
+  }
+
+  class Route {
+    +routeId : String <<PK>>
+    +transportMode : String
+    +operatorId : String <<FK>>
+  }
+
+  class RouteStops {
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +stopOrder : Integer
+  }
+
+  class Schedule {
+    +scheduleId : String <<PK>>
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +arrivalTime : DateTime
+    +departureTime : DateTime
+  }
+
+  class ServiceStatus {
+    +statusId : String <<PK>>
+    +routeId : String <<FK>>
+    +stationId : String <<FK>>
+    +delayMinutes : Integer
+    +cancellationFlag : Boolean
+    +lastUpdated : DateTime
+  }
+}
+
+package "Reliability & Disruptions" {
+  class ReliabilityScore {
+    +routeId : String <<FK>>
+    +score : Float
+    +confidenceLevel : String
+    +calculatedAt : DateTime
+  }
+
+  class Disruptions {
+    +disruptionId : String <<PK>>
+    +routeId : String <<FK>>
+    +type : String
+    +description : String
+    +startTime : DateTime
+    +endTime : DateTime
+  }
+
+  class RouteVerification {
+    +routeId : String <<FK>>
+    +primarySource : String
+    +verifiedSources : String
+    +confidenceScore : Float
+    +lastVerified : DateTime
+  }
+
+  class Strike {
+    +strikeId : String <<PK>>
+    +operatorId : String <<FK>>
+    +startDate : Date
+    +endDate : Date
+  }
+}
+
+package "Provider & Monitoring" {
+  class Operator {
+    +operatorId : String <<PK>>
+    +serviceProvider : String
+  }
+
+  class API_status {
+    +apiName : String <<PK>>
+    +status : String
+    +responseTimeMs : Integer
+    +lastChecked : DateTime
+  }
+}
+
+' =========================
+' Relationships (FK links)
+' =========================
+
+Operator "1" -- "0..*" Route : operates >
+Route "1" -- "0..*" RouteStops
+Station "1" -- "0..*" RouteStops
+
+Route "1" -- "0..*" Schedule
+Station "1" -- "0..*" Schedule
+
+Route "1" -- "0..*" ServiceStatus
+Station "1" -- "0..*" ServiceStatus
+
+Route "1" -- "0..*" Disruptions
+
+' ReliabilityScore and RouteVerification are per-route (can be 0..* history or 0..1 latest)
+Route "1" -- "0..*" ReliabilityScore
+Route "1" -- "0..*" RouteVerification
+
+Operator "1" -- "0..*" Strike
+
+@enduml

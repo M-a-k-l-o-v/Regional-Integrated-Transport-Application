@@ -1,0 +1,5 @@
+timestamp,source,error_message
+2026-03-03T02:06:36.420851,departures,"LAN: HTTPSConnectionPool(host='transport.scc.lancs.ac.uk', port=443): Read timed out. (read timeout=15)"
+2026-03-03T02:06:55.402738,departures,"BPN: HTTPSConnectionPool(host='transport.scc.lancs.ac.uk', port=443): Read timed out. (read timeout=15)"
+2026-03-03T02:07:20.701815,departures,"DWN: HTTPSConnectionPool(host='transport.scc.lancs.ac.uk', port=443): Read timed out. (read timeout=15)"
+2026-03-03T02:07:40.532554,departures,"BUB: HTTPSConnectionPool(host='transport.scc.lancs.ac.uk', port=443): Read timed out. (read timeout=15)"
