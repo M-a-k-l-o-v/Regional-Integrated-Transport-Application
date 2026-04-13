@@ -1,238 +1,192 @@
-# Regional Integrated Transport Database
+# Backend — Lancashire Transport API
 
-TypeScript + Express + Prisma service for ingesting and modelling regional transport datasets in PostgreSQL.
+Express.js REST API serving bus, rail, road, and weather data for the Lancashire transport network. Connects to PostgreSQL for stored timetable data and to external feeds for live information.
 
-## Current Scope
+## Tech Stack
 
-Lancashire-focused integrated transport data layer with:
-- Bus timetable ingestion as primary delivery focus
-- Rail timetable ingestion in parallel
-- Query APIs for stop/station search and departures
+| Layer | Technology |
+|-------|------------|
+| Runtime | Node.js 20+ with TypeScript |
+| Framework | Express 5 |
+| Database | PostgreSQL 16 via Prisma ORM |
+| Caching | Redis 7 (optional — the server works without it) |
+| Validation | Zod |
+| XML Parsing | fast-xml-parser (SOAP rail boards, SIRI-VM bus feeds) |
+| Live Streaming | STOMP (Network Rail train movements) |
+| Scheduling | node-cron |
 
-In scope datasets:
-- NaPTAN access nodes (`BusStop`)
-- NPTG localities (`Locality`)
-- BODS/TransXChange bus timetable XML
-- Network Rail timetable NDJSON
+---
 
-## Current Build Status (Catch-Up)
+## Getting Started
 
-Implemented and working:
-1. Runtime and infra
-- Express app boot + health checks
-- Prisma ORM client integration
-- Ingestion cron wiring
+> If you are setting up the whole project for the first time, follow the root [README](../../README.md) instead — it walks through everything end-to-end.
 
-2. Ingestion pipelines
-- `LocalitiesIngestionService`
-- `AccessNodesIngestionService`
-- `RailIngestionService` (streaming NDJSON)
-- `BusTimetableIngestionService` (streaming TXC XML)
+### Quick setup (with database snapshot)
 
-3. Bus route and timetable handling
-- `BusRouteStop` maintains ordered stop chains per route
-- `BusSchedule` stores generated timed stop events per service date
-- Scope filtering supported in ingest:
-  - `strict`
-  - `corridor`
-  - `strict+corridor` / `strict_corridor`
-  - `all`
+The fastest way to get a working backend is to restore the shared database snapshot. This gives you the full dataset without running the lengthy ingestion scripts.
 
-4. Date-aware bus service logic
-- `BusServiceCalendar` stores:
-  - validity window (`validFrom`, `validTo`)
-  - weekday flags (`runsMon..runsSun`)
-- `BusServiceException` stores date-range include/exclude overrides
-- Query rule for bus services is:
-  - accept `date=YYYY-MM-DD`
-  - derive weekday
-  - apply validity + weekday + exception overrides
+```bash
+# 1. Install dependencies
+npm install
 
-5. APIs currently available
-- `GET /`
-- `GET /health`
-- `GET /search?q=`
-- `GET /rail/departures/:crs`
-- `GET /bus/departures/:stopId`
-  - supports `limit`, `windowMinutes`, `from`, `date`
-- `GET /bus/routes/:routeId/calendar`
-  - inspect route calendar + exceptions for a date
+# 2. Create your environment file
+cp .env.example .env
+# Open .env and set DATABASE_URL to your local PostgreSQL connection string, e.g.:
+#   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/transport"
 
-## Known Gaps / Next Priorities
+# 3. Make sure Git LFS has pulled the snapshot
+cd ../..          # go to repo root
+git lfs pull
+cd code/Database
 
-- STOMP live rail stream worker
-- Redis cache-first layer
-- Weather/road aggregation endpoints
-- Facilities endpoint
-- Automated tests (unit + integration)
+# 4. Create the database and restore
+createdb transport
+./db/db-restore.sh
 
-## Project Structure
-
-```text
-src/
-  infrastructure/
-  ingestion/
-  services/
-  cronJobs/
-  scripts/
-prisma/
-data/
+# 5. Start the server
+npm run dev       # Runs on http://localhost:3000
 ```
 
-## Local Setup
+### Manual setup (without snapshot)
 
-From `code/Database`:
+If you prefer to start with an empty database and ingest data yourself:
 
 ```bash
 npm install
-npm run prisma:generate
-npx prisma migrate dev
-npm run dev
+cp .env.example .env          # Fill in DATABASE_URL, etc.
+npx prisma migrate dev         # Create tables
+npx prisma generate            # Generate the Prisma client
+npm run dev                    # Start the server on :3000
 ```
 
-Open Prisma Studio:
+You will then need to trigger the ingestion scripts to populate bus and rail data. Refer to the seed and ingestion services in `Src/` for details.
 
-```bash
-npx prisma studio
+---
+
+## About the Database Snapshot
+
+A compressed PostgreSQL dump is stored at `db/snapshots/transport_latest.dump` (~182 MB compressed, ~2.7 GB when restored). It contains all ingested bus timetables, rail schedules, station data, and reference tables.
+
+The file is tracked with **Git LFS** so it does not bloat the repository. When you clone the repo, Git downloads a small pointer file. Running `git lfs pull` replaces it with the actual data.
+
+The restore script (`db/db-restore.sh`) handles everything:
+1. Verifies the file checksum
+2. Drops existing tables for a clean slate
+3. Runs `pg_restore` to load the data
+4. Runs `prisma migrate deploy` to ensure the schema is current
+
+---
+
+## Scripts
+
+| Command | What it does |
+|---------|--------------|
+| `npm run dev` | Start the dev server with ts-node-dev (hot-reload) |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm start` | Run the compiled production build |
+| `npm test` | Run the Vitest test suite |
+| `npm run test:coverage` | Run tests with a coverage report |
+| `npm run prisma:studio` | Open Prisma Studio (visual database browser) |
+| `npm run prisma:migrate` | Create and apply a new Prisma migration |
+
+---
+
+## API Endpoints
+
+### Core
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check |
+| GET | `/search?q=<query>` | Search stations and bus stops by name |
+
+### Rail
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/rail/departures/:crs` | Scheduled departures for a station |
+| GET | `/rail/live/departures/:crs` | Live departure board via SOAP proxy |
+| GET | `/rail/delay-stats/:stanox` | Delay statistics for a location |
+| GET | `/rail/delay-log` | Recent movement log entries |
+| GET | `/rail/stations/:crs/facilities` | Station accessibility, parking, toilets, amenities |
+
+### Bus
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/bus/departures/:stopId` | Scheduled bus departures |
+| GET | `/bus/groups/:groupId/departures` | Departures for a grouped bus station |
+| GET | `/bus/routes/:routeId/calendar` | Route operating calendar and exceptions |
+| GET | `/bus/live/:operatorRef` | Live SIRI-VM vehicle positions |
+
+### Journey Planning
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/journeys/plan` | Multimodal journey planner |
+| GET | `/journeys/legs/detail` | Detailed leg path, disruptions, and weather |
+
+### Other
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/weather/current?lat=&lon=` | Current weather for a set of coordinates |
+| GET | `/road/vms?road=M6` | Variable Message Sign data for a road |
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `NAPTAN_API_BASE_URL` | Yes | NaPTAN API base (`https://naptan.api.dft.gov.uk`) |
+| `RAIL_TIMETABLE_PATH` | Yes | Path to the NDJSON timetable index file |
+| `REDIS_URL` | No | Redis connection string (enables caching) |
+| `TRANSPORT_SERVER_BASE_URL` | No | University transport proxy URL |
+| `NETWORK_RAIL_STOMP_ENABLED` | No | `true` to connect to the live rail STOMP feed |
+| `NETWORK_RAIL_STOMP_HOST` | No | STOMP broker hostname |
+| `NETWORK_RAIL_STOMP_PORT` | No | STOMP broker port |
+| `NETWORK_RAIL_STOMP_USERNAME` | No | STOMP credentials |
+| `NETWORK_RAIL_STOMP_PASSWORD` | No | STOMP credentials |
+| `NATIONAL_HIGHWAYS_API_KEY` | No | National Highways API key for live VMS data |
+
+---
+
+## Caching Strategy
+
+All cache TTLs are set to respect the university proxy's rate limits:
+
+| Data | TTL | Why |
+|------|-----|-----|
+| Weather | 5 min | OpenWeatherMap rate limit via proxy |
+| Rail live board | 30 sec | Near-real-time requirement |
+| Search results | 5 min | Reference data changes infrequently |
+| VMS signs | 5 min | National Highways update cadence |
+| Station facilities | 1 hour | Static curated data |
+
+---
+
+## Project Layout
+
 ```
-
-## Environment
-
-Create `.env` in `code/Database`:
-
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/transport?schema=public"
-PORT=3000
-NODE_ENV=development
-NAPTAN_API_BASE_URL="https://naptan.api.dft.gov.uk"
-TRANSPORT_SERVER_BASE_URL="http://transport.scc.lancs.ac.uk"
-RAIL_TIMETABLE_PATH="/absolute/path/to/rail_timetable_index.ndjson"
+Src/
+  app.ts                          Express app — route handlers defined here
+  server.ts                       Server startup, STOMP connection, cron jobs
+  config/env.ts                   Environment variable loading + validation
+  infrastructure/
+    apiClients/                   TransportServerClient, NationalHighwaysClient
+    cache/RedisCache.ts           Redis get/set/del wrapper
+    liveData/                     In-memory stores (LiveMovementStore, BusLiveDelayStore)
+    orm/prisma/                   Prisma client singleton
+  services/
+    journeys/                     Journey planning, leg detail, operational status
+    stations/                     Station facilities, coordinate backfill
+    liveRail/                     STOMP stream processing
+  __tests__/                      Unit and load tests
+prisma/
+  schema.prisma                   Database schema (20+ models)
+db/
+  snapshots/                      Database dump + checksum
+  db-restore.sh                   Restore script for teammates
 ```
-
-## Ingestion Commands
-
-Seed data source rows:
-
-```bash
-npx ts-node src/scripts/seedDataSource.ts
-```
-
-Rail timetable:
-
-```bash
-npx ts-node src/scripts/ingestRailTimetable.ts
-```
-
-Bus timetables (recursive by folder):
-
-```bash
-npx ts-node src/scripts/ingestBusTimetables.ts --dir="data/bus"
-```
-
-Bus timetables with explicit scope controls:
-
-```bash
-# strict
-npx ts-node src/scripts/ingestBusTimetables.ts --dir="data/bus" --scopeMode=strict --edgeStops=2
-
-# corridor
-npx ts-node src/scripts/ingestBusTimetables.ts --dir="data/bus" --scopeMode=corridor --corridorAnchor=lancaster --edgeStops=5
-
-# strict + corridor
-npx ts-node src/scripts/ingestBusTimetables.ts --dir="data/bus" --scopeMode=strict+corridor --corridorAnchor=lancaster --edgeStops=5
-
-# all
-npx ts-node src/scripts/ingestBusTimetables.ts --dir="data/bus" --scopeMode=all
-```
-
-Re-ingest bus stops for ATCO prefixes currently present in `BusSchedule`:
-
-```bash
-npx ts-node src/scripts/reingestBusStopsFromBusScheduleCoverage.ts
-```
-
-## API Quick Checks
-
-```bash
-curl "http://localhost:3000/search?q=preston&limit=20"
-curl "http://localhost:3000/rail/departures/PRE"
-curl "http://localhost:3000/bus/departures/<STOP_ID>?date=2026-03-05&windowMinutes=180&limit=10"
-curl "http://localhost:3000/bus/routes/<ROUTE_ID>/calendar?date=2026-03-05"
-```
-
-## No-Server Collaboration Workflow (Snapshot Dumps)
-
-### Why
-Timetable ingestion is heavy. Instead of asking every collaborator to re-ingest all sources, use the baseline snapshot committed in this repo.
-
-### Baseline snapshot tracked in repo
-
-Tracked files:
-- `db/snapshots/transport_latest.dump`
-- `db/snapshots/transport_latest.dump.sha256`
-
-### Restore the committed baseline (collaborator machine)
-
-```bash
-cd "/Users/yin/Documents/UNI/Year 2 /SCC200/Regional-Integrated-Transport-Application/code/Database"
-shasum -a 256 -c db/snapshots/transport_latest.dump.sha256
-
-dropdb --if-exists transport
-createdb transport
-/opt/homebrew/opt/libpq/bin/pg_restore \
-  --clean \
-  --if-exists \
-  --no-owner \
-  --no-privileges \
-  --dbname=transport \
-  db/snapshots/transport_latest.dump
-```
-
-### Verify sync after restore
-
-Run in psql:
-
-```sql
-SELECT COUNT(*) FROM "BusSchedule";
-SELECT COUNT(*) FROM "BusServiceCalendar";
-SELECT COUNT(*) FROM "BusServiceException";
-```
-
-If these counts match the owner environment, collaborators are in sync.
-
-### Refresh baseline snapshot (owner machine)
-
-```bash
-cd "/Users/yin/Documents/UNI/Year 2 /SCC200/Regional-Integrated-Transport-Application/code/Database"
-source .env
-PSQL_URL="${DATABASE_URL%%\?*}"
-/opt/homebrew/opt/libpq/bin/pg_dump "$PSQL_URL" \
-  --format=custom \
-  --compress=9 \
-  --no-owner \
-  --no-privileges \
-  --schema=public \
-  --file="db/snapshots/transport_latest.dump"
-shasum -a 256 db/snapshots/transport_latest.dump > db/snapshots/transport_latest.dump.sha256
-```
-
-## Snapshot Storage Policy
-
-- Keep exactly one tracked baseline dump in git: `transport_latest.dump`.
-- For larger historical snapshots, prefer GitHub Releases artifacts.
-- Do not commit multiple versioned dump files to normal git history.
-- Keep `.env` and secrets out of version control.
-
-## Troubleshooting
-
-`psql: invalid URI query parameter: "schema"`
-- Use `PSQL_URL="${DATABASE_URL%%\?*}"` before calling `psql`.
-
-`psql` connection errors on `/tmp/.s.PGSQL.5432`
-- Usually means `PSQL_URL` is empty or PostgreSQL is not running.
-- Re-source `.env` from `code/Database` and ensure your DB container is up.
-
-Prisma migrate `Schema engine error`
-- Re-run from `code/Database`.
-- Verify `DATABASE_URL` and local DB availability.
-- Run `npx prisma validate` first.

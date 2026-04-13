@@ -14,6 +14,7 @@ export class AccessNodeRepository {
         where: { stopId: n.stopId },
         update: {
           name: n.name,
+          indicator: n.indicator ?? null,
           latitude: n.latitude,
           longitude: n.longitude,
           localityId: n.localityId ?? null,
@@ -22,6 +23,7 @@ export class AccessNodeRepository {
         create: {
           stopId: n.stopId,
           name: n.name,
+          indicator: n.indicator ?? null,
           latitude: n.latitude,
           longitude: n.longitude,
           localityId: n.localityId ?? null,

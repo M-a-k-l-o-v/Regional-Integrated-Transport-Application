@@ -1,25 +1,485 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f5;
+  --foreground: #1a1a1a;
+  --muted: #8a8a8a;
+  --surface: #fefcf9;
+  --surface-strong: #fefcf9;
+  --surface-soft: #f5f2ee;
+  --surface-alt: #f0ece7;
+  --surface-alt-hover: #e8e3dd;
+  --surface-accent: #e6f4ec;
+  --surface-accent-strong: #d2edde;
+  --input: #fefcf9;
+  --brand: #1b5e3b;
+  --brand-ink: #1b5e3b;
+  --brand-light: #e6f4ec;
+  --outline: #e8e3dd;
+  --outline-soft: #f0ece7;
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --radius-card: 1.25rem;
+  --radius-pill: 9999px;
+  color-scheme: light;
+}
+
+html[data-theme="night"] {
+  --background: #0f1218;
+  --foreground: #eef1f4;
+  --muted: #8a9bb0;
+  --surface: #1a2030;
+  --surface-strong: #1e2638;
+  --surface-soft: #151b28;
+  --surface-alt: #222c40;
+  --surface-alt-hover: #2b3750;
+  --surface-accent: rgba(115, 210, 176, 0.12);
+  --surface-accent-strong: rgba(115, 210, 176, 0.2);
+  --input: #151b28;
+  --brand: #4eba8a;
+  --brand-ink: #d4f5e6;
+  --brand-light: rgba(78, 186, 138, 0.12);
+  --outline: rgba(255, 255, 255, 0.1);
+  --outline-soft: rgba(255, 255, 255, 0.06);
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-inter);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Accessibility — WCAG 2.1 AA ─────────────────────────────────────── */
+
+/* Visible focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip-to-content link — hidden until focused */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0 0 0.5rem 0;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* Ensure minimum touch targets (WCAG 2.5.8) */
+button, [role="button"], a {
+  min-height: 2.25rem; /* 36px — slightly under 44px but prevents layout breakage on inline links */
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Shared component classes ──────────────────────────────────────────── */
+
+.panel-surface {
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.app-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--brand-ink);
+}
+
+.app-stat-tile {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  padding: 0.85rem 1rem;
+}
+
+.app-list-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  padding: 1rem;
+}
+
+html[data-theme="night"] .panel-surface {
+  border-color: var(--outline);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-card);
+}
+
+html[data-theme="night"] .app-pill {
+  border-color: var(--outline);
+  background: var(--surface-strong);
+}
+
+html[data-theme="night"] .app-stat-tile,
+html[data-theme="night"] .app-list-card {
+  border-color: var(--outline);
+  background: var(--surface-strong);
+}
+
+/* ── Map styles ────────────────────────────────────────────────────────── */
+
+.map-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.map-nav-item--active {
+  background: var(--brand);
+  color: white;
+}
+
+.app-map-marker {
+  display: flex;
+  height: 28px;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px solid var(--surface-strong);
+  background: var(--surface-strong);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: var(--foreground);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.app-map-marker--active {
+  height: 34px;
+  width: 34px;
+  background: var(--brand);
+  color: white;
+}
+
+.app-map-popup {
+  min-width: 150px;
+  color: var(--foreground);
+}
+
+.app-map-popup__eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.app-map-popup__title {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.app-map-popup__code {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.app-map-popup__link {
+  margin-top: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--brand);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+}
+
+.app-map-popup__actions {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.app-map-popup__link--secondary {
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  color: var(--brand);
+}
+
+/* ── Journey route map labels ──────────────────────────────────────────── */
+
+.journey-route-duration-wrapper {
+  background: transparent;
+  border: 0;
+}
+
+.journey-route-duration {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: var(--shadow-soft);
+  white-space: nowrap;
+}
+
+.journey-route-duration--active {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.journey-map-point-label {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.journey-map-point-label .leaflet-tooltip-content {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--outline);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: var(--shadow-soft);
+}
+
+.journey-map-point-label:before {
+  display: none;
+}
+
+/* ── Bottom-sheet slide-up animation ──────────────────────────────────── */
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+/* ── Live bus vehicle markers ─────────────────────────────────────────── */
+.app-map-vehicle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.app-map-vehicle__arrow {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--bearing, 0deg));
+}
+
+.app-map-vehicle__arrow::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #f59e0b;
+  margin-bottom: 14px;
+}
+
+.app-map-vehicle__label {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+/* ── Animated live bus markers ────────────────────────────────────────── */
+.live-bus-marker {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.live-bus-marker__body {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: var(--delay-color, #6b7280);
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.4s ease;
+}
+
+.live-bus-marker__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-bus-marker__icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+  fill: none;
+}
+
+.live-bus-marker__bearing {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) rotate(var(--bearing, 0deg));
+  transform-origin: center 28px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid var(--delay-color, #6b7280);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  transition: border-bottom-color 0.4s ease;
+}
+
+.live-bus-marker__label {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 22px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  background: var(--delay-color, #6b7280);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  transition: background 0.4s ease;
+}
+
+/* Pulse ring animation for live bus markers */
+.live-bus-marker__body::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 14px;
+  border: 2px solid var(--delay-color, #6b7280);
+  opacity: 0;
+  animation: busPulse 2s ease-out infinite;
+}
+
+@keyframes busPulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+/* ── VMS map markers ─────────────────────────────────────────────────────── */
+.vms-map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+  background: #94a3b8;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vms-map-marker--message {
+  background: #f59e0b;
+}
+
+.vms-map-marker--blank {
+  background: #cbd5e1;
+  opacity: 0.7;
+}
+
+.vms-map-marker--active {
+  transform: scale(1.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 10;
 }

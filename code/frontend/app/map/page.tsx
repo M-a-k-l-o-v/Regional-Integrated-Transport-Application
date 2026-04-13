@@ -1,125 +1,274 @@
-"use client";
-import React from "react";
-import Image from "next/image";
-const BlogSinglePage = () => {
-    return (
-        <div className="w-screen flex flex-col items-center justify-center h-screen relative bg-neutral-50 overflow-hidden">
-            <img className="w-full left-0 top-0 absolute" src="/map.png" />
-            
-            {/*Gradient*/}
-            <div className="w-full h-56 left-0 top-0 absolute bg-gradient-to-t from-zinc-300/0 to-neutral-500" />
+import Link from "next/link";
+import AppShell from "../components/AppShell";
+import ModeTabs from "../components/ModeTabs";
+import PageHeader from "../components/PageHeader";
+import PanelCard from "../components/PanelCard";
+import MapCanvas from "./MapCanvas";
+import {
+  PlannerLocation,
+  SearchResponse,
+  buildBoardHref,
+  fetchJson,
+} from "../lib/transportApi";
 
-            {/* Location Entry Boxes */}
-            <div className="w-96 p-4 top-0 absolute bg-gradient-to-t from-white/0 to-neutral-400/0 shadow-[0px_5px_20px_0px_rgba(9,50,98,0.02)] inline-flex justify-start items-center gap-4">
-                <div className="flex-1 relative inline-flex flex-col justify-start items-start gap-3">
-                    <div className="w-96 h-12 p-4 bg-neutral-50 rounded-[10px] outline outline-2 outline-offset-[-2px] outline-neutral-300 inline-flex justify-start items-center gap-2.5 overflow-hidden">
-                        <div className="justify-center text-gray-800 text-xs font-normal font-['Inter'] leading-4">Temple</div>
-                    </div>
-                    <div className="w-96 h-12 p-4 bg-neutral-50 rounded-[10px] outline outline-2 outline-offset-[-2px] outline-neutral-300 inline-flex justify-start items-center gap-2.5 overflow-hidden">
-                        <div className="justify-center text-gray-800 text-xs font-normal font-['Inter'] leading-4">Theed St.</div>
-                    </div>
-                    <div className="p-1 left-[332px] top-[38px] absolute bg-green-800 rounded-[10px] inline-flex justify-start items-start gap-2.5">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-4 left-[3px] top-[4px] absolute outline outline-2 outline-offset-[-1px] outline-white" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+export const dynamic = "force-dynamic";
 
-            <div className="w-full flex flex-col inline-flex justify-center items-center bottom-0 absolute">
-
-                {/*Current Location Center Button*/}
-                <div className="flex-1">
-                    <div className="w-12 h-12 flex justify-center items-center right-5 absolute bg-green-800 rounded-[10px] overflow-hidden">
-                        <Image
-                            className="white"
-                            src="/icons/center_location.svg"
-                            alt="Center_location"
-                            width={30}
-                            height={30}
-                        />
-                    </div>
-                </div>
-
-                {/* Filter Bar */}
-                <div className="self-stretch flex-1 inline-flex flex-row justify-center items-center px-20 py-10 gap-10 bg-white">
-                    
-                    <div className="self-stretch justify-center items-center flex flex-row inline-flex min-h-12 min-w-30 px-5 w-full bg-orange-500/10 rounded-lg">
-                        <Image
-                            className="white"
-                            src="/icons/walk_icon.svg"
-                            alt="Walk"
-                            width={40}
-                            height={40}
-                        />
-                        <div className="w-full text-center text-green-800 text-lg font-bold font-['Inter']">Walk</div>
-                    </div>
-
-                    <div className="self-stretch justify-center items-center flex flex-row inline-flex min-h-12 min-w-30 px-5 w-full bg-orange-500/10 rounded-lg">
-                        <Image
-                            className="text-green-800"
-                            src="/icons/train_icon.svg"
-                            alt="Train"
-                            width={40}
-                            height={40}
-                        />
-                        <div className="w-full text-center text-green-800 text-lg font-bold font-['Inter']">Train</div>
-                    </div>
-
-                    <div className="self-stretch justify-center items-center flex flex-row inline-flex min-h-12 min-w-30 px-5 w-full bg-green-800 rounded-lg">
-                        <Image
-                            className="white"
-                            src="/icons/bus_icon.svg"
-                            alt="Bus"
-                            width={40}
-                            height={40}
-                        />
-                        <div className="w-full text-center text-white text-lg font-bold font-['Inter']">Bus</div>
-                    </div>
-                </div>
-
-                {/*Bottom Bar*/}
-                <div className="self-stretch flex-0 h-20 p-4 bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] flex flex-col justify-center items-center gap-2.5 overflow-hidden">
-                    <div className="w-96 px-6 inline-flex justify-between items-center">
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-5 h-4 left-[2px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-2 bg-green-800 rounded-[10px] inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[4px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-white" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[3px] top-[2.27px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-4 left-[4px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                            <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                                <div className="w-6 h-6 relative overflow-hidden">
-                                    <div className="w-4 h-5 left-[3.05px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+type MapPageProps = {
+  searchParams?: Promise<{
+    q?: string;
+    mode?: string;
+    focus?: string;
+  }>;
 };
-export default BlogSinglePage;
+
+type MapMode = "rail" | "bus" | "both";
+
+type MapItem = PlannerLocation & {
+  latitude: number;
+  longitude: number;
+  boardHref: string;
+  focusHref: string;
+};
+
+function parseMode(value: string | undefined): MapMode {
+  if (value === "rail" || value === "bus") return value;
+  return "both";
+}
+
+function modeHref(q: string, mode: MapMode, focus?: string): string {
+  const params = new URLSearchParams();
+  if (q.length > 0) params.set("q", q);
+  params.set("mode", mode);
+  if (focus) params.set("focus", focus);
+  return `/map?${params.toString()}`;
+}
+
+export default async function MapPage({ searchParams }: MapPageProps) {
+  const params = (await searchParams) ?? {};
+  const q = typeof params.q === "string" ? params.q.trim() : "";
+  const effectiveQuery = q.length >= 2 ? q : "lanc";
+  const mode = parseMode(typeof params.mode === "string" ? params.mode : undefined);
+  const focus = typeof params.focus === "string" ? params.focus.trim() : "";
+
+  const searchResult = await fetchJson<SearchResponse>(
+    `/search?q=${encodeURIComponent(effectiveQuery)}&limit=30&scheduledOnly=true`
+  );
+
+  const rawResults = searchResult.data?.results ?? [];
+  const filtered = rawResults.filter((result) => {
+    if (result.latitude === null || result.longitude === null) return false;
+    if (mode === "rail") return result.type === "station";
+    if (mode === "bus") return result.type === "bus_stop" || result.type === "bus_stop_group";
+    return true;
+  });
+
+  const mapItems: MapItem[] = filtered.map((result) => ({
+    id: result.id,
+    type: result.type,
+    code: result.code,
+    name: result.name,
+    localityName: result.localityName,
+    latitude: result.latitude as number,
+    longitude: result.longitude as number,
+    boardHref: buildBoardHref({
+      type: result.type,
+      id: result.id,
+      code: result.code,
+      name: result.name,
+      localityName: result.localityName,
+    }, effectiveQuery),
+    focusHref: modeHref(effectiveQuery, mode, result.id),
+  }));
+
+  const activeItem =
+    mapItems.find((item) => item.id === focus || item.code === focus) ??
+    mapItems[0] ??
+    null;
+
+  // Show live vehicle positions for bus/both modes using known Lancashire operators
+  const vehicleOperatorIds =
+    mode === "rail" ? [] : ["LNCS", "PC", "ANW", "GONW"];
+
+  const renderMapSheet = (tone: "light" | "default") => {
+    const isLight = tone === "light";
+    const eyebrowClass = isLight
+      ? "text-xs font-semibold uppercase tracking-wider text-slate-400"
+      : "text-xs font-semibold uppercase tracking-wider text-[var(--muted)]";
+    const titleClass = isLight
+      ? "mt-1.5 text-lg font-bold text-slate-900"
+      : "mt-1.5 text-lg font-bold text-[var(--foreground)]";
+    const bodyClass = isLight
+      ? "mt-1.5 text-sm text-slate-500"
+      : "mt-1.5 text-sm text-[var(--muted)]";
+    const badgeClass = isLight
+      ? "rounded-full border border-slate-200 bg-emerald-600 px-3 py-1 text-xs font-semibold text-white"
+      : "rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-1 text-xs font-semibold text-[var(--muted)]";
+    const inputWrapClass = isLight
+      ? "flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3"
+      : "flex items-center gap-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3";
+    const inputClass = isLight
+      ? "w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+      : "w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]";
+    const selectedCardClass = isLight
+      ? "rounded-xl border border-slate-200 bg-white p-4"
+      : "rounded-xl border border-[var(--outline)] bg-[var(--surface)] p-4";
+    const selectedEyebrowClass = isLight
+      ? "text-xs font-semibold uppercase tracking-wider text-slate-400"
+      : "text-xs font-semibold uppercase tracking-wider text-[var(--muted)]";
+    const selectedTitleClass = isLight
+      ? "mt-1.5 text-lg font-bold text-slate-900"
+      : "mt-1.5 text-lg font-bold text-[var(--foreground)]";
+    const selectedMetaClass = isLight
+      ? "mt-1.5 text-sm text-slate-500"
+      : "mt-1.5 text-sm text-[var(--muted)]";
+    const matchesEyebrowClass = isLight
+      ? "text-xs font-semibold uppercase tracking-wider text-slate-400"
+      : "text-xs font-semibold uppercase tracking-wider text-[var(--muted)]";
+    const emptyClass = isLight
+      ? "rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500"
+      : "rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]";
+    const resultCardClass = isLight
+      ? "rounded-xl border border-slate-200 bg-white p-4"
+      : "app-list-card";
+    const resultTypeClass = isLight
+      ? "text-xs font-semibold uppercase tracking-wider text-slate-400"
+      : "text-xs font-semibold uppercase tracking-wider text-[var(--muted)]";
+    const resultTitleClass = isLight
+      ? "mt-1 text-base font-bold text-slate-900"
+      : "mt-1 text-base font-bold text-[var(--foreground)]";
+    const resultMetaClass = isLight
+      ? "mt-1 text-sm text-slate-500"
+      : "mt-1 text-sm text-[var(--muted)]";
+    const focusButtonClass = isLight
+      ? "rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+      : "rounded-full bg-[var(--surface-accent)] px-4 py-2 text-sm font-semibold text-[var(--brand)]";
+
+    return (
+      <div className="space-y-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className={eyebrowClass}>Network map</div>
+            <div className={titleClass}>Search mapped stops and stations</div>
+            <div className={bodyClass}>
+              Focus a mapped result, open its board, and keep the scheduled-only map view aligned with the journey explorer.
+            </div>
+          </div>
+          <div className={badgeClass}>{mapItems.length} mapped</div>
+        </div>
+
+        <form action="/map" className="grid gap-3">
+          <input type="hidden" name="mode" value={mode} />
+          <div className={inputWrapClass}>
+            <span className={isLight ? "text-lg text-emerald-400" : "text-lg text-[var(--brand)]"}>⌕</span>
+            <input
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="Search area, station, or stop"
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <ModeTabs
+              tabs={[
+                { label: "Rail", href: modeHref(effectiveQuery, "rail", activeItem?.id), active: mode === "rail" },
+                { label: "Bus", href: modeHref(effectiveQuery, "bus", activeItem?.id), active: mode === "bus" },
+                { label: "Both", href: modeHref(effectiveQuery, "both", activeItem?.id), active: mode === "both" },
+              ]}
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)] transition hover:bg-[var(--brand-ink)]"
+            >
+              Refresh map
+            </button>
+          </div>
+        </form>
+
+        <div className={selectedCardClass}>
+          <div className={selectedEyebrowClass}>Selected</div>
+          <div className={selectedTitleClass}>{activeItem?.name ?? "No mapped result"}</div>
+          {activeItem ? (
+            <>
+              <div className={selectedMetaClass}>
+                {activeItem.type === "station" ? "Rail station" : activeItem.type === "bus_stop_group" ? "Bus station group" : "Bus stop"}
+                {activeItem.type === "bus_stop_group" ? "" : ` · ${activeItem.localityName ?? activeItem.code}`}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link
+                  href={activeItem.boardHref}
+                  className="inline-flex items-center rounded-full bg-[var(--brand)] px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] transition hover:bg-[var(--brand-ink)]"
+                >
+                  {activeItem.type === "station" ? "Open station board" : activeItem.type === "bus_stop_group" ? "Open bus station board" : "Open stop board"}
+                </Link>
+                <Link href={activeItem.focusHref} className={focusButtonClass}>
+                  Keep focused
+                </Link>
+              </div>
+            </>
+          ) : (
+            <p className={bodyClass}>Search for a location to populate the map and focus panel.</p>
+          )}
+        </div>
+
+        <div>
+          <div className={matchesEyebrowClass}>Matches</div>
+          <div className="mt-2 space-y-3">
+            {searchResult.error ? (
+              <div className="rounded-[1.4rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{searchResult.error}</div>
+            ) : mapItems.length === 0 ? (
+              <div className={emptyClass}>No results with usable coordinates matched this search.</div>
+            ) : (
+              mapItems.slice(0, 8).map((item) => (
+                <div key={item.id} className={resultCardClass}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className={resultTypeClass}>
+                        {item.type === "station" ? "Rail station" : item.type === "bus_stop_group" ? "Bus station group" : "Bus stop"}
+                      </div>
+                      <div className={resultTitleClass}>{item.name}</div>
+                      <div className={resultMetaClass}>
+                        {[item.localityName, item.type === "bus_stop_group" ? null : item.code].filter(Boolean).join(" · ")}
+                      </div>
+                    </div>
+                    <Link href={item.focusHref} className={focusButtonClass}>
+                      Focus
+                    </Link>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <AppShell activePath="map">
+      <PageHeader
+        eyebrow="Network map"
+        title="Explore stations and bus stops on the map"
+        description="Find stations and stops near you."
+      />
+
+      <PanelCard eyebrow="Explore on map" title="Mapped search results" className="overflow-hidden">
+        <div className="relative">
+          <div className="h-[420px] bg-[var(--surface-soft)] sm:h-[520px] lg:h-[820px]">
+            <MapCanvas items={mapItems} activeId={activeItem?.id ?? null} vehicleOperatorIds={vehicleOperatorIds} />
+          </div>
+
+          <div className="hidden xl:block absolute left-5 top-5 z-[700] max-h-[calc(100%-2.5rem)] w-[min(380px,calc(100%-2.5rem))] overflow-y-auto rounded-2xl border border-slate-200 bg-white/97 p-5 text-slate-900 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-sm">
+            {renderMapSheet("light")}
+          </div>
+        </div>
+      </PanelCard>
+
+      <div className="xl:hidden">
+        <PanelCard eyebrow="Map controls" title="Search and focus mapped locations">
+          {renderMapSheet("default")}
+        </PanelCard>
+      </div>
+    </AppShell>
+  );
+}

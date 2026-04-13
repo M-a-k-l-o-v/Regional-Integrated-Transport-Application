@@ -1,122 +1,194 @@
-"use client";
-import React from "react";
-const BlogSinglePage = () => {
-    return (
-        <div className="w-96 h-[892px] relative bg-neutral-50 overflow-hidden">
-            <div className="w-96 h-20 p-4 left-0 top-[812px] absolute bg-white shadow-[0px_-5px_20px_0px_rgba(9,50,98,0.03)] inline-flex justify-center items-center gap-10 overflow-hidden">
-                <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                    <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-5 h-4 left-[2px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                    </div>
-                </div>
-                <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                    <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-5 left-[4px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                    </div>
-                </div>
-                <div className="inline-flex flex-col justify-center items-center gap-1">
-                    <div className="flex flex-col justify-center items-center gap-1.5">
-                        <div className="p-2 bg-green-800 rounded-lg inline-flex justify-start items-center gap-2.5">
-                            <div className="w-6 h-6 relative overflow-hidden">
-                                <div className="w-4 h-5 left-[3px] top-[2.27px] absolute outline outline-2 outline-offset-[-1px] outline-white" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                    <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-4 left-[4px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                    </div>
-                </div>
-                <div className="inline-flex flex-col justify-center items-center gap-1.5">
-                    <div className="p-1 rounded-lg inline-flex justify-start items-center gap-2.5">
-                        <div className="w-6 h-6 relative overflow-hidden">
-                            <div className="w-4 h-5 left-[3.04px] top-[2px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-600" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="w-96 h-[820px] p-5 left-0 top-0 absolute inline-flex flex-col justify-start items-center gap-5">
-                <div className="w-14 h-14 bg-zinc-300 rounded-full" />
-                <img className="w-28 h-44" src="https://placehold.co/113x170" />
-                <div className="justify-start text-green-800 text-3xl font-semibold font-['Inter']">Hi, Gigi</div>
-                <div className="w-96 h-28 bg-white rounded-[10px] shadow-[0px_20px_40px_0px_rgba(255,174,0,0.29)] shadow-[0px_5px_10px_0px_rgba(255,174,0,0.26)] flex flex-col justify-center items-center overflow-hidden">
-                    <div className="self-stretch p-2.5 inline-flex flex-col justify-start items-start">
-                        <div className="self-stretch h-10 px-5 py-2.5 bg-gradient-to-br from-green-800 to-green-800 rounded-lg inline-flex justify-center items-center gap-2.5">
-                            <div className="text-center justify-start text-white text-sm font-black font-['Font_Awesome_5_Free'] leading-4">SEARCH</div>
-                            <div className="text-center justify-start text-white text-lg font-bold font-['Source_Sans_Pro'] leading-4">Find </div>
-                        </div>
-                        <div className="self-stretch h-10 p-2.5 bg-gray-200 rounded-lg inline-flex justify-start items-center gap-2.5">
-                            <div className="w-5 h-10 text-center justify-center text-green-800 text-2xl font-black font-['Font_Awesome_5_Free'] leading-8">map-marker-alt</div>
-                            <div className="flex-1 h-5 justify-center text-neutral-400 text-lg font-normal font-['Open_Sans'] leading-6">Search station or stop</div>
-                        </div>
-                    </div>
-                    <div className="self-stretch p-2.5 bg-white inline-flex flex-col justify-start items-start">
-                        <div className="self-stretch self-stretch px-2.5 py-2.5 bg-orange-500/10 rounded-lg inline-flex justify-center items-center gap-1.5">
-                            <div className="w-5 h-2.5 outline outline-[1.50px] outline-offset-[-0.75px] outline-green-800" />
-                            <div className="w-5 h-3.5 outline outline-[1.50px] outline-offset-[-0.75px] outline-green-800" />
-                            <div className="justify-start text-green-800 text-lg font-bold font-['Source_Sans_Pro'] leading-4">Rail</div>
-                        </div>
-                        <div className="self-stretch p-2.5 bg-orange-500/10 rounded-lg inline-flex justify-center items-center gap-2.5">
-                            <div className="w-5 h-5 relative overflow-hidden">
-                                <div className="w-5 h-5 left-0 top-0 absolute" />
-                                <div className="w-4 h-3.5 left-[1.67px] top-[2.50px] absolute bg-green-800" />
-                            </div>
-                            <div className="justify-start text-green-800 text-lg font-bold font-['Source_Sans_Pro'] leading-4">Bus</div>
-                        </div>
-                        <div className="self-stretch h-10 p-2.5 bg-green-800 rounded-lg inline-flex justify-center items-center gap-2.5">
-                            <div className="w-4 h-4 bg-white" />
-                            <div className="justify-start text-white text-lg font-bold font-['Source_Sans_Pro'] leading-4">Both</div>
-                        </div>
-                    </div>
-                </div>
-                <div className="self-stretch h-7 text-center justify-center text-green-800 text-2xl font-bold font-['Inter']">Recently Viewed</div>
-                <div className="self-stretch h-36 flex flex-col justify-center items-center">
-                    <div className="self-stretch flex-1 px-5 py-2.5 bg-white border-l border-r border-b border-zinc-100 inline-flex flex-col justify-start items-start">
-                        <div className="w-1.5 h-3 bg-black" />
-                        <div className="self-stretch h-7 justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">Lancaster Station</div>
-                    </div>
-                    <div className="self-stretch flex-1 px-5 py-2.5 bg-white border-l border-r border-b border-zinc-100 inline-flex flex-col justify-start items-start">
-                        <div className="w-1.5 h-3 bg-black" />
-                        <div className="self-stretch h-7 justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">Preston Station</div>
-                    </div>
-                    <div className="self-stretch flex-1 px-5 py-2.5 bg-white border-l border-r border-b border-zinc-100 inline-flex flex-col justify-start items-start">
-                        <div className="w-1.5 h-3 bg-black" />
-                        <div className="self-stretch h-7 justify-center text-zinc-600 text-xs font-normal font-['Inter'] leading-4">Blackpool North</div>
-                    </div>
-                </div>
-                <div className="self-stretch h-7 px-2.5 inline-flex flex-col justify-start items-start">
-                    <div className="self-stretch self-stretch text-right justify-center text-zinc-600 text-base font-medium font-['Inter'] leading-7 tracking-tight">See all</div>
-                    <div className="self-stretch self-stretch justify-center text-green-800 text-xl font-semibold font-['Inter']">Quick Links </div>
-                </div>
-                <div className="self-stretch h-[476px] px-2.5 inline-flex flex-col justify-start items-start">
-                    <div className="self-stretch h-48 bg-white rounded-[10px] shadow-[0px_10px_13px_0px_rgba(0,0,0,0.25)] inline-flex flex-col justify-between items-center">
-                        <img className="self-stretch h-28 rounded-tl-[10px] rounded-tr-[10px]" src="https://placehold.co/166x110" />
-                        <div className="self-stretch h-24 p-2.5 flex flex-col justify-center items-center gap-2.5">
-                            <div className="self-stretch h-5 text-center justify-center text-green-800 text-sm font-semibold font-['Inter']">Lancaster Station</div>
-                            <div className="self-stretch p-2.5 bg-green-800 rounded-[5px] inline-flex justify-center items-center">
-                                <div className="text-center justify-start text-white text-base font-medium font-['Roboto'] uppercase">Departures</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="self-stretch h-48 bg-white rounded-[10px] shadow-[0px_10px_13px_0px_rgba(0,0,0,0.25)] inline-flex flex-col justify-between items-center">
-                        <img className="self-stretch h-28 rounded-tl-[10px] rounded-tr-[10px]" src="https://placehold.co/166x110" />
-                        <div className="self-stretch h-24 p-2.5 flex flex-col justify-center items-center gap-2.5">
-                            <div className="self-stretch h-5 text-center justify-center text-green-800 text-sm font-semibold font-['Inter']">Morecambe</div>
-                            <div className="self-stretch p-2.5 bg-green-800 rounded-[5px] inline-flex justify-center items-center">
-                                <div className="text-center justify-start text-white text-base font-medium font-['Roboto'] uppercase">Departures</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+import Link from "next/link";
+import AppShell from "../components/AppShell";
+import JourneyPlannerForm from "../components/JourneyPlannerForm";
+import PanelCard from "../components/PanelCard";
+import RecentBoardStrip from "../components/RecentBoardStrip";
+import {
+  DEFAULT_BUS_DATE,
+  DEFAULT_TRAIN_FROM,
+  HealthResponse,
+  PlannerLocation,
+  fetchJson,
+  getLondonCurrentPlannerDefaults,
+  getLondonGreeting,
+  getLondonTodayDate,
+} from "../lib/transportApi";
+
+export const dynamic = "force-dynamic";
+
+type HomePageProps = {
+  searchParams?: Promise<Record<string, string | undefined>>;
 };
-export default BlogSinglePage;
+
+function parseLocation(params: Record<string, string | undefined>, prefix: "origin" | "destination"): PlannerLocation | null {
+  const type = params[`${prefix}Type`];
+  const id = params[`${prefix}Id`];
+  const name = params[`${prefix}Name`];
+  const code = params[`${prefix}Code`];
+  const localityName = params[`${prefix}LocalityName`];
+  if ((type !== "station" && type !== "bus_stop" && type !== "bus_stop_group") || !id || !name || !code) {
+    return null;
+  }
+  return { type, id, name, code, localityName: localityName ?? null };
+}
+
+const quickLinks = [
+  {
+    label: "Lancaster Station",
+    sub: "Rail departures",
+    type: "rail" as const,
+    href: `/location-info/train?crs=LAN&from=${encodeURIComponent(DEFAULT_TRAIN_FROM)}`,
+  },
+  {
+    label: "Lancaster Bus Station",
+    sub: "Bus departures",
+    type: "bus" as const,
+    href: `/location-info/bus?groupId=lancaster_bus_station&date=${DEFAULT_BUS_DATE}&groupName=${encodeURIComponent("Lancaster Bus Station")}&stopLocalityName=${encodeURIComponent("Lancaster City Centre")}`,
+  },
+  {
+    label: "Preston Station",
+    sub: "Rail departures",
+    type: "rail" as const,
+    href: `/location-info/train?crs=PRE&from=${encodeURIComponent(DEFAULT_TRAIN_FROM)}`,
+  },
+  {
+    label: "Morecambe Station",
+    sub: "Rail departures",
+    type: "rail" as const,
+    href: `/location-info/train?crs=MCM&from=${encodeURIComponent(DEFAULT_TRAIN_FROM)}`,
+  },
+];
+
+function getTimeOfDayTip(): string {
+  const hour = new Date().getHours();
+  if (hour < 6) return "Late night services may be limited. Check timetables before travelling.";
+  if (hour < 9) return "Morning peak hours — allow extra time for busy services.";
+  if (hour < 16) return "Off-peak fares may apply on some rail services.";
+  if (hour < 19) return "Evening peak — services may be busier than usual.";
+  return "Last services depart soon. Check departure boards for final times.";
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = (await searchParams) ?? {};
+  const health = await fetchJson<HealthResponse>("/health");
+  const backendHealthy = health.data?.ok === true;
+  const plannerDefaults = getLondonCurrentPlannerDefaults();
+  const greeting = getLondonGreeting();
+  const todayDate = getLondonTodayDate();
+
+  return (
+    <AppShell activePath="home">
+      {/* Greeting row */}
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-[var(--foreground)] sm:text-2xl">{greeting}</h1>
+          <p className="mt-0.5 text-sm text-[var(--muted)]">Where do you want to go?</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-[var(--muted)]">{backendHealthy ? "Online" : "Offline"}</span>
+          <div className={`h-2.5 w-2.5 rounded-full ${backendHealthy ? "bg-emerald-500" : "bg-red-400"}`} />
+        </div>
+      </div>
+
+      {/* Two-column layout on desktop */}
+      <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+        {/* Left: planner */}
+        <PanelCard>
+          <JourneyPlannerForm
+            initialOrigin={parseLocation(params, "origin")}
+            initialDestination={parseLocation(params, "destination")}
+            initialDate={params.date ?? plannerDefaults.date}
+            initialTime={params.time ?? plannerDefaults.time}
+            initialPreference={
+              params.preference === "balanced" || params.preference === "fewest_changes" || params.preference === "fastest"
+                ? params.preference
+                : undefined
+            }
+          />
+        </PanelCard>
+
+        {/* Right: quick links + tip */}
+        <div className="flex flex-col gap-4">
+          <PanelCard title="Quick links" className="flex-1">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              {quickLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-2.5 transition hover:border-[var(--brand)] hover:shadow-[var(--shadow-soft)]"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-light)]">
+                    {item.type === "rail" ? (
+                      <svg className="h-4 w-4 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17l-2 4m8-4l2 4M4 4h16a1 1 0 011 1v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a1 1 0 011-1zm5 12h6M12 4v4" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 17a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2zM6 4h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2zm0 8h12" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-[var(--foreground)]">{item.label}</div>
+                    <div className="text-xs text-[var(--muted)]">{item.sub}</div>
+                  </div>
+                  <svg className="h-4 w-4 shrink-0 text-[var(--muted)] transition group-hover:text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+          </PanelCard>
+
+          {/* Explore map CTA */}
+          <Link
+            href="/map?q=lanc&mode=both"
+            className="flex items-center gap-3 rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--brand-light)] px-4 py-3 transition hover:shadow-[var(--shadow-soft)]"
+          >
+            <svg className="h-5 w-5 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-[var(--brand)]">Explore the network map</div>
+              <div className="text-xs text-[var(--muted)]">View stops and stations nearby</div>
+            </div>
+            <svg className="h-4 w-4 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+
+          {/* M6 road info CTA */}
+          <Link
+            href="/road-info"
+            className="flex items-center gap-3 rounded-[var(--radius-card)] border border-[var(--outline)] bg-amber-50 px-4 py-3 transition hover:shadow-[var(--shadow-soft)] dark:bg-amber-950/20"
+          >
+            <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l3-18m0 18l3-18M4 8h18M2 16h18" />
+            </svg>
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-amber-700 dark:text-amber-400">M6 road signs</div>
+              <div className="text-xs text-[var(--muted)]">VMS messages for the M6 corridor</div>
+            </div>
+            <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
+      {/* Recent boards */}
+      <RecentBoardStrip />
+
+      {/* Travel tip */}
+      <div className="flex items-start gap-3 rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3">
+        <svg className="mt-0.5 h-4 w-4 shrink-0 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 10v6" strokeLinecap="round" />
+          <circle cx="12" cy="7.2" r="1" fill="currentColor" stroke="none" />
+        </svg>
+        <p className="text-sm text-[var(--muted)]">{getTimeOfDayTip()}</p>
+      </div>
+    </AppShell>
+  );
+}
