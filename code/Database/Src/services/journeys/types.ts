@@ -46,6 +46,11 @@ export type TransitEdge = {
   scheduleId: string | null;
   /** Set when live delay data was applied. Positive = late, negative = early. */
   liveDelayMinutes?: number | null;
+  /** Reliability score from AI stats */
+  reliability?: {
+    score: number;
+    confidenceLevel: "HIGH" | "MEDIUM" | "LOW";
+  } | null;
   /** True when the route's XML declares a bank holiday non-operation for this date,
    *  but we still show it because operators often run amended timetables anyway. */
   bankHolidayAdvisory?: boolean;
@@ -108,6 +113,11 @@ export type JourneyLegResponse = {
   routeId: string | null;
   scheduleId: string | null;
   isScheduled: true;
+  /** Reliability score for da AI stats */
+  reliability?: {
+    score: number;
+    confidenceLevel: "HIGH" | "MEDIUM" | "LOW";
+  } | null;
   /** True when service may be affected by bank holiday timetable changes. */
   bankHolidayAdvisory?: boolean;
 };

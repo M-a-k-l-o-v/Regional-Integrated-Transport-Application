@@ -1052,6 +1052,13 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
 
     const windowEnd = new Date(from.getTime() + windowMinutes * 60 * 1000);
 
+    // ── Fetch aggregate AI reliability score ──────────────────────────
+    const reliability = await prisma.reliabilityScore.findFirst({
+      where: { routeId: "AI_STATS_AGG" },
+      orderBy: { calculatedAt: "desc" },
+      select: { score: true, confidenceLevel: true },
+    });
+
     // Overlay live movement data if the STOMP stream is active
     let stationStanox: string | null = null;
     let liveOverlayCount = 0;
@@ -1067,6 +1074,10 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       const base = {
         ...row,
         destination: destinationByScheduleId.get(row.scheduleId) ?? null,
+        reliability: reliability ? {
+          score: reliability.score,
+          confidenceLevel: reliability.confidenceLevel,
+        } : null,
         liveDelay: null as null | {
           timetableVariationMinutes: number | null;
           variationStatus: string | null;

@@ -39,6 +39,7 @@ function buildLeg(edge: TakenEdge, graph: TransitGraph): JourneyLegResponse {
     routeId: edge.routeId,
     scheduleId: edge.scheduleId,
     isScheduled: true,
+    reliability: edge.reliability,
     bankHolidayAdvisory: edge.bankHolidayAdvisory || undefined,
   };
 }

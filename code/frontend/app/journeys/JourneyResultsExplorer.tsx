@@ -606,6 +606,17 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
                               Holiday
                             </span>
                           )}
+                          {leg.reliability && (
+                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${
+                              leg.reliability.confidenceLevel === "HIGH" 
+                                ? "bg-emerald-500/15 text-emerald-600" 
+                                : leg.reliability.confidenceLevel === "MEDIUM"
+                                  ? "bg-amber-500/15 text-amber-600"
+                                  : "bg-rose-500/15 text-rose-600"
+                            }`}>
+                              AI Reliability Score: {leg.reliability.confidenceLevel}
+                            </span>
+                          )}
                         </div>
 
                         {/* Route info */}

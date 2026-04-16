@@ -133,6 +133,13 @@ export class RailRoutingAdapter {
       }
     }
 
+    // ── Get AI score ──────────────────────────
+    const reliability = await this.prisma.reliabilityScore.findFirst({
+      where: { routeId: "AI_STATS_AGG" },
+      orderBy: { calculatedAt: "desc" },
+      select: { score: true, confidenceLevel: true },
+    });
+
     for (const schedule of effectiveSchedules) {
       latestUpdatedAtMs = latestUpdatedAtMs === null ? schedule.updatedAt.getTime() : Math.max(latestUpdatedAtMs, schedule.updatedAt.getTime());
       const orderedStops = stopsBySchedule.get(schedule.scheduleId) ?? [];
@@ -179,6 +186,10 @@ export class RailRoutingAdapter {
           routeId: null,
           scheduleId: schedule.scheduleId,
           liveDelayMinutes,
+          reliability: reliability ? {
+            score: reliability.score,
+            confidenceLevel: reliability.confidenceLevel,
+          } : null,
         });
       }
     }

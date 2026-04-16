@@ -229,9 +229,14 @@ export class JourneyOperationalStatusService {
     destinationDisplay: string | null;
     points: StatusPoint[];
   }): Promise<StatusResponse> {
-    const [weather, railBoard] = await Promise.all([
+    const [weather, railBoard, reliability] = await Promise.all([
       this.loadWeather(args.points),
       args.fromCrs ? this.transportClient.getRailDepartures(args.fromCrs).catch(() => null) : Promise.resolve(null),
+      this.prisma.reliabilityScore.findFirst({
+        where: { routeId: "AI_STATS_AGG" },
+        orderBy: { calculatedAt: "desc" },
+        select: { score: true, confidenceLevel: true, calculatedAt: true },
+      }),
     ]);
 
     const services = railBoard ? [...railBoard.trainServices, ...railBoard.busServices] : [];
@@ -281,11 +286,11 @@ export class JourneyOperationalStatusService {
         })),
       },
       reliability: {
-        available: false,
-        message: "Reliability scoring is not linked to rail schedules yet.",
-        score: null,
-        confidenceLevel: null,
-        calculatedAt: null,
+        available: reliability !== null,
+        message: reliability ? null : "No reliability index has been calculated for this route yet.",
+        score: reliability?.score ?? null,
+        confidenceLevel: reliability?.confidenceLevel ?? null,
+        calculatedAt: toIso(reliability?.calculatedAt),
       },
       delays: {
         available: railBoard !== null,

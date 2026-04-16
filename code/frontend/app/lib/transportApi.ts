@@ -164,6 +164,10 @@ export type RailDeparturesResponse = {
     destination: string | null;
     minutesUntilDeparture: number;
     source: "timetable";
+    reliability?: {
+      score: number;
+      confidenceLevel: "HIGH" | "MEDIUM" | "LOW";
+    } | null;
     isLive: false;
   }>;
 };
@@ -225,6 +229,10 @@ export type JourneyPlanResponse = {
       routeId: string | null;
       scheduleId: string | null;
       isScheduled: true;
+      reliability?: {
+        score: number;
+        confidenceLevel: "HIGH" | "MEDIUM" | "LOW";
+      } | null;
       bankHolidayAdvisory?: boolean;
     }>;
   }>;

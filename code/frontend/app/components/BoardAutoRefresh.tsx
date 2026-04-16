@@ -23,16 +23,16 @@ export default function BoardAutoRefresh({ intervalSeconds = 90 }: Props) {
 
   useEffect(() => {
     const id = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          refresh();
-          return intervalSeconds;
-        }
-        return prev - 1;
-      });
+      setCountdown((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(id);
-  }, [refresh, intervalSeconds]);
+  }, []);
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      refresh();
+    }
+  }, [countdown, refresh]);
 
   // Refresh when the tab regains focus
   useEffect(() => {

@@ -44,9 +44,22 @@ export default function RailDepartureList({ departures, initialVisible = DEFAULT
               </div>
               <div className="space-y-2">
                 <div className="text-lg font-semibold text-[var(--foreground)]">{departure.destination ?? "Destination unavailable"}</div>
-                <div className="text-sm text-[var(--muted)]">
-                  {departure.platform ? `Platform ${departure.platform}` : "Platform TBC"}
-                  {departure.operatorCode ? ` · ${departure.operatorCode}` : ""}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="text-sm text-[var(--muted)]">
+                    {departure.platform ? `Platform ${departure.platform}` : "Platform TBC"}
+                    {departure.operatorCode ? ` · ${departure.operatorCode}` : ""}
+                  </div>
+                  {departure.reliability && (
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                      departure.reliability.confidenceLevel === "HIGH" 
+                        ? "bg-emerald-500/15 text-emerald-600" 
+                        : departure.reliability.confidenceLevel === "MEDIUM"
+                          ? "bg-amber-500/15 text-amber-600"
+                          : "bg-rose-500/15 text-rose-600"
+                    }`}>
+                      AI Reliability Score: {departure.reliability.confidenceLevel}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
