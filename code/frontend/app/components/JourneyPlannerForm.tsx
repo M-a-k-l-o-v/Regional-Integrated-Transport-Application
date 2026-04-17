@@ -100,12 +100,14 @@ export default function JourneyPlannerForm({
           placeholder="Search station or stop"
           value={origin}
           onChange={setOrigin}
+          transitModes={modes}
         />
         <LocationSearchField
           label="To"
           placeholder="Search destination"
           value={destination}
           onChange={setDestination}
+          transitModes={modes}
         />
         {/* Swap button */}
         <button
