@@ -85,7 +85,22 @@ function getCalendarRunsForDate(
   return calendar.runsSun;
 }
 
-function searchRank(qLower: string, name: string, code: string): number {
+function isInLancashire(lat: number, long: number): boolean {
+  // these are the coordinates for the extremities of Lancashire
+  // NOTE: this will mark some places as IN Lancashire which shouldn't be
+  // but checking coordinates against a bounding box is much easier than
+  // against a huge weird geofence.
+  // the important thing is that Prestwich and Prestatyn aren't in here
+  const NORTH_LAT = 54.2389558;
+  const SOUTH_LAT = 53.6139160;
+  const WEST_LONG = -3.2861230;
+  const EAST_LONG = -2.0425645;
+
+  return (SOUTH_LAT <= lat && lat <= NORTH_LAT) &&
+    (WEST_LONG <= long && long <= EAST_LONG)
+}
+
+function searchRank(qLower: string, name: string, code: string, lat: number, long: number): number {
   const nameLower = name.toLowerCase();
   const codeLower = code.toLowerCase();
 
@@ -93,13 +108,17 @@ function searchRank(qLower: string, name: string, code: string): number {
   if (nameLower === qLower) return 1;
 
   // junction codes start with X, and people basically never want them
-  if (codeLower.startsWith('x')) return 7;
+  if (codeLower.startsWith('x')) return 10;
 
-  if (codeLower.startsWith(qLower)) return 2;
-  if (nameLower.startsWith(qLower)) return 3;
-  if (nameLower.includes(` ${qLower}`)) return 4;
-  if (nameLower.includes(qLower)) return 5;
-  return 6;
+  // minimum rank is 2, then add 4 if the station is outside of Lancashire
+  const baseRank = 2 + (isInLancashire(lat, long) ? 0 : 4);
+  // then add however much extra for each of these tests
+  if (codeLower.startsWith(qLower)) return baseRank;
+  if (nameLower.startsWith(qLower)) return baseRank + 1;
+  if (nameLower.includes(` ${qLower}`)) return baseRank + 2;
+  if (nameLower.includes(qLower)) return baseRank + 3;
+  // maximum rank is 9, junctions are 10, so 11 if unmatched
+  return 11;
 }
 
 function searchTypePriority(type: "station" | "bus_stop" | "bus_stop_group"): number {
@@ -384,7 +403,7 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       const busHubBoostB = b.type === "bus_stop_group" && qLower.includes("bus") ? -1 : 0;
       if (busHubBoostA !== busHubBoostB) return busHubBoostA - busHubBoostB;
 
-      const rankDiff = searchRank(qLower, a.name, a.code) - searchRank(qLower, b.name, b.code);
+      const rankDiff = searchRank(qLower, a.name, a.code, a.latitude ?? 0, a.longitude ?? 0) - searchRank(qLower, b.name, b.code, b.latitude ?? 0, b.longitude ?? 0);
       if (rankDiff !== 0) return rankDiff;
       const priorityDiff = searchTypePriority(a.type) - searchTypePriority(b.type);
       if (priorityDiff !== 0) return priorityDiff;
