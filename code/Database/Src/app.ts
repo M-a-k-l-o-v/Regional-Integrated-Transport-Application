@@ -265,7 +265,8 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
 
     const limit = Math.min(parsePositiveInt(req.query.limit, 20), 500);
     const scheduledOnly = req.query.scheduledOnly === "true";
-    const searchCacheKey = `search:${q.toLowerCase()}:${limit}:${scheduledOnly}`;
+    const transitMode = req.query.transitMode;
+    const searchCacheKey = `search:${q.toLowerCase()}:${limit}:${scheduledOnly}:${transitMode}`;
     const cached = await cacheGet(searchCacheKey);
     if (cached) return res.json(JSON.parse(cached));
 
@@ -275,7 +276,7 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
     const groupedMemberStopIds = new Set(groupedStops.flatMap((group) => group.memberStopIds));
 
     const [busStops, stations] = await Promise.all([
-      prisma.busStop.findMany({
+      transitMode !== "rail" ? prisma.busStop.findMany({
         where: {
           OR: [
             { stopId: { contains: q, mode: "insensitive" } },
@@ -296,8 +297,8 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
           longitude: true,
         },
         take: perTypeLimit,
-      }),
-      prisma.station.findMany({
+      }) : [],
+      transitMode !== "bus" ? prisma.station.findMany({
         where: {
           OR: [
             { stationId: { contains: q, mode: "insensitive" } },
@@ -311,7 +312,7 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
           longitude: true,
         },
         take: perTypeLimit,
-      }),
+      }) : [],
     ]);
 
     const candidateCoveredStopIds =
