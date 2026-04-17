@@ -62,14 +62,14 @@ function toUtcDayRange(date: Date): { start: Date; end: Date } {
 function getCalendarRunsForDate(
   calendar:
     | {
-        runsMon: boolean;
-        runsTue: boolean;
-        runsWed: boolean;
-        runsThu: boolean;
-        runsFri: boolean;
-        runsSat: boolean;
-        runsSun: boolean;
-      }
+      runsMon: boolean;
+      runsTue: boolean;
+      runsWed: boolean;
+      runsThu: boolean;
+      runsFri: boolean;
+      runsSat: boolean;
+      runsSun: boolean;
+    }
     | null
     | undefined,
   date: Date
@@ -91,6 +91,10 @@ function searchRank(qLower: string, name: string, code: string): number {
 
   if (codeLower === qLower) return 0;
   if (nameLower === qLower) return 1;
+
+  // junction codes start with X, and people basically never want them
+  if (codeLower.startsWith('x')) return 7;
+
   if (codeLower.startsWith(qLower)) return 2;
   if (nameLower.startsWith(qLower)) return 3;
   if (nameLower.includes(` ${qLower}`)) return 4;
@@ -313,25 +317,25 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
     const candidateCoveredStopIds =
       scheduledOnly
         ? new Set(
-            (
-              await prisma.busSchedule.findMany({
-                where: {
-                  stopId: {
-                    in: Array.from(
-                      new Set([
-                        ...busStops.map((stop) => stop.stopId),
-                        ...groupedStops.flatMap((group) => group.memberStopIds),
-                      ])
-                    ),
-                  },
+          (
+            await prisma.busSchedule.findMany({
+              where: {
+                stopId: {
+                  in: Array.from(
+                    new Set([
+                      ...busStops.map((stop) => stop.stopId),
+                      ...groupedStops.flatMap((group) => group.memberStopIds),
+                    ])
+                  ),
                 },
-                select: {
-                  stopId: true,
-                },
-                distinct: ["stopId"],
-              })
-            ).map((row) => row.stopId)
-          )
+              },
+              select: {
+                stopId: true,
+              },
+              distinct: ["stopId"],
+            })
+          ).map((row) => row.stopId)
+        )
         : null;
 
     const mixed = [
@@ -534,27 +538,27 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       routeIds.length === 0 || departureTimes.length === 0
         ? []
         : await prisma.busJourneyStop.findMany({
-            where: {
-              stopId: { in: stopIds },
-              departureTime: { in: departureTimes },
-              journey: {
-                routeId: { in: routeIds },
+          where: {
+            stopId: { in: stopIds },
+            departureTime: { in: departureTimes },
+            journey: {
+              routeId: { in: routeIds },
+            },
+          },
+          select: {
+            stopId: true,
+            departureTime: true,
+            journey: {
+              select: {
+                routeId: true,
+                lineRef: true,
+                direction: true,
+                destinationDisplay: true,
               },
             },
-            select: {
-              stopId: true,
-              departureTime: true,
-              journey: {
-                select: {
-                  routeId: true,
-                  lineRef: true,
-                  direction: true,
-                  destinationDisplay: true,
-                },
-              },
-            },
-            orderBy: [{ departureTime: "asc" }, { stopSeq: "asc" }],
-          });
+          },
+          orderBy: [{ departureTime: "asc" }, { stopSeq: "asc" }],
+        });
 
     const journeyByKey = new Map<
       string,
@@ -578,37 +582,37 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       routeIds.length === 0
         ? [[], []]
         : await Promise.all([
-            prisma.busServiceCalendar.findMany({
-              where: {
-                routeId: { in: routeIds },
-                AND: [
-                  { OR: [{ validFrom: null }, { validFrom: { lte: serviceDay.end } }] },
-                  { OR: [{ validTo: null }, { validTo: { gte: serviceDay.start } }] },
-                ],
-              },
-              select: {
-                routeId: true,
-                runsMon: true,
-                runsTue: true,
-                runsWed: true,
-                runsThu: true,
-                runsFri: true,
-                runsSat: true,
-                runsSun: true,
-              },
-            }),
-            prisma.busServiceException.findMany({
-              where: {
-                routeId: { in: routeIds },
-                startDate: { lte: serviceDay.end },
-                endDate: { gte: serviceDay.start },
-              },
-              select: {
-                routeId: true,
-                isRunning: true,
-              },
-            }),
-          ]);
+          prisma.busServiceCalendar.findMany({
+            where: {
+              routeId: { in: routeIds },
+              AND: [
+                { OR: [{ validFrom: null }, { validFrom: { lte: serviceDay.end } }] },
+                { OR: [{ validTo: null }, { validTo: { gte: serviceDay.start } }] },
+              ],
+            },
+            select: {
+              routeId: true,
+              runsMon: true,
+              runsTue: true,
+              runsWed: true,
+              runsThu: true,
+              runsFri: true,
+              runsSat: true,
+              runsSun: true,
+            },
+          }),
+          prisma.busServiceException.findMany({
+            where: {
+              routeId: { in: routeIds },
+              startDate: { lte: serviceDay.end },
+              endDate: { gte: serviceDay.start },
+            },
+            select: {
+              routeId: true,
+              isRunning: true,
+            },
+          }),
+        ]);
 
     const calendarByRoute = new Map(calendars.map((c) => [c.routeId, c]));
     const exceptionsByRoute = new Map<string, Array<{ isRunning: boolean }>>();
@@ -941,17 +945,17 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       candidateTrainUids.length === 0
         ? []
         : await prisma.railServiceSchedule.findMany({
-            where: {
-              trainUid: { in: candidateTrainUids },
-              stpIndicator: "C",
-              scheduleStartDate: { lte: serviceDate },
-              scheduleEndDate: { gte: serviceDate },
-            },
-            select: {
-              trainUid: true,
-              scheduleDaysRuns: true,
-            },
-          });
+          where: {
+            trainUid: { in: candidateTrainUids },
+            stpIndicator: "C",
+            scheduleStartDate: { lte: serviceDate },
+            scheduleEndDate: { gte: serviceDate },
+          },
+          select: {
+            trainUid: true,
+            scheduleDaysRuns: true,
+          },
+        });
 
     const cancelledPermanentTrainUids = new Set(
       cancellationSchedules
@@ -995,30 +999,30 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       scheduleIds.length === 0
         ? []
         : await prisma.railServiceStop.findMany({
-            where: {
-              scheduleId: { in: scheduleIds },
-            },
-            select: {
-              scheduleId: true,
-              locationType: true,
-              publicArrival: true,
-              publicDeparture: true,
-              station: {
-                select: {
-                  stationId: true,
-                  name: true,
-                },
-              },
-              tiploc: {
-                select: {
-                  crsCode: true,
-                  description: true,
-                  tpsDescription: true,
-                },
+          where: {
+            scheduleId: { in: scheduleIds },
+          },
+          select: {
+            scheduleId: true,
+            locationType: true,
+            publicArrival: true,
+            publicDeparture: true,
+            station: {
+              select: {
+                stationId: true,
+                name: true,
               },
             },
-            orderBy: [{ scheduleId: "asc" }, { stopSeq: "desc" }],
-          });
+            tiploc: {
+              select: {
+                crsCode: true,
+                description: true,
+                tpsDescription: true,
+              },
+            },
+          },
+          orderBy: [{ scheduleId: "asc" }, { stopSeq: "desc" }],
+        });
 
     const destinationByScheduleId = new Map<string, string>();
     const fallbackDestinationByScheduleId = new Map<string, string>();
