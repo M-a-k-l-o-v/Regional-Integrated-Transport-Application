@@ -14,6 +14,8 @@ import {
   filterSearchResultsForBoardMode,
   formatPlannerLocationLabel,
   getApiBaseUrl,
+  getLondonNowTimestamp,
+  getLondonTodayDate,
 } from "../lib/transportApi";
 
 type BoardsDirectoryProps = {
@@ -35,6 +37,23 @@ function getBoardSecondaryText(location: PlannerLocation, mode: BoardMode) {
   }
 
   return location.localityName ?? "Scheduled stop board";
+}
+
+function updateRecentBoardDate(entry: RecentBoardEntry): RecentBoardEntry {
+  const [href, params] = entry.href.split("?", 2);
+  const searchParams = new URLSearchParams(params);
+  // bus boards have a "date" parameter but rail boards have a "from" parameter
+  // we can check for the existence of each and set it if found
+  if (searchParams.has("date")) {
+    searchParams.set("date", getLondonTodayDate());
+  }
+  if (searchParams.has("from")) {
+    searchParams.set("from", getLondonNowTimestamp());
+  }
+  return {
+    ...entry,
+    href: `${href}?${searchParams.toString()}`,
+  }
 }
 
 export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectoryProps) {
@@ -98,7 +117,7 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
     () =>
       recentBoards.filter(
         (entry) => entry.mode === mode && matchesLocationQuery(entry.location, query)
-      ),
+      ).map(updateRecentBoardDate),
     [mode, query, recentBoards]
   );
 
@@ -129,11 +148,10 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                     key={candidate}
                     type="button"
                     onClick={() => setMode(candidate)}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      active
-                        ? "bg-[var(--brand)] text-white shadow-[var(--shadow-soft)]"
-                        : "text-[var(--brand-ink)] hover:bg-[var(--surface-alt-hover)]"
-                    }`}
+                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${active
+                      ? "bg-[var(--brand)] text-white shadow-[var(--shadow-soft)]"
+                      : "text-[var(--brand-ink)] hover:bg-[var(--surface-alt-hover)]"
+                      }`}
                   >
                     {candidate === "bus" ? "Bus boards" : "Rail boards"}
                   </button>
@@ -159,8 +177,8 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
             {loading
               ? "Searching location names…"
               : query.trim().length >= 2
-              ? `Showing up to 20 ${mode} board matches for “${query.trim()}”.`
-              : `Showing a curated list of 20 ${mode} board locations. Use search to switch to name-based lookup.`}
+                ? `Showing up to 20 ${mode} board matches for “${query.trim()}”.`
+                : `Showing a curated list of 20 ${mode} board locations. Use search to switch to name-based lookup.`}
           </div>
         </div>
       </section>
