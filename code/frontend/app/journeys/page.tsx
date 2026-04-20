@@ -167,14 +167,14 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
   const result =
     origin && destination
       ? await postJson<JourneyPlanResponse>("/journeys/plan", {
-          origin: { type: origin.type, id: origin.id },
-          destination: { type: destination.type, id: destination.id },
-          date,
-          time,
-          preference,
-          maxItineraries: 8,
-          ...(modes ? { modes } : {}),
-        })
+        origin: { type: origin.type, id: origin.id },
+        destination: { type: destination.type, id: destination.id },
+        date,
+        time,
+        preference,
+        maxItineraries: 8,
+        ...(modes ? { modes } : {}),
+      })
       : { data: null, error: null };
 
   const legDetailsMap = result.data ? await loadLegDetails(result.data.itineraries) : new Map();
@@ -234,7 +234,7 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
         ) : null}
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)]">
-          <PanelCard eyebrow="Adjust search" title="Re-plan this journey" className="overflow-hidden">
+          <PanelCard eyebrow="Adjust search" title="Re-plan this journey">
             <JourneyPlannerForm
               initialOrigin={origin}
               initialDestination={destination}

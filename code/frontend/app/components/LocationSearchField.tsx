@@ -6,6 +6,7 @@ import {
   PlannerLocation,
   SearchResponse,
   SearchResult,
+  TransitModeFilter,
 } from "../lib/transportApi";
 
 type LocationSearchFieldProps = {
@@ -13,7 +14,7 @@ type LocationSearchFieldProps = {
   placeholder: string;
   value: PlannerLocation | null;
   onChange: (value: PlannerLocation | null) => void;
-  allowedTypes?: Array<PlannerLocation["type"]>;
+  transitModes: TransitModeFilter[];
   showCodeInLabel?: boolean;
   scheduledOnly?: boolean;
 };
@@ -41,7 +42,7 @@ export default function LocationSearchField({
   placeholder,
   value,
   onChange,
-  allowedTypes,
+  transitModes,
   showCodeInLabel = true,
   scheduledOnly = false,
 }: LocationSearchFieldProps) {
@@ -69,7 +70,10 @@ export default function LocationSearchField({
       try {
         const searchParams = new URLSearchParams();
         searchParams.set("q", trimmed);
-        searchParams.set("limit", "8");
+        searchParams.set("limit", "20");
+        if (transitModes.length === 1) {
+          searchParams.set("transitMode", transitModes[0])
+        }
         if (scheduledOnly) {
           searchParams.set("scheduledOnly", "true");
         }
@@ -83,11 +87,7 @@ export default function LocationSearchField({
           setResults([]);
           return;
         }
-        setResults(
-          allowedTypes && allowedTypes.length > 0
-            ? body.results.filter((result) => allowedTypes.includes(result.type))
-            : body.results
-        );
+        setResults(body.results);
       } catch {
         if (!controller.signal.aborted) {
           setResults([]);
@@ -103,7 +103,7 @@ export default function LocationSearchField({
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [query, allowedTypes, scheduledOnly]);
+  }, [query, transitModes, scheduledOnly]);
 
   function selectResult(result: SearchResult) {
     const selected = toPlannerLocation(result);

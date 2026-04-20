@@ -62,14 +62,14 @@ function toUtcDayRange(date: Date): { start: Date; end: Date } {
 function getCalendarRunsForDate(
   calendar:
     | {
-        runsMon: boolean;
-        runsTue: boolean;
-        runsWed: boolean;
-        runsThu: boolean;
-        runsFri: boolean;
-        runsSat: boolean;
-        runsSun: boolean;
-      }
+      runsMon: boolean;
+      runsTue: boolean;
+      runsWed: boolean;
+      runsThu: boolean;
+      runsFri: boolean;
+      runsSat: boolean;
+      runsSun: boolean;
+    }
     | null
     | undefined,
   date: Date
@@ -85,17 +85,40 @@ function getCalendarRunsForDate(
   return calendar.runsSun;
 }
 
-function searchRank(qLower: string, name: string, code: string): number {
+function isInLancashire(lat: number, long: number): boolean {
+  // these are the coordinates for the extremities of Lancashire
+  // NOTE: this will mark some places as IN Lancashire which shouldn't be
+  // but checking coordinates against a bounding box is much easier than
+  // against a huge weird geofence.
+  // the important thing is that Prestwich and Prestatyn aren't in here
+  const NORTH_LAT = 54.2389558;
+  const SOUTH_LAT = 53.6139160;
+  const WEST_LONG = -3.2861230;
+  const EAST_LONG = -2.0425645;
+
+  return (SOUTH_LAT <= lat && lat <= NORTH_LAT) &&
+    (WEST_LONG <= long && long <= EAST_LONG)
+}
+
+function searchRank(qLower: string, name: string, code: string, lat: number, long: number): number {
   const nameLower = name.toLowerCase();
   const codeLower = code.toLowerCase();
 
   if (codeLower === qLower) return 0;
   if (nameLower === qLower) return 1;
-  if (codeLower.startsWith(qLower)) return 2;
-  if (nameLower.startsWith(qLower)) return 3;
-  if (nameLower.includes(` ${qLower}`)) return 4;
-  if (nameLower.includes(qLower)) return 5;
-  return 6;
+
+  // junction codes start with X, and people basically never want them
+  if (codeLower.startsWith('x')) return 10;
+
+  // minimum rank is 2, then add 4 if the station is outside of Lancashire
+  const baseRank = 2 + (isInLancashire(lat, long) ? 0 : 4);
+  // then add however much extra for each of these tests
+  if (codeLower.startsWith(qLower)) return baseRank;
+  if (nameLower.startsWith(qLower)) return baseRank + 1;
+  if (nameLower.includes(` ${qLower}`)) return baseRank + 2;
+  if (nameLower.includes(qLower)) return baseRank + 3;
+  // maximum rank is 9, junctions are 10, so 11 if unmatched
+  return 11;
 }
 
 function searchTypePriority(type: "station" | "bus_stop" | "bus_stop_group"): number {
@@ -261,7 +284,8 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
 
     const limit = Math.min(parsePositiveInt(req.query.limit, 20), 500);
     const scheduledOnly = req.query.scheduledOnly === "true";
-    const searchCacheKey = `search:${q.toLowerCase()}:${limit}:${scheduledOnly}`;
+    const transitMode = req.query.transitMode;
+    const searchCacheKey = `search:${q.toLowerCase()}:${limit}:${scheduledOnly}:${transitMode}`;
     const cached = await cacheGet(searchCacheKey);
     if (cached) return res.json(JSON.parse(cached));
 
@@ -271,7 +295,7 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
     const groupedMemberStopIds = new Set(groupedStops.flatMap((group) => group.memberStopIds));
 
     const [busStops, stations] = await Promise.all([
-      prisma.busStop.findMany({
+      transitMode !== "rail" ? prisma.busStop.findMany({
         where: {
           OR: [
             { stopId: { contains: q, mode: "insensitive" } },
@@ -292,8 +316,8 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
           longitude: true,
         },
         take: perTypeLimit,
-      }),
-      prisma.station.findMany({
+      }) : [],
+      transitMode !== "bus" ? prisma.station.findMany({
         where: {
           OR: [
             { stationId: { contains: q, mode: "insensitive" } },
@@ -307,31 +331,31 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
           longitude: true,
         },
         take: perTypeLimit,
-      }),
+      }) : [],
     ]);
 
     const candidateCoveredStopIds =
       scheduledOnly
         ? new Set(
-            (
-              await prisma.busSchedule.findMany({
-                where: {
-                  stopId: {
-                    in: Array.from(
-                      new Set([
-                        ...busStops.map((stop) => stop.stopId),
-                        ...groupedStops.flatMap((group) => group.memberStopIds),
-                      ])
-                    ),
-                  },
+          (
+            await prisma.busSchedule.findMany({
+              where: {
+                stopId: {
+                  in: Array.from(
+                    new Set([
+                      ...busStops.map((stop) => stop.stopId),
+                      ...groupedStops.flatMap((group) => group.memberStopIds),
+                    ])
+                  ),
                 },
-                select: {
-                  stopId: true,
-                },
-                distinct: ["stopId"],
-              })
-            ).map((row) => row.stopId)
-          )
+              },
+              select: {
+                stopId: true,
+              },
+              distinct: ["stopId"],
+            })
+          ).map((row) => row.stopId)
+        )
         : null;
 
     const mixed = [
@@ -379,7 +403,7 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       const busHubBoostB = b.type === "bus_stop_group" && qLower.includes("bus") ? -1 : 0;
       if (busHubBoostA !== busHubBoostB) return busHubBoostA - busHubBoostB;
 
-      const rankDiff = searchRank(qLower, a.name, a.code) - searchRank(qLower, b.name, b.code);
+      const rankDiff = searchRank(qLower, a.name, a.code, a.latitude ?? 0, a.longitude ?? 0) - searchRank(qLower, b.name, b.code, b.latitude ?? 0, b.longitude ?? 0);
       if (rankDiff !== 0) return rankDiff;
       const priorityDiff = searchTypePriority(a.type) - searchTypePriority(b.type);
       if (priorityDiff !== 0) return priorityDiff;
@@ -534,27 +558,27 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       routeIds.length === 0 || departureTimes.length === 0
         ? []
         : await prisma.busJourneyStop.findMany({
-            where: {
-              stopId: { in: stopIds },
-              departureTime: { in: departureTimes },
-              journey: {
-                routeId: { in: routeIds },
+          where: {
+            stopId: { in: stopIds },
+            departureTime: { in: departureTimes },
+            journey: {
+              routeId: { in: routeIds },
+            },
+          },
+          select: {
+            stopId: true,
+            departureTime: true,
+            journey: {
+              select: {
+                routeId: true,
+                lineRef: true,
+                direction: true,
+                destinationDisplay: true,
               },
             },
-            select: {
-              stopId: true,
-              departureTime: true,
-              journey: {
-                select: {
-                  routeId: true,
-                  lineRef: true,
-                  direction: true,
-                  destinationDisplay: true,
-                },
-              },
-            },
-            orderBy: [{ departureTime: "asc" }, { stopSeq: "asc" }],
-          });
+          },
+          orderBy: [{ departureTime: "asc" }, { stopSeq: "asc" }],
+        });
 
     const journeyByKey = new Map<
       string,
@@ -578,37 +602,37 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       routeIds.length === 0
         ? [[], []]
         : await Promise.all([
-            prisma.busServiceCalendar.findMany({
-              where: {
-                routeId: { in: routeIds },
-                AND: [
-                  { OR: [{ validFrom: null }, { validFrom: { lte: serviceDay.end } }] },
-                  { OR: [{ validTo: null }, { validTo: { gte: serviceDay.start } }] },
-                ],
-              },
-              select: {
-                routeId: true,
-                runsMon: true,
-                runsTue: true,
-                runsWed: true,
-                runsThu: true,
-                runsFri: true,
-                runsSat: true,
-                runsSun: true,
-              },
-            }),
-            prisma.busServiceException.findMany({
-              where: {
-                routeId: { in: routeIds },
-                startDate: { lte: serviceDay.end },
-                endDate: { gte: serviceDay.start },
-              },
-              select: {
-                routeId: true,
-                isRunning: true,
-              },
-            }),
-          ]);
+          prisma.busServiceCalendar.findMany({
+            where: {
+              routeId: { in: routeIds },
+              AND: [
+                { OR: [{ validFrom: null }, { validFrom: { lte: serviceDay.end } }] },
+                { OR: [{ validTo: null }, { validTo: { gte: serviceDay.start } }] },
+              ],
+            },
+            select: {
+              routeId: true,
+              runsMon: true,
+              runsTue: true,
+              runsWed: true,
+              runsThu: true,
+              runsFri: true,
+              runsSat: true,
+              runsSun: true,
+            },
+          }),
+          prisma.busServiceException.findMany({
+            where: {
+              routeId: { in: routeIds },
+              startDate: { lte: serviceDay.end },
+              endDate: { gte: serviceDay.start },
+            },
+            select: {
+              routeId: true,
+              isRunning: true,
+            },
+          }),
+        ]);
 
     const calendarByRoute = new Map(calendars.map((c) => [c.routeId, c]));
     const exceptionsByRoute = new Map<string, Array<{ isRunning: boolean }>>();
@@ -941,17 +965,17 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       candidateTrainUids.length === 0
         ? []
         : await prisma.railServiceSchedule.findMany({
-            where: {
-              trainUid: { in: candidateTrainUids },
-              stpIndicator: "C",
-              scheduleStartDate: { lte: serviceDate },
-              scheduleEndDate: { gte: serviceDate },
-            },
-            select: {
-              trainUid: true,
-              scheduleDaysRuns: true,
-            },
-          });
+          where: {
+            trainUid: { in: candidateTrainUids },
+            stpIndicator: "C",
+            scheduleStartDate: { lte: serviceDate },
+            scheduleEndDate: { gte: serviceDate },
+          },
+          select: {
+            trainUid: true,
+            scheduleDaysRuns: true,
+          },
+        });
 
     const cancelledPermanentTrainUids = new Set(
       cancellationSchedules
@@ -995,30 +1019,30 @@ export function createApp(opts: { liveMovementStore?: LiveMovementStore; busLive
       scheduleIds.length === 0
         ? []
         : await prisma.railServiceStop.findMany({
-            where: {
-              scheduleId: { in: scheduleIds },
-            },
-            select: {
-              scheduleId: true,
-              locationType: true,
-              publicArrival: true,
-              publicDeparture: true,
-              station: {
-                select: {
-                  stationId: true,
-                  name: true,
-                },
-              },
-              tiploc: {
-                select: {
-                  crsCode: true,
-                  description: true,
-                  tpsDescription: true,
-                },
+          where: {
+            scheduleId: { in: scheduleIds },
+          },
+          select: {
+            scheduleId: true,
+            locationType: true,
+            publicArrival: true,
+            publicDeparture: true,
+            station: {
+              select: {
+                stationId: true,
+                name: true,
               },
             },
-            orderBy: [{ scheduleId: "asc" }, { stopSeq: "desc" }],
-          });
+            tiploc: {
+              select: {
+                crsCode: true,
+                description: true,
+                tpsDescription: true,
+              },
+            },
+          },
+          orderBy: [{ scheduleId: "asc" }, { stopSeq: "desc" }],
+        });
 
     const destinationByScheduleId = new Map<string, string>();
     const fallbackDestinationByScheduleId = new Map<string, string>();
