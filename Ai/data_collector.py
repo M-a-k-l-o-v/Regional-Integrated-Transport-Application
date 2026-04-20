@@ -137,7 +137,6 @@ class CSVWriter:
                 self._file_handle.close()
 
 
-# ALL THE CSVS, BECAUSE I CBA WITH SQL
 writers = {}
 def init_writers():
     global writers
