@@ -112,25 +112,25 @@ function itineraryUsesService(itinerary: JourneyPlanResponse["itineraries"][numb
   return itinerary.legs.some((leg) => leg.mode !== "walk" && leg.line === service);
 }
 
-function countFacilityAmenities(f: StationFacilities): number {
-  let count = 0;
-  if (f.accessibility.stepFreeAccess === "full") count += 3;
-  else if (f.accessibility.stepFreeAccess === "partial") count += 1;
-  if (f.accessibility.lift) count++;
-  if (f.accessibility.accessibleToilet) count++;
-  if (f.accessibility.wheelchairAvailable) count++;
-  if (f.ticketOffice.available) count++;
-  if (f.ticketOffice.ticketMachine) count++;
-  if (f.parking.available) count++;
-  if (f.toilets.available) count++;
-  if (f.amenities.wifi) count++;
-  if (f.amenities.waitingRoom) count++;
-  if (f.amenities.cafe) count++;
-  if (f.amenities.bikeStorage) count++;
-  if (f.amenities.taxiRank) count++;
-  if (f.amenities.customerHelpPoint) count++;
-  return count;
-}
+// function countFacilityAmenities(f: StationFacilities): number {
+//   let count = 0;
+//   if (f.accessibility.stepFreeAccess === "full") count += 3;
+//   else if (f.accessibility.stepFreeAccess === "partial") count += 1;
+//   if (f.accessibility.lift) count++;
+//   if (f.accessibility.accessibleToilet) count++;
+//   if (f.accessibility.wheelchairAvailable) count++;
+//   if (f.ticketOffice.available) count++;
+//   if (f.ticketOffice.ticketMachine) count++;
+//   if (f.parking.available) count++;
+//   if (f.toilets.available) count++;
+//   if (f.amenities.wifi) count++;
+//   if (f.amenities.waitingRoom) count++;
+//   if (f.amenities.cafe) count++;
+//   if (f.amenities.bikeStorage) count++;
+//   if (f.amenities.taxiRank) count++;
+//   if (f.amenities.customerHelpPoint) count++;
+//   return count;
+// }
 
 type SortMode = "default" | "amenities";
 
@@ -146,20 +146,16 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
   const [sheetDismissing, setSheetDismissing] = useState(false);
   const sheetScrollRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
-  const pullStartY = useRef<number | null>(null);
-  const [pullOffset, setPullOffset] = useState(0);
 
   const dismissSheet = useCallback(() => {
     setSheetDismissing(true);
     setTimeout(() => {
       setDetailOpen(false);
       setSheetDismissing(false);
-      setPullOffset(0);
-      pullStartY.current = null;
-    }, 280);
+    }, 200);
   }, []);
 
-  // Keyboard: Escape to dismiss sheet
+  // Keyboard: Escape to dismiss
   useEffect(() => {
     if (!detailOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -168,52 +164,6 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [detailOpen, dismissSheet]);
-
-  // Pull-to-dismiss: track touch when scrolled to top
-  useEffect(() => {
-    const scrollEl = sheetScrollRef.current;
-    if (!detailOpen || !scrollEl) return;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (scrollEl.scrollTop <= 0) {
-        pullStartY.current = e.touches[0].clientY;
-      } else {
-        pullStartY.current = null;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (pullStartY.current === null) return;
-      const dy = e.touches[0].clientY - pullStartY.current;
-      if (dy > 0) {
-        // Pulling down while at top — apply rubber-band offset
-        setPullOffset(dy * 0.45);
-      } else {
-        // Scrolling up into content — cancel pull tracking
-        pullStartY.current = null;
-        setPullOffset(0);
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (pullOffset > 100) {
-        dismissSheet();
-      } else {
-        setPullOffset(0);
-        pullStartY.current = null;
-      }
-    };
-
-    scrollEl.addEventListener("touchstart", handleTouchStart, { passive: true });
-    scrollEl.addEventListener("touchmove", handleTouchMove, { passive: true });
-    scrollEl.addEventListener("touchend", handleTouchEnd, { passive: true });
-
-    return () => {
-      scrollEl.removeEventListener("touchstart", handleTouchStart);
-      scrollEl.removeEventListener("touchmove", handleTouchMove);
-      scrollEl.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [detailOpen, pullOffset, dismissSheet]);
 
   const legDetailsMap = useMemo(() => {
     if (!legDetails) return new Map<string, JourneyLegDetailResponse>();
@@ -246,7 +196,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
           const res = await fetch(`${getApiBaseUrl()}/rail/stations/${encodeURIComponent(code)}/facilities`, { cache: "no-store" });
           if (res.ok) {
             const data: StationFacilitiesResponse = await res.json();
-            if (data.facilities) facilityMap.set(code, countFacilityAmenities(data.facilities));
+            // if (data.facilities) facilityMap.set(code, countFacilityAmenities(data.facilities));
           }
         } catch { /* ignore */ }
       })
@@ -378,7 +328,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
                 {line}
               </button>
             ))}
-            <span className={isLight ? "mx-0.5 w-px bg-slate-200" : "mx-0.5 w-px bg-[var(--outline)]"} />
+            {/* <span className={isLight ? "mx-0.5 w-px bg-slate-200" : "mx-0.5 w-px bg-[var(--outline)]"} />
             <button
               type="button"
               onClick={() => setSortMode(sortMode === "amenities" ? "default" : "amenities")}
@@ -388,7 +338,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
               }
             >
               {amenitiesLoading ? "Loading…" : "Most amenities"}
-            </button>
+            </button> */}
           </div>
         ) : null}
 
@@ -426,9 +376,9 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
                       {bankHolidayAffected && (
                         <span className="text-[0.65rem] font-semibold text-yellow-500">Holiday</span>
                       )}
-                      {sortMode === "amenities" && amenityScore !== null && amenityScore > 0 && (
+                      {/* {sortMode === "amenities" && amenityScore !== null && amenityScore > 0 && (
                         <span className="text-[0.65rem] font-semibold text-violet-500">{amenityScore} amenities</span>
-                      )}
+                      )} */}
                     </div>
                   </div>
                   <span className={pillClass(isSelected)}>{index === 0 ? "Best" : index + 1}</span>
@@ -491,7 +441,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
         </div>
       </PanelCard>
 
-      {/* ── Route detail bottom sheet ─────────────────────────────────── */}
+      {/* ── Route detail modal ────────────────────────────────────────── */}
       {detailOpen && selectedItinerary ? (
         <>
           <div
@@ -501,24 +451,21 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
             aria-hidden="true"
           />
 
-          <div
-            ref={sheetRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Route details"
-            className={`fixed inset-x-0 bottom-0 z-[901] flex max-h-[85vh] flex-col rounded-t-[1.75rem] border-t border-[var(--outline)] bg-[var(--surface-strong)] shadow-[0_-16px_48px_rgba(0,0,0,0.25)] ${sheetDismissing ? "animate-[slideDown_0.28s_ease-in_forwards]" : "animate-[slideUp_0.3s_ease-out]"}`}
-            style={pullOffset > 0 && !sheetDismissing ? { transform: `translateY(${pullOffset}px)`, transition: "none" } : undefined}
-          >
-            {/* Drag handle */}
-            <div className="shrink-0 px-4 pt-3">
-              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[var(--muted)] opacity-40" />
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-[var(--outline)] pb-3">
+          <div className="fixed inset-0 z-[901] flex items-center justify-center p-4 pointer-events-none">
+            <div
+              ref={sheetRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Route details"
+              className={`pointer-events-auto flex h-[80vh] w-full max-w-[53.3vh] flex-col overflow-hidden rounded-[2rem] border border-[var(--outline)] bg-[var(--surface-strong)] shadow-[0_32px_80px_rgba(0,0,0,0.35)] ${sheetDismissing ? "scale-95 opacity-0 transition-all duration-200" : "animate-[modalPopIn_0.25s_ease-out]"}`}
+            >
+            {/* Modal Header */}
+            <div className="shrink-0 px-6 pt-5">
+              <div className="flex items-center justify-between border-b border-[var(--outline)] pb-4">
                 <button
                   type="button"
                   onClick={dismissSheet}
-                  className="text-sm font-semibold text-[var(--muted)] transition hover:text-[var(--foreground)]"
+                  className="rounded-full bg-[var(--surface-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] transition hover:bg-[var(--surface-alt)] hover:text-[var(--foreground)]"
                 >
                   Close
                 </button>
@@ -532,7 +479,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
             </div>
 
             {/* Scrollable content */}
-            <div ref={sheetScrollRef} className="flex-1 overflow-y-auto px-4 pb-8 pt-4">
+            <div ref={sheetScrollRef} className="flex-1 overflow-y-auto px-6 pb-8 pt-5">
               {/* Time header */}
               <div className="mb-4 text-center">
                 <div className="text-2xl font-bold text-[var(--foreground)]">
@@ -723,6 +670,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
               ) : null}
             </div>
           </div>
+        </div>
         </>
       ) : null}
     </div>

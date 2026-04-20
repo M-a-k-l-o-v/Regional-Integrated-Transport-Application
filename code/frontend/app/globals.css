@@ -22,6 +22,7 @@
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.07);
   --radius-card: 1.25rem;
   --radius-pill: 9999px;
+  --container-max-w: min(72rem, 66.66vh);
   color-scheme: light;
 }
 
@@ -300,14 +301,14 @@ html[data-theme="night"] .app-list-card {
 }
 
 /* ── Bottom-sheet slide-up animation ──────────────────────────────────── */
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
 @keyframes slideDown {
   from { transform: translateY(0); }
   to { transform: translateY(100%); }
+}
+
+@keyframes modalPopIn {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* ── Live bus vehicle markers ─────────────────────────────────────────── */
