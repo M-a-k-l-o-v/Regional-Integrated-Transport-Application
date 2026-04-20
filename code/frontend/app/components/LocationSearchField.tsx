@@ -70,7 +70,7 @@ export default function LocationSearchField({
       try {
         const searchParams = new URLSearchParams();
         searchParams.set("q", trimmed);
-        searchParams.set("limit", "8");
+        searchParams.set("limit", "20");
         if (transitModes.length === 1) {
           searchParams.set("transitMode", transitModes[0])
         }
