@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001";
 
 export const DEFAULT_BUS_DATE = getLondonTodayDate();
 export const DEFAULT_TRAIN_FROM = getLondonNowTimestamp();

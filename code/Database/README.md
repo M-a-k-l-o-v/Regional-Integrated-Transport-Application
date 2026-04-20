@@ -30,9 +30,9 @@ The fastest way to get a working backend is to restore the shared database snaps
 npm install
 
 # 2. Create your environment file
-cp .env.example .env
-# Open .env and set DATABASE_URL to your local PostgreSQL connection string, e.g.:
+# Create code/Database/.env with at minimum:
 #   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/transport"
+# See the "Environment Variables" section below for the full list.
 
 # 3. Make sure Git LFS has pulled the snapshot
 cd ../..          # go to repo root
@@ -44,7 +44,7 @@ createdb transport
 ./db/db-restore.sh
 
 # 5. Start the server
-npm run dev       # Runs on http://localhost:3000
+npm run dev       # Runs on http://localhost:3001
 ```
 
 ### Manual setup (without snapshot)
@@ -53,10 +53,10 @@ If you prefer to start with an empty database and ingest data yourself:
 
 ```bash
 npm install
-cp .env.example .env          # Fill in DATABASE_URL, etc.
+# Create .env — see "Environment Variables" below for the full list
 npx prisma migrate dev         # Create tables
 npx prisma generate            # Generate the Prisma client
-npm run dev                    # Start the server on :3000
+npm run dev                    # Start the server on :3001
 ```
 
 You will then need to trigger the ingestion scripts to populate bus and rail data. Refer to the seed and ingestion services in `Src/` for details.
@@ -171,7 +171,7 @@ All cache TTLs are set to respect the university proxy's rate limits:
 
 ```
 Src/
-  app.ts                          Express app — route handlers defined here
+  app.ts                          Express app — all route handlers defined here
   server.ts                       Server startup, STOMP connection, cron jobs
   config/env.ts                   Environment variable loading + validation
   infrastructure/
@@ -179,11 +179,16 @@ Src/
     cache/RedisCache.ts           Redis get/set/del wrapper
     liveData/                     In-memory stores (LiveMovementStore, BusLiveDelayStore)
     orm/prisma/                   Prisma client singleton
+    repositories/                 Reliability + Verification Prisma adapters
   services/
     journeys/                     Journey planning, leg detail, operational status
     stations/                     Station facilities, coordinate backfill
     liveRail/                     STOMP stream processing
-  __tests__/                      Unit and load tests
+    ApiIngestionService.ts        Orchestrator over bus / rail / locality ingestion jobs
+    ApiHealthService.ts           Probes for DB, Redis, STOMP, live-store status (cron-invoked)
+    ReliabilityService.ts         Station punctuality aggregation (feeds /rail/delay-stats)
+    RouteVerificationService.ts   Stored-schedule vs. live-board cross-check (cron)
+  __tests__/                      Vitest unit and service-level tests (+ load/)
 prisma/
   schema.prisma                   Database schema (20+ models)
 db/

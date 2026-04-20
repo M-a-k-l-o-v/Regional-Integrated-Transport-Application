@@ -55,4 +55,6 @@ export const env = {
     "VSTP_ALL",
   ]),
   NATIONAL_HIGHWAYS_API_KEY: process.env.NATIONAL_HIGHWAYS_API_KEY ?? null,
+  ADMIN_API_KEY: process.env.ADMIN_API_KEY ?? null,
+  READONLY_API_KEY: process.env.READONLY_API_KEY ?? null,
 };

@@ -1,7 +1,7 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { prisma } from "./infrastructure/orm/prisma/client";
-import { startCronJobs } from "./cronJobs";
+import { buildApiIngestionService, startCronJobs } from "./cronJobs";
 import { RailLiveStreamService } from "./services/liveRail/RailLiveStreamService";
 import { LiveMovementStore } from "./infrastructure/liveData/LiveMovementStore";
 import { BusLiveDelayStore } from "./infrastructure/liveData/BusLiveDelayStore";
@@ -90,10 +90,13 @@ async function main() {
     busLiveDelayStore.evictExpired();
   });
 
-  // ── HTTP app ──────────────────────────────────────────────────────────────
-  const app = createApp({ liveMovementStore, busLiveDelayStore });
+  // ── Ingestion orchestrator (shared by cron + admin trigger) ───────────────
+  const ingestionService = buildApiIngestionService();
 
-  startCronJobs();
+  // ── HTTP app ──────────────────────────────────────────────────────────────
+  const app = createApp({ liveMovementStore, busLiveDelayStore, ingestionService });
+
+  startCronJobs(ingestionService);
 
   app.listen(env.PORT, () => {
     console.log(`Backend running on http://localhost:${env.PORT}`);

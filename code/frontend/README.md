@@ -22,16 +22,15 @@ Next.js web application providing journey planning, departure boards, interactiv
 # 1. Install dependencies
 npm install
 
-# 2. Create your environment file
-cp .env.local.example .env.local
-# The only variable is:
-#   NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+# 2. Create your environment file — code/frontend/.env.local
+#   NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+# (this is the only variable the frontend reads)
 
 # 3. Start the dev server
-npm run dev       # Runs on http://localhost:3001
+npm run dev       # Runs on http://localhost:3000
 ```
 
-The frontend expects the backend to be running on port 3000. If it is not running, pages will still load but data panels will show errors or empty states.
+The frontend expects the backend to be running on port 3001. If it is not running, pages will still load but data panels will show errors or empty states.
 
 ---
 
@@ -43,6 +42,9 @@ The frontend expects the backend to be running on port 3000. If it is not runnin
 | `npm run build` | Create a production build |
 | `npm start` | Serve the production build |
 | `npm run lint` | Run ESLint |
+| `npm test` | Run the Vitest test suite (jsdom + React Testing Library + axe-core) |
+| `npm run test:watch` | Run the suite in watch mode |
+| `npm run test:coverage` | Run the suite with a v8 coverage report |
 
 ---
 
@@ -90,13 +92,30 @@ Every map component follows the same approach to avoid SSR crashes:
 
 ## Accessibility
 
-The frontend targets **WCAG 2.1 AA** compliance:
+The frontend targets **WCAG 2.2 AA** compliance:
 
 - **Skip-to-content link** — hidden until focused, lets keyboard users jump past the navigation.
 - **ARIA attributes** — `aria-label` on navigation, `aria-current="page"` on active links, `aria-modal` on dialogs.
 - **Focus indicators** — a visible 2 px brand-coloured ring on all focusable elements via `:focus-visible`.
 - **Reduced motion** — a `prefers-reduced-motion` media query disables all animations and transitions.
 - **Touch targets** — all buttons and links have a minimum height of 36 px.
+
+### Automated accessibility audit
+
+`app/__tests__/accessibility.test.tsx` runs **axe-core** (via `vitest-axe`) against rendered components and a composed page section. The test fails the build on any violation, giving the a11y claim a repeatable artifact that runs with every `npm test` invocation.
+
+---
+
+## Testing
+
+Tests live in `app/__tests__/` and use:
+
+- **Vitest** with the `jsdom` environment for DOM APIs
+- **React Testing Library** for component rendering and user-interaction simulation
+- **vitest-axe** for the automated accessibility audit
+- An in-memory `localStorage` / `sessionStorage` shim installed in `setup.ts` (jsdom 29 requires an explicit storage backend)
+
+Coverage spans pure helpers (`transportApi.ts`, board history persistence), small self-contained components (`ModeTabs`, `PanelCard`, `PageHeader`), and the a11y audit. Leaflet-based and data-fetching components are intentionally out of scope to keep the suite fast and dependency-light.
 
 ---
 
@@ -126,6 +145,7 @@ app/
   boards/                 Departure board directory
   location-info/          Bus and rail departure pages
   road-info/              VMS road information
+  settings/               User settings + theme switch
 
   components/
     AppShell.tsx           Page wrapper with top nav (desktop) and bottom nav (mobile)
@@ -135,6 +155,13 @@ app/
     StationFacilitiesPanel.tsx   Station accessibility and amenity display
     ThemeToggle.tsx        Light / dark theme switch
     ...                    Other shared components
+
+  __tests__/
+    setup.ts                Vitest setup — axe + jest-dom matchers, storage shim
+    transportApi.test.ts    API-client helper tests (32)
+    boardHistory.test.ts    Recent-boards persistence tests (7)
+    components.test.tsx     React Testing Library component tests (12)
+    accessibility.test.tsx  axe-core accessibility audit (4 surfaces)
 
 public/
   icons/                  SVG icons used in maps and UI
