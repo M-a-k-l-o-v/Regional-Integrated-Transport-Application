@@ -50,14 +50,20 @@ export default function RailDepartureList({ departures, initialVisible = DEFAULT
                     {departure.operatorCode ? ` · ${departure.operatorCode}` : ""}
                   </div>
                   {departure.reliability && (
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
-                      departure.reliability.confidenceLevel === "HIGH" 
-                        ? "bg-emerald-500/15 text-emerald-600" 
-                        : departure.reliability.confidenceLevel === "MEDIUM"
-                          ? "bg-amber-500/15 text-amber-600"
-                          : "bg-rose-500/15 text-rose-600"
-                    }`}>
+                    <span 
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.65rem] font-semibold ${
+                        departure.reliability.confidenceLevel === "HIGH" 
+                          ? "bg-emerald-500/15 text-emerald-600" 
+                          : departure.reliability.confidenceLevel === "MEDIUM"
+                            ? "bg-amber-500/15 text-amber-600"
+                            : "bg-rose-500/15 text-rose-600"
+                      }`}
+                      title="Experimental in-house AI model. Accuracy is not guaranteed."
+                    >
                       AI Reliability Score: {departure.reliability.confidenceLevel}
+                      <svg className="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </span>
                   )}
                 </div>
