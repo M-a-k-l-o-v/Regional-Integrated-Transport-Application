@@ -12,12 +12,34 @@ function getUrgencyClass(sign: VmsSign): string {
   if (sign.isBlank) return "border-[var(--outline)]";
   const msg = (sign.message ?? "").toUpperCase();
   if (msg.includes("CLOSED") || msg.includes("ACCIDENT") || msg.includes("INCIDENT"))
-    return "border-red-400 bg-red-50 dark:bg-red-950/20";
-  if (msg.includes("DELAY") || msg.includes("QUEUE") || msg.includes("CONGESTION") || msg.includes("FOG") || msg.includes("WIND"))
-    return "border-amber-400 bg-amber-50 dark:bg-amber-950/20";
+    return "border-red-400 bg-red-100 dark:bg-red-950/20";
   if (msg.includes("ROADWORKS") || msg.includes("SPEED LIMIT"))
-    return "border-orange-300 bg-orange-50 dark:bg-orange-950/20";
-  return "border-blue-300 bg-blue-50 dark:bg-blue-950/20";
+    return "border-orange-500 bg-orange-100 dark:bg-orange-950/20";
+  if (msg.includes("DELAY") || msg.includes("QUEUE") || msg.includes("CONGESTION") || msg.includes("FOG") || msg.includes("WIND"))
+    return "border-amber-400 bg-amber-100 dark:bg-amber-950/20";
+  return "border-blue-300 bg-blue-100 dark:bg-blue-950/20";
+}
+
+function getUrgencyDescription(sign: VmsSign): string {
+  if (sign.isBlank) return "Blank sign";
+  const msg = (sign.message ?? "").toUpperCase();
+  if (msg.includes("CLOSED") || msg.includes("ACCIDENT") || msg.includes("INCIDENT"))
+    return "Accident or road closure";
+  if (msg.includes("ROADWORKS") || msg.includes("SPEED LIMIT"))
+    return "Reduce speed";
+  if (msg.includes("DELAY") || msg.includes("QUEUE") || msg.includes("CONGESTION") || msg.includes("FOG") || msg.includes("WIND"))
+    return "Expect delays";
+  return "Normal conditions";
+}
+
+function getDirectionColor(direction: string | null): string {
+  if (!direction) return "";
+  const d = direction.toLowerCase();
+  if (d.includes("north")) return "bg-red-100 dark:bg-red-950/20";
+  if (d.includes("south")) return "bg-blue-100 dark:bg-blue-950/20";
+  if (d.includes("east")) return "bg-green-100 dark:bg-green-950/20";
+  if (d.includes("west")) return "bg-amber-100 dark:bg-amber-950/20";
+  return direction.charAt(0).toUpperCase();
 }
 
 function getDirectionIcon(direction: string | null): string {
@@ -49,14 +71,13 @@ export default function VmsSignList({ signs, selectedId, onSelectSign }: VmsSign
             key={sign.id}
             type="button"
             onClick={() => onSelectSign(isSelected ? null : sign.id)}
-            className={`w-full text-left rounded-2xl border-2 px-4 py-3.5 transition ${getUrgencyClass(sign)} ${
-              isSelected
-                ? "ring-2 ring-[var(--brand)] ring-offset-1"
-                : "hover:shadow-[var(--shadow-soft)]"
-            }`}
+            className={`w-full text-left rounded-2xl border-2 px-4 py-3.5 transition border-[var(--outline)] ${isSelected
+              ? "ring-2 ring-[var(--brand)] ring-offset-1"
+              : "hover:shadow-[var(--shadow-soft)]"
+              }`}
           >
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--surface)] text-sm font-bold text-[var(--brand-ink)] shadow-sm border border-[var(--outline)]">
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${getDirectionColor(sign.direction)} text-sm font-bold text-[var(--brand-ink)] shadow-sm border border-[var(--outline)]`}>
                 {getDirectionIcon(sign.direction)}
               </div>
               <div className="min-w-0 flex-1">
@@ -65,8 +86,8 @@ export default function VmsSignList({ signs, selectedId, onSelectSign }: VmsSign
                     {sign.junction ?? sign.road}
                   </span>
                   {sign.direction ? (
-                    <span className="rounded-full bg-[var(--surface-accent)] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)]">
-                      {sign.direction}
+                    <span className={`rounded-full bg-[var(--surface-accent)] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] border ${getUrgencyClass(sign)}`}>
+                      {getUrgencyDescription(sign)}
                     </span>
                   ) : null}
                 </div>
@@ -104,9 +125,8 @@ export default function VmsSignList({ signs, selectedId, onSelectSign }: VmsSign
                 key={sign.id}
                 type="button"
                 onClick={() => onSelectSign(sign.id === selectedId ? null : sign.id)}
-                className={`w-full text-left rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-2.5 text-sm transition hover:shadow-sm ${
-                  sign.id === selectedId ? "ring-2 ring-[var(--brand)] ring-offset-1" : ""
-                }`}
+                className={`w-full text-left rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-3 py-2.5 text-sm transition hover:shadow-sm ${sign.id === selectedId ? "ring-2 ring-[var(--brand)] ring-offset-1" : ""
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-slate-300" />
