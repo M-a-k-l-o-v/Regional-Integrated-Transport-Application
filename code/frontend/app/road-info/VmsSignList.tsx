@@ -12,12 +12,12 @@ function getUrgencyClass(sign: VmsSign): string {
   if (sign.isBlank) return "border-[var(--outline)]";
   const msg = (sign.message ?? "").toUpperCase();
   if (msg.includes("CLOSED") || msg.includes("ACCIDENT") || msg.includes("INCIDENT"))
-    return "border-red-400 bg-red-100 dark:bg-red-950/20";
+    return "border-red-400 bg-red-100 night:bg-red-900 night:text-red-200";
   if (msg.includes("ROADWORKS") || msg.includes("SPEED LIMIT"))
-    return "border-orange-500 bg-orange-100 dark:bg-orange-950/20";
+    return "border-orange-500 bg-orange-100 night:bg-orange-900 night:text-orange-200";
   if (msg.includes("DELAY") || msg.includes("QUEUE") || msg.includes("CONGESTION") || msg.includes("FOG") || msg.includes("WIND"))
-    return "border-amber-400 bg-amber-100 dark:bg-amber-950/20";
-  return "border-blue-300 bg-blue-100 dark:bg-blue-950/20";
+    return "border-amber-400 bg-amber-100 night:bg-amber-900 night:text-amber-200";
+  return "border-blue-300 bg-blue-100 night:bg-blue-900 night:text-blue-200";
 }
 
 function getUrgencyDescription(sign: VmsSign): string {
@@ -35,11 +35,11 @@ function getUrgencyDescription(sign: VmsSign): string {
 function getDirectionColor(direction: string | null): string {
   if (!direction) return "";
   const d = direction.toLowerCase();
-  if (d.includes("north")) return "bg-red-100 dark:bg-red-950/20";
-  if (d.includes("south")) return "bg-blue-100 dark:bg-blue-950/20";
-  if (d.includes("east")) return "bg-green-100 dark:bg-green-950/20";
-  if (d.includes("west")) return "bg-amber-100 dark:bg-amber-950/20";
-  return direction.charAt(0).toUpperCase();
+  if (d.includes("north")) return "bg-red-100 night:bg-red-950/20";
+  if (d.includes("south")) return "bg-blue-100 night:bg-blue-950/20";
+  if (d.includes("east")) return "bg-green-100 night:bg-green-950/20";
+  if (d.includes("west")) return "bg-amber-100 night:bg-amber-950/20";
+  return "bg-neutral-100 night:bg-neutral-950/20"
 }
 
 function getDirectionIcon(direction: string | null): string {
@@ -77,7 +77,7 @@ export default function VmsSignList({ signs, selectedId, onSelectSign }: VmsSign
               }`}
           >
             <div className="flex items-start gap-3">
-              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${getDirectionColor(sign.direction)} text-sm font-bold text-[var(--brand-ink)] shadow-sm border border-[var(--outline)]`}>
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${getDirectionColor(sign.direction)} text-sm font-bold text-neutral-900 shadow-sm border border-[var(--outline)]`}>
                 {getDirectionIcon(sign.direction)}
               </div>
               <div className="min-w-0 flex-1">
@@ -86,7 +86,7 @@ export default function VmsSignList({ signs, selectedId, onSelectSign }: VmsSign
                     {sign.junction ?? sign.road}
                   </span>
                   {sign.direction ? (
-                    <span className={`rounded-full bg-[var(--surface-accent)] px-2 py-0.5 text-[10px] font-semibold text-[var(--brand)] border ${getUrgencyClass(sign)}`}>
+                    <span className={`rounded-full bg-[var(--surface-accent)] px-2 py-0.5 text-[10px] font-semibold text-neutral-900 border ${getUrgencyClass(sign)}`}>
                       {getUrgencyDescription(sign)}
                     </span>
                   ) : null}
