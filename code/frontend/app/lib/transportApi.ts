@@ -201,6 +201,8 @@ export type BusRouteCalendarResponse = {
   }>;
 };
 
+export type JourneyNoMatchReason = "no_service_within_wait_cap" | "no_service_match";
+
 export type JourneyPlanResponse = {
   dataState: DataState;
   query: {
@@ -209,7 +211,9 @@ export type JourneyPlanResponse = {
     date: string;
     time: string;
     preference: JourneyPreference;
+    serviceFilter?: string | null;
   };
+  noMatchReason?: JourneyNoMatchReason | null;
   itineraries: Array<{
     departureTime: string;
     arrivalTime: string;

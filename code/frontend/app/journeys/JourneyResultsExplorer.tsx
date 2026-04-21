@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import PanelCard from "../components/PanelCard";
 import {
@@ -135,12 +136,60 @@ function itineraryUsesService(itinerary: JourneyPlanResponse["itineraries"][numb
 type SortMode = "default" | "amenities";
 
 export default function JourneyResultsExplorer({ itineraries, routeShapes, preference, legDetails }: JourneyResultsExplorerProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const urlServiceFilter = searchParams.get("serviceFilter");
+  const serviceFilter = urlServiceFilter && urlServiceFilter.trim().length > 0 ? urlServiceFilter.trim().toUpperCase() : null;
+
+  const applyServiceFilter = useCallback(
+    (next: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (next) {
+        params.set("serviceFilter", next);
+      } else {
+        params.delete("serviceFilter");
+      }
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams]
+  );
+
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [visibleLimit, setVisibleLimit] = useState(ROUTES_PER_PAGE);
   const [liveTracking, setLiveTracking] = useState<LiveTrackingState | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [serviceFilter, setServiceFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("default");
+  const [refinedRouteShapes, setRefinedRouteShapes] = useState<typeof routeShapes | null>(null);
+
+  useEffect(() => {
+    if (routeShapes.length === 0) {
+      setRefinedRouteShapes(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await fetch("/api/refine-shapes", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ routeShapes }),
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as { routeShapes?: typeof routeShapes };
+        if (!cancelled && Array.isArray(data.routeShapes)) {
+          setRefinedRouteShapes(data.routeShapes);
+        }
+      } catch {
+        // Keep the straight-line fallback on failure.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [routeShapes]);
+
+  const effectiveRouteShapes = refinedRouteShapes ?? routeShapes;
   const [amenityScores, setAmenityScores] = useState<Map<number, number>>(new Map());
   const [amenitiesLoading, setAmenitiesLoading] = useState(false);
   const [sheetDismissing, setSheetDismissing] = useState(false);
@@ -241,7 +290,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
   const visibleCount = Math.min(visibleLimit, cappedTotal);
   const visibleOriginalIndices = filteredIndices.slice(0, visibleCount);
   const visibleItineraries = visibleOriginalIndices.map((i) => itineraries[i]);
-  const visibleShapes = visibleOriginalIndices.map((i) => routeShapes[i]);
+  const visibleShapes = visibleOriginalIndices.map((i) => effectiveRouteShapes[i]);
   const activeIndex = getSelectedIndex(selectedIndex, visibleCount);
   const selectedOriginalIndex = visibleOriginalIndices[activeIndex] ?? 0;
   const selectedItinerary = visibleItineraries[activeIndex] ?? null;
@@ -307,7 +356,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
           <div className="mt-2 flex flex-wrap gap-1.5">
             <button
               type="button"
-              onClick={() => setServiceFilter(null)}
+              onClick={() => applyServiceFilter(null)}
               className={isLight
                 ? `rounded-lg border px-2.5 py-1 text-[0.65rem] font-semibold transition ${serviceFilter === null ? "border-emerald-400 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white/80 text-slate-500 hover:border-slate-300"}`
                 : `rounded-lg border px-2.5 py-1 text-[0.65rem] font-semibold transition ${serviceFilter === null ? "border-[var(--brand)] bg-[var(--surface-accent)] text-[var(--brand)]" : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--brand)]/40"}`
@@ -319,7 +368,7 @@ export default function JourneyResultsExplorer({ itineraries, routeShapes, prefe
               <button
                 key={line}
                 type="button"
-                onClick={() => setServiceFilter(serviceFilter === line ? null : line)}
+                onClick={() => applyServiceFilter(serviceFilter === line ? null : line)}
                 className={isLight
                   ? `rounded-lg border px-2.5 py-1 text-[0.65rem] font-semibold transition ${serviceFilter === line ? "border-emerald-400 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white/80 text-slate-500 hover:border-slate-300"}`
                   : `rounded-lg border px-2.5 py-1 text-[0.65rem] font-semibold transition ${serviceFilter === line ? "border-[var(--brand)] bg-[var(--surface-accent)] text-[var(--brand)]" : "border-[var(--outline)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--brand)]/40"}`

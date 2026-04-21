@@ -184,6 +184,7 @@ const journeyPlanRequestSchema = z.object({
   preference: z.enum(["fastest", "balanced", "fewest_changes"]).default("fastest"),
   maxItineraries: z.coerce.number().int().min(1).max(8).default(3),
   modes: z.array(z.enum(["bus", "rail"])).min(1).optional(),
+  serviceFilter: z.string().trim().min(1).max(16).nullable().optional(),
 });
 
 const journeyLegDetailRequestSchema = z.object({

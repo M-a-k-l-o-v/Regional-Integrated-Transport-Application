@@ -20,7 +20,10 @@ export type JourneyPlanRequest = {
   preference: JourneyPreference;
   maxItineraries: number;
   modes?: TransitMode[];
+  serviceFilter?: string | null;
 };
+
+export type JourneyNoMatchReason = "no_service_within_wait_cap" | "no_service_match";
 
 export type JourneyNode = {
   nodeId: string;
@@ -158,6 +161,8 @@ export type JourneyPlanResponse = {
     date: string;
     time: string;
     preference: JourneyPreference;
+    serviceFilter?: string | null;
   };
   itineraries: JourneyItineraryResponse[];
+  noMatchReason?: JourneyNoMatchReason | null;
 };
