@@ -5,7 +5,6 @@ import PanelCard from "../components/PanelCard";
 import JourneyResultsExplorer from "./JourneyResultsExplorer";
 import RecentJourneyStrip from "./RecentJourneyStrip";
 import SaveRecentJourney from "./SaveRecentJourney";
-import { routeGeometryService } from "./RouteGeometryService";
 import { JourneyRouteShape } from "./types";
 import {
   JourneyLegDetailResponse,
@@ -70,6 +69,7 @@ function buildJourneyHref(origin: PlannerLocation, destination: PlannerLocation,
   if (params.date) sp.set("date", params.date);
   if (params.time) sp.set("time", params.time);
   if (params.modes) sp.set("modes", params.modes);
+  if (params.serviceFilter) sp.set("serviceFilter", params.serviceFilter);
   return `/journeys?${sp.toString()}`;
 }
 
@@ -104,10 +104,10 @@ async function loadLegDetails(itineraries: JourneyPlanResponse["itineraries"]): 
   return new Map(resolved.filter((entry): entry is readonly [string, JourneyLegDetailResponse] => entry[1] !== null));
 }
 
-async function buildRouteShapes(
+function buildRouteShapes(
   itineraries: JourneyPlanResponse["itineraries"],
   legDetails: Map<string, JourneyLegDetailResponse>
-): Promise<JourneyRouteShape[]> {
+): JourneyRouteShape[] {
   const routeShapes = itineraries.map((itinerary) => {
     const segments = itinerary.legs.flatMap((leg) => {
       if (leg.mode === "walk" && hasCoordinates(leg.from) && hasCoordinates(leg.to)) {
@@ -151,7 +151,7 @@ async function buildRouteShapes(
     };
   });
 
-  return routeGeometryService.refineShapes(routeShapes);
+  return routeShapes;
 }
 
 export default async function JourneysPage({ searchParams }: JourneysPageProps) {
@@ -163,6 +163,8 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
   const date = params.date ?? plannerDefaults.date;
   const time = params.time ?? plannerDefaults.time;
   const modes = parseModes(params.modes);
+  const serviceFilterRaw = typeof params.serviceFilter === "string" ? params.serviceFilter.trim() : "";
+  const serviceFilter = serviceFilterRaw.length > 0 ? serviceFilterRaw.toUpperCase() : null;
 
   const result =
     origin && destination
@@ -174,11 +176,12 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
         preference,
         maxItineraries: 8,
         ...(modes ? { modes } : {}),
+        ...(serviceFilter ? { serviceFilter } : {}),
       })
       : { data: null, error: null };
 
   const legDetailsMap = result.data ? await loadLegDetails(result.data.itineraries) : new Map();
-  const routeShapes = result.data ? await buildRouteShapes(result.data.itineraries, legDetailsMap) : [];
+  const routeShapes = result.data ? buildRouteShapes(result.data.itineraries, legDetailsMap) : [];
   const legDetailsRecord: Record<string, JourneyLegDetailResponse> = {};
   for (const [key, value] of legDetailsMap) {
     legDetailsRecord[key] = value;
@@ -208,11 +211,26 @@ export default async function JourneysPage({ searchParams }: JourneysPageProps) 
         ) : null}
 
         {result.data && result.data.itineraries.length === 0 ? (
-          <PanelCard eyebrow="No route" title="No scheduled journey was found">
-            <p className="text-sm text-[var(--muted)]">
-              Try a different time, use a broader interchange point, or change the preference from fewest changes to fastest.
-            </p>
-          </PanelCard>
+          result.data.noMatchReason === "no_service_within_wait_cap" && serviceFilter ? (
+            <PanelCard eyebrow="Filter applied" title={`No direct ${serviceFilter} within 20 minutes`}>
+              <p className="text-sm text-[var(--muted)]">
+                The next {serviceFilter} doesn&apos;t depart within a 20-minute wait of your start time. Clear the
+                filter to see journeys that change services.
+              </p>
+            </PanelCard>
+          ) : result.data.noMatchReason === "no_service_match" && serviceFilter ? (
+            <PanelCard eyebrow="Filter applied" title={`Service ${serviceFilter} doesn't run between these stops today`}>
+              <p className="text-sm text-[var(--muted)]">
+                Clear the filter to see journeys using other services.
+              </p>
+            </PanelCard>
+          ) : (
+            <PanelCard eyebrow="No route" title="No scheduled journey was found">
+              <p className="text-sm text-[var(--muted)]">
+                Try a different time, use a broader interchange point, or change the preference from fewest changes to fastest.
+              </p>
+            </PanelCard>
+          )
         ) : null}
 
         {result.data && result.data.itineraries.length > 0 && origin && destination ? (

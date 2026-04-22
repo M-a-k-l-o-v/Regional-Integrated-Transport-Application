@@ -7,6 +7,7 @@ import { TransitGraphBuilder } from "./TransitGraphBuilder";
 import {
   AccessCandidate,
   JourneyItineraryResponse,
+  JourneyNoMatchReason,
   JourneyPlanRequest,
   JourneyPlanResponse,
   JourneyPreference,
@@ -24,6 +25,13 @@ const MAX_LABELS_PER_NODE = 48;
 const ACCESS_RADIUS_METRES = 1500;
 const ACCESS_WALK_SPEED_METRES_PER_SECOND = 1.3;
 const STATION_FRONTAGE_WALK_MINUTES = 4;
+const MAX_ORIGIN_WAIT_MS = 20 * 60 * 1000;
+
+function normaliseServiceFilter(raw: string | null | undefined): string | null {
+  if (raw === null || raw === undefined) return null;
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed.toUpperCase() : null;
+}
 
 type ResolvedLocation = {
   type: "station" | "bus_stop" | "bus_stop_group";
@@ -125,6 +133,7 @@ export class JourneyPlanningService {
     this.ensureNodePresent(graph, origin);
     this.ensureNodePresent(graph, destination);
 
+    const serviceFilter = normaliseServiceFilter(request.serviceFilter);
     const originNodeId = toNodeId(origin.type, origin.id);
     const destinationNodeId = toNodeId(destination.type, destination.id);
     const originAccess = await this.buildAccessCandidates(graph, origin);
@@ -141,7 +150,8 @@ export class JourneyPlanningService {
           request.preference,
           request.maxItineraries,
           origin,
-          destination
+          destination,
+          serviceFilter
         )
       : [];
 
@@ -149,6 +159,11 @@ export class JourneyPlanningService {
     const hasAnyLiveData = itineraries.some((itin) =>
       itin.legs.some((leg) => leg.liveDelayMinutes !== null)
     );
+
+    let noMatchReason: JourneyNoMatchReason | null = null;
+    if (serviceFilter && itineraries.length === 0) {
+      noMatchReason = this.diagnoseServiceFilterMiss(graph, originAccess, departureDateTime, serviceFilter);
+    }
 
     return {
       dataState: {
@@ -163,9 +178,41 @@ export class JourneyPlanningService {
         date: request.date,
         time: request.time,
         preference: request.preference,
+        serviceFilter,
       },
       itineraries,
+      noMatchReason,
     };
+  }
+
+  private diagnoseServiceFilterMiss(
+    graph: TransitGraph,
+    originAccess: AccessCandidate[],
+    departureDateTime: Date,
+    serviceFilter: string
+  ): JourneyNoMatchReason {
+    const filterUpper = serviceFilter.toUpperCase();
+    const departureTimeMs = departureDateTime.getTime();
+    let anyServiceRunsToday = false;
+
+    for (const candidate of originAccess) {
+      const edges = graph.transitOutgoing.get(candidate.nodeId) ?? [];
+      for (const edge of edges) {
+        if (edge.mode !== "bus") continue;
+        if ((edge.line ?? "").toUpperCase() !== filterUpper) continue;
+        anyServiceRunsToday = true;
+        if (edge.departureTimeMs === null) continue;
+        const arrivalAtStopMs = departureTimeMs + candidate.durationMinutes * 60 * 1000;
+        if (edge.departureTimeMs >= arrivalAtStopMs &&
+            edge.departureTimeMs - arrivalAtStopMs <= MAX_ORIGIN_WAIT_MS) {
+          // A match exists within the wait cap — empty result means the downstream
+          // journey wasn't reachable, not the filter. Treat as no-match for safety.
+          return "no_service_within_wait_cap";
+        }
+      }
+    }
+
+    return anyServiceRunsToday ? "no_service_within_wait_cap" : "no_service_match";
   }
 
   private searchGraph(
@@ -178,7 +225,8 @@ export class JourneyPlanningService {
     preference: JourneyPreference,
     maxItineraries: number,
     origin: ResolvedLocation,
-    _destination: ResolvedLocation
+    _destination: ResolvedLocation,
+    serviceFilter: string | null
   ) {
     const departureTimeMs = departureDateTime.getTime();
     const frontier = new SearchLabelMinHeap();
@@ -234,11 +282,17 @@ export class JourneyPlanningService {
 
       const transitEdges = graph.transitOutgoing.get(current.nodeId) ?? [];
       const startIndex = this.findTransitStartIndex(transitEdges, current.timeMs);
+      const isOriginLeg = !current.hasBoardedTransit;
       for (let index = startIndex; index < transitEdges.length; index += 1) {
         const edge = transitEdges[index];
         if (edge.departureTimeMs === null) continue;
         if (edge.departureTimeMs < current.timeMs) continue;
         if (edge.departureTimeMs > searchEndMs) break;
+        if (serviceFilter && isOriginLeg) {
+          if (edge.mode !== "bus") continue;
+          if ((edge.line ?? "").toUpperCase() !== serviceFilter) continue;
+          if (edge.departureTimeMs - current.timeMs > MAX_ORIGIN_WAIT_MS) continue;
+        }
         const nextLabel = this.createNextLabel(current, edge, edge.arrivalTimeMs);
         if (nextLabel.transfers > MAX_TRANSFERS) continue;
         this.pushIfViable(labelsByNode, frontier, nextLabel, preference);

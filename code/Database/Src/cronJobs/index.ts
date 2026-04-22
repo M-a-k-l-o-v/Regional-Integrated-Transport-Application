@@ -7,25 +7,31 @@ import { AccessNodeRepository } from "../infrastructure/repositories/AccessNodeR
 import { AccessNodesIngestionService } from "../services/AccessNodesIngestionService";
 import { RailTimetableClient } from "../infrastructure/apiClients/RailTimetableClient";
 import { RailIngestionService } from "../services/RailIngestionService";
+import { ApiIngestionService } from "../services/ApiIngestionService";
 import { env } from "../config/env";
 
-export function startCronJobs() {
+export function buildApiIngestionService(): ApiIngestionService {
   const baseUrl = env.NAPTAN_API_BASE_URL;
 
-  const client = new NptgClient(baseUrl);
-  const repo = new LocalityRepository();
-  const service = new LocalitiesIngestionService(client, repo);
-  const accessClient = new AccessNodesClient(baseUrl);
-  const accessRepo = new AccessNodeRepository();
-  const accessService = new AccessNodesIngestionService(accessClient, accessRepo);
-  const railClient = new RailTimetableClient(env.RAIL_TIMETABLE_PATH);
-  const railService = new RailIngestionService(railClient);
+  const localities = new LocalitiesIngestionService(
+    new NptgClient(baseUrl),
+    new LocalityRepository()
+  );
+  const accessNodes = new AccessNodesIngestionService(
+    new AccessNodesClient(baseUrl),
+    new AccessNodeRepository()
+  );
+  const rail = new RailIngestionService(new RailTimetableClient(env.RAIL_TIMETABLE_PATH));
 
+  return new ApiIngestionService(localities, accessNodes, rail);
+}
+
+export function startCronJobs(ingestion: ApiIngestionService = buildApiIngestionService()) {
   // Localities are effectively static; run weekly.
   cron.schedule("0 2 * * 0", async () => {
     try {
-      const localitiesCount = await service.ingestLocalities("naptan-nptg");
-      console.log(`[cron] localities ingested: ${localitiesCount}`);
+      const count = await ingestion.ingestLocalities();
+      console.log(`[cron] localities ingested: ${count}`);
     } catch (e) {
       console.error("[cron] localities ingestion failed:", e);
     }
@@ -34,11 +40,8 @@ export function startCronJobs() {
   // Access nodes change infrequently; daily is sufficient.
   cron.schedule("10 2 * * *", async () => {
     try {
-      const accessNodesCount = await accessService.ingestAccessNodes(
-        "naptan-access-nodes",
-        ["250"]
-      );
-      console.log(`[cron] access nodes ingested: ${accessNodesCount}`);
+      const count = await ingestion.ingestAccessNodes(["250"]);
+      console.log(`[cron] access nodes ingested: ${count}`);
     } catch (e) {
       console.error("[cron] access nodes ingestion failed:", e);
     }
@@ -46,8 +49,13 @@ export function startCronJobs() {
 
   // Rail timetable refresh daily from the local timetable file path.
   cron.schedule("0 3 * * *", async () => {
-    await railService.ingestRailRoutes("rail_timetable");
+    try {
+      await ingestion.ingestRail();
+    } catch (e) {
+      console.error("[cron] rail ingestion failed:", e);
+    }
   });
 
   console.log("Cron jobs started.");
+  return ingestion;
 }

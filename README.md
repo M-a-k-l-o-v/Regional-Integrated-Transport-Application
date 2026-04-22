@@ -79,7 +79,7 @@ NATIONAL_HIGHWAYS_API_KEY=
 **Frontend** — create `code/frontend/.env.local`:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
 ```
 
 ### 5. Restore the database
@@ -105,16 +105,16 @@ This takes roughly 2-5 minutes depending on your machine.
 Open two terminal windows:
 
 ```bash
-# Terminal 1 — Backend (port 3000)
+# Terminal 1 — Backend (port 3001)
 cd code/Database
 npm run dev
 
-# Terminal 2 — Frontend (port 3001)
+# Terminal 2 — Frontend (port 3000)
 cd code/frontend
 npm run dev
 ```
 
-Then open [http://localhost:3001](http://localhost:3001) in your browser.
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### 7. Enable live data (optional)
 
@@ -155,6 +155,21 @@ This simulates 50 concurrent users hitting the API and checks that p95 response 
 
 ---
 
+## Automated Tests
+
+Both sub-projects use Vitest. From each folder:
+
+```bash
+npm test               # Single run
+npm run test:watch     # Watch mode
+npm run test:coverage  # With v8 coverage report
+```
+
+- **Backend** (`code/Database`) — 106 tests across 11 files: pure helpers, and service-layer logic (journey mapping, reliability, route verification, facilities, API health).
+- **Frontend** (`code/frontend`) — 55 tests across 4 files: pure API-client helpers, recent-boards persistence, React component rendering, and an axe-core accessibility audit over composed page sections.
+
+---
+
 ## Project Structure
 
 | Directory | What it contains |
@@ -164,13 +179,17 @@ This simulates 50 concurrent users hitting the API and checks that p95 response 
 | `code/Database/Src/infrastructure/apiClients/` | Clients for the transport proxy and National Highways |
 | `code/Database/Src/infrastructure/cache/` | Redis caching layer |
 | `code/Database/Src/infrastructure/liveData/` | In-memory stores for STOMP movements and bus delays |
+| `code/Database/Src/infrastructure/repositories/` | Prisma-backed data access (reliability, verification) |
 | `code/Database/Src/services/journeys/` | Journey planning algorithm, leg detail, operational status |
 | `code/Database/Src/services/stations/` | Station facilities and coordinate data |
 | `code/Database/Src/services/liveRail/` | Network Rail live stream processing |
+| `code/Database/Src/services/` | Domain services run by cron (ingestion, health, reliability, route verification) |
+| `code/Database/Src/__tests__/` | Vitest unit and service-level tests |
 | `code/Database/prisma/schema.prisma` | Database schema |
 | `code/frontend/app/` | Next.js pages and route handlers |
 | `code/frontend/app/components/` | Shared UI components (AppShell, PanelCard, etc.) |
 | `code/frontend/app/lib/transportApi.ts` | API client, TypeScript types, and formatting helpers |
+| `code/frontend/app/__tests__/` | Vitest + React Testing Library tests (incl. axe-core a11y audit) |
 
 ---
 
@@ -198,7 +217,7 @@ This simulates 50 concurrent users hitting the API and checks that p95 response 
 | NFR-01 | Page load under 4 seconds | Server-side rendering, dynamic Leaflet imports, Redis caching |
 | NFR-02 | Mobile-first (360 px+) | Responsive Tailwind breakpoints, mobile bottom nav, touch targets |
 | NFR-03 | Polling within rate limits | Bus 15 s/operator, rail 30 s cache, weather 5 min cache |
-| NFR-04 | WCAG 2.1 AA accessibility | Skip-nav, ARIA landmarks, focus-visible outlines, prefers-reduced-motion |
+| NFR-04 | WCAG 2.2 AA accessibility | Skip-nav, ARIA landmarks, focus-visible outlines, prefers-reduced-motion, automated axe-core audit in the frontend test suite |
 | NFR-05 | Support 50 concurrent users | k6 load test, stateless API, connection pooling |
 | NFR-06 | Containerised deployment | Dockerfiles + docker-compose.yml |
 | NFR-07 | Documentation and AI disclosure | This README, sub-project READMEs, inline comments |

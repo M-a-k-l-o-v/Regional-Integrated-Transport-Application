@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { XMLParser } from "fast-xml-parser";
+import type { TransportApiClient } from "../../domain/interfaces/TransportApiClient";
 
 type RailBoardService = {
   std: string | null;
@@ -134,7 +135,7 @@ function normaliseRailBoardService(value: any): RailBoardService {
   };
 }
 
-export class TransportServerClient {
+export class TransportServerClient implements TransportApiClient {
   private readonly http: AxiosInstance;
   private readonly xmlParser: XMLParser;
 
