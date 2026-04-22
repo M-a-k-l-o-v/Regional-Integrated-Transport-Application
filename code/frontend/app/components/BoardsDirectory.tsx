@@ -173,12 +173,43 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
             />
           </label>
 
-          <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
-            {loading
-              ? "Searching location names…"
-              : query.trim().length >= 2
-                ? `Showing up to 20 ${mode} board matches for “${query.trim()}”.`
-                : `Showing a curated list of 20 ${mode} board locations. Use search to switch to name-based lookup.`}
+          <div className="space-y-3">
+            <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
+              {loading
+                ? "Searching location names…"
+                : query.trim().length >= 2
+                  ? `Showing up to 20 ${mode} board matches.`
+                  : `Showing a curated list of 20 ${mode} board locations. Use search to switch to name-based lookup.`}
+            </div>
+            <div className="grid gap-3 max-h-64 overflow-y-auto">
+              {browseLocations.length === 0 ? (
+                <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
+                  No matching {mode} boards were found for this location search.
+                </div>
+              ) : (
+                browseLocations.map((location) => (
+                  <Link
+                    key={`${location.type}:${location.id}`}
+                    href={buildBoardHref(location)}
+                    className="block rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3.5 transition hover:border-[var(--brand)] hover:shadow-[var(--shadow-soft)]"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="text-lg font-semibold text-[var(--foreground)]">
+                          {formatPlannerLocationLabel(location)}
+                        </div>
+                        <div className="mt-1 text-sm text-[var(--muted)]">
+                          {getBoardSecondaryText(location, mode)}
+                        </div>
+                      </div>
+                      <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
+                        Open
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -220,52 +251,6 @@ export default function BoardsDirectory({ initialMode = "bus" }: BoardsDirectory
                     </div>
                     <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
                       Recent
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section className="rounded-[var(--radius-card)] border border-[var(--outline)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                Browse
-              </div>
-              <h2 className="mt-1.5 text-lg font-bold text-[var(--foreground)]">
-                {mode === "bus" ? "Bus board locations" : "Rail board locations"}
-              </h2>
-            </div>
-            <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
-              {browseLocations.length}
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            {browseLocations.length === 0 ? (
-              <div className="rounded-xl border border-[var(--outline)] bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--muted)]">
-                No matching {mode} boards were found for this location search.
-              </div>
-            ) : (
-              browseLocations.map((location) => (
-                <Link
-                  key={`${location.type}:${location.id}`}
-                  href={buildBoardHref(location)}
-                  className="block rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3.5 transition hover:border-[var(--brand)] hover:shadow-[var(--shadow-soft)]"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-lg font-semibold text-[var(--foreground)]">
-                        {formatPlannerLocationLabel(location)}
-                      </div>
-                      <div className="mt-1 text-sm text-[var(--muted)]">
-                        {getBoardSecondaryText(location, mode)}
-                      </div>
-                    </div>
-                    <div className="rounded-full border border-[var(--outline)] bg-[var(--surface-soft)] px-2.5 py-0.5 text-xs font-semibold text-[var(--muted)]">
-                      Open
                     </div>
                   </div>
                 </Link>

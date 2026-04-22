@@ -160,19 +160,36 @@ export default function JourneyPlannerForm({
         <input key={m} type="hidden" name="modes" value={m} />
       ))}
 
-      {/* Departure time */}
-      <button
-        type="button"
-        onClick={() => setPickerOpen(true)}
-        className="flex w-full items-center gap-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-left transition hover:border-[var(--brand)]"
-      >
-        <svg className="h-5 w-5 shrink-0 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span className="text-sm font-semibold text-[var(--foreground)]">
-          {formatPickerDisplay(date, time)}
-        </span>
-      </button>
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">Departure</label>
+        <div className="hidden gap-3 xl:grid xl:grid-cols-2">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
+          />
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          className="flex w-full items-center gap-3 rounded-xl border border-[var(--outline)] bg-[var(--surface)] px-4 py-3 text-left transition hover:border-[var(--brand)] xl:hidden"
+        >
+          <svg className="h-5 w-5 shrink-0 text-[var(--brand)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-semibold text-[var(--foreground)]">
+            {formatPickerDisplay(date, time)}
+          </span>
+        </button>
+      </div>
+      
       <input type="hidden" name="date" value={date} />
       <input type="hidden" name="time" value={time} />
 
