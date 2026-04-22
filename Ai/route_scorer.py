@@ -111,11 +111,6 @@ def get_route_reliability_score(
             'prediction':      str,        # 'ON_TIME' or 'LIKELY_LATE'
             'delay_probability': float,    # 0.0 - 1.0
         }
-
-    Example:
-        >>> route = prisma.route.find_unique(where={'routeId': 'some-id'}, include={...})
-        >>> result = get_route_reliability_score(route.__dict__)
-        >>> print(f"Reliability: {result['score']}%")
     """
     _ensure_model_loaded()
 
@@ -130,7 +125,6 @@ def get_route_reliability_score(
     mode = route.get('mode', 'OTHER')
     operator_id = route.get('operatorId', 'UNK')
 
-    # ---- COLLECT SIGNALS FROM THE ROUTE ----
     signals = {
         'ml_score': None,
         'historical_score': None,
@@ -139,8 +133,6 @@ def get_route_reliability_score(
         'existing_reliability': None,
     }
 
-    # 1) ML MODEL PREDICTION (per-stop)
-    #    run the RF model for each stop on the route and average
     stop_predictions = _predict_stops(
         route, model, encoders, feature_meta,
         scheduled_time, weather
@@ -150,7 +142,6 @@ def get_route_reliability_score(
         avg_late_prob = np.mean([p['probability'] for p in stop_predictions])
         signals['ml_score'] = (1.0 - avg_late_prob) * 100.0
     else:
-        # no stops to predict — use a generic prediction
         generic = predict_delay(
             model, encoders, feature_meta,
             toc_id=operator_id,
@@ -159,30 +150,26 @@ def get_route_reliability_score(
         )
         signals['ml_score'] = (1.0 - generic['probability']) * 100.0
 
-    # 2) HISTORICAL PERFORMANCE (from the Prisma historicalPerf relation)
+    # HISTORICAL
     hist_perf = route.get('historicalPerf', [])
     if hist_perf:
         signals['historical_score'] = _score_from_history(hist_perf)
 
-    # 3) ACTIVE DISRUPTIONS (from the Prisma disruptions relation)
+    # ACTIVE DISRUPTIONS
     disruptions = route.get('disruptions', [])
     signals['disruption_penalty'] = _disruption_penalty(disruptions, scheduled_time)
 
-    # 4) CURRENT SERVICE STATUS (from serviceStatuses)
+    # CURRENT STATUS
     statuses = route.get('serviceStatuses', [])
     signals['status_penalty'] = _status_penalty(statuses)
 
-    # 5) EXISTING RELIABILITY SCORE (if already computed and stored)
+    # OLD RELIABILITY SCORE
     existing_scores = route.get('reliabilityScores', [])
     if existing_scores:
-        # use the most recent one as a prior
         latest = max(existing_scores, key=lambda s: s.get('calculatedAt', ''))
         signals['existing_reliability'] = latest.get('score', None)
 
-    # ---- COMBINE INTO FINAL SCORE ----
     final_score, confidence = _combine_signals(signals)
-
-    # clamp to 1-100
     final_score = max(1, min(100, int(round(final_score))))
 
     prediction = 'ON_TIME' if final_score >= 50 else 'LIKELY_LATE'
@@ -219,7 +206,6 @@ def _predict_stops(route, model, encoders, feature_meta,
             station = stop.get('station', {})
             station_id = station.get('stationId', 'UNK')
 
-            # try to find stanox from CRS
             stanox = CRS_TO_STANOX.get(station_id, 'UNK')
 
             pred = predict_delay(
