@@ -76,8 +76,10 @@ export class BusRoutingAdapter {
     const calendars = await this.prisma.busServiceCalendar.findMany({
       where: {
         [dayField]: true,
-        validFrom: { lte: nextDayStart },
-        OR: [{ validTo: null }, { validTo: { gte: dayStart } }],
+        AND: [
+          { OR: [{ validFrom: null }, { validFrom: { lte: nextDayStart } }] },
+          { OR: [{ validTo: null }, { validTo: { gte: dayStart } }] },
+        ],
       },
       select: { routeId: true },
     });
