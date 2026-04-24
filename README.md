@@ -27,12 +27,12 @@ Follow these steps in order to get a fully working version of the application on
 
 Make sure you have the following installed before continuing:
 
-| Tool | Version | How to install (macOS) |
-|------|---------|----------------------|
-| **Node.js** | 20 or newer | `brew install node` |
-| **PostgreSQL** | 16 or newer | `brew install postgresql@16 && brew services start postgresql@16` |
-| **Git LFS** | any | `brew install git-lfs && git lfs install` |
-| **Redis** | 7+ *(optional)* | `brew install redis && brew services start redis` |
+| Tool           | Version         | How to install (macOS)                                            |
+| -------------- | --------------- | ----------------------------------------------------------------- |
+| **Node.js**    | 20 or newer     | `brew install node`                                               |
+| **PostgreSQL** | 16 or newer     | `brew install postgresql@16 && brew services start postgresql@16` |
+| **Git LFS**    | any             | `brew install git-lfs && git lfs install`                         |
+| **Redis**      | 7+ _(optional)_ | `brew install redis && brew services start redis`                 |
 
 > Redis is optional. The backend works without it — caching will simply be skipped.
 
@@ -89,10 +89,13 @@ A compressed snapshot of the full database is included in the repository so you 
 ```bash
 cd code/Database
 createdb transport          # Create an empty database (skip if it already exists)
-./db/db-restore.sh          # Restores the snapshot and runs migrations
+cd db/snapshots
+psql -c "ALTER USER postgres WITH LOGIN SUPERUSER;" transport
+../db-restore.sh          # Restores the snapshot and runs migrations
 ```
 
 The script will:
+
 - Verify the file integrity with a SHA-256 checksum
 - Drop any existing tables (clean slate)
 - Restore all bus, rail, and reference data from the snapshot
@@ -107,6 +110,7 @@ Open two terminal windows:
 ```bash
 # Terminal 1 — Backend (port 3001)
 cd code/Database
+npx prisma generate
 npm run dev
 
 # Terminal 2 — Frontend (port 3000)
@@ -114,7 +118,7 @@ cd code/frontend
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open [http://localhost:3001](http://localhost:3001) in your browser.
 
 ### 7. Enable live data (optional)
 
@@ -129,6 +133,9 @@ The application works fully with scheduled/static data out of the box. To overla
 ---
 
 ## Container Deployment (Podman / Docker)
+
+> [!WARNING]
+> This section hasn't been tested recently. We recommend trying to build manually.
 
 As an alternative to the manual setup above, you can run everything in containers:
 
@@ -172,24 +179,24 @@ npm run test:coverage  # With v8 coverage report
 
 ## Project Structure
 
-| Directory | What it contains |
-|-----------|-----------------|
-| `code/Database/Src/app.ts` | Express app — all route handlers defined here |
-| `code/Database/Src/server.ts` | Server startup, STOMP connection, cron jobs |
-| `code/Database/Src/infrastructure/apiClients/` | Clients for the transport proxy and National Highways |
-| `code/Database/Src/infrastructure/cache/` | Redis caching layer |
-| `code/Database/Src/infrastructure/liveData/` | In-memory stores for STOMP movements and bus delays |
-| `code/Database/Src/infrastructure/repositories/` | Prisma-backed data access (reliability, verification) |
-| `code/Database/Src/services/journeys/` | Journey planning algorithm, leg detail, operational status |
-| `code/Database/Src/services/stations/` | Station facilities and coordinate data |
-| `code/Database/Src/services/liveRail/` | Network Rail live stream processing |
-| `code/Database/Src/services/` | Domain services run by cron (ingestion, health, reliability, route verification) |
-| `code/Database/Src/__tests__/` | Vitest unit and service-level tests |
-| `code/Database/prisma/schema.prisma` | Database schema |
-| `code/frontend/app/` | Next.js pages and route handlers |
-| `code/frontend/app/components/` | Shared UI components (AppShell, PanelCard, etc.) |
-| `code/frontend/app/lib/transportApi.ts` | API client, TypeScript types, and formatting helpers |
-| `code/frontend/app/__tests__/` | Vitest + React Testing Library tests (incl. axe-core a11y audit) |
+| Directory                                        | What it contains                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `code/Database/Src/app.ts`                       | Express app — all route handlers defined here                                    |
+| `code/Database/Src/server.ts`                    | Server startup, STOMP connection, cron jobs                                      |
+| `code/Database/Src/infrastructure/apiClients/`   | Clients for the transport proxy and National Highways                            |
+| `code/Database/Src/infrastructure/cache/`        | Redis caching layer                                                              |
+| `code/Database/Src/infrastructure/liveData/`     | In-memory stores for STOMP movements and bus delays                              |
+| `code/Database/Src/infrastructure/repositories/` | Prisma-backed data access (reliability, verification)                            |
+| `code/Database/Src/services/journeys/`           | Journey planning algorithm, leg detail, operational status                       |
+| `code/Database/Src/services/stations/`           | Station facilities and coordinate data                                           |
+| `code/Database/Src/services/liveRail/`           | Network Rail live stream processing                                              |
+| `code/Database/Src/services/`                    | Domain services run by cron (ingestion, health, reliability, route verification) |
+| `code/Database/Src/__tests__/`                   | Vitest unit and service-level tests                                              |
+| `code/Database/prisma/schema.prisma`             | Database schema                                                                  |
+| `code/frontend/app/`                             | Next.js pages and route handlers                                                 |
+| `code/frontend/app/components/`                  | Shared UI components (AppShell, PanelCard, etc.)                                 |
+| `code/frontend/app/lib/transportApi.ts`          | API client, TypeScript types, and formatting helpers                             |
+| `code/frontend/app/__tests__/`                   | Vitest + React Testing Library tests (incl. axe-core a11y audit)                 |
 
 ---
 
@@ -197,30 +204,30 @@ npm run test:coverage  # With v8 coverage report
 
 ### Functional Requirements
 
-| Req | Description | Status |
-|-----|-------------|--------|
-| FR-01 | Regional coverage (Lancashire bus + rail) | Met |
-| FR-02 | Live rail departures | Met |
-| FR-03 | Data freshness indicators | Met |
-| FR-04 | Station and stop search | Met |
-| FR-05 | Interactive network map | Met |
-| FR-06 | Delay data collection | Met |
-| FR-07 | Regional weather integration | Met |
-| FR-08 | Offline fallback (scheduled data) | Met |
-| FR-09 | Road information / VMS | Met |
-| FR-10 | Rail station facilities | Met |
+| Req   | Description                               | Status |
+| ----- | ----------------------------------------- | ------ |
+| FR-01 | Regional coverage (Lancashire bus + rail) | Met    |
+| FR-02 | Live rail departures                      | Met    |
+| FR-03 | Data freshness indicators                 | Met    |
+| FR-04 | Station and stop search                   | Met    |
+| FR-05 | Interactive network map                   | Met    |
+| FR-06 | Delay data collection                     | Met    |
+| FR-07 | Regional weather integration              | Met    |
+| FR-08 | Offline fallback (scheduled data)         | Met    |
+| FR-09 | Road information / VMS                    | Met    |
+| FR-10 | Rail station facilities                   | Met    |
 
 ### Non-Functional Requirements
 
-| Req | Description | How it is met |
-|-----|-------------|---------------|
-| NFR-01 | Page load under 4 seconds | Server-side rendering, dynamic Leaflet imports, Redis caching |
-| NFR-02 | Mobile-first (360 px+) | Responsive Tailwind breakpoints, mobile bottom nav, touch targets |
-| NFR-03 | Polling within rate limits | Bus 15 s/operator, rail 30 s cache, weather 5 min cache |
-| NFR-04 | WCAG 2.2 AA accessibility | Skip-nav, ARIA landmarks, focus-visible outlines, prefers-reduced-motion, automated axe-core audit in the frontend test suite |
-| NFR-05 | Support 50 concurrent users | k6 load test, stateless API, connection pooling |
-| NFR-06 | Containerised deployment | Dockerfiles + docker-compose.yml |
-| NFR-07 | Documentation and AI disclosure | This README, sub-project READMEs, inline comments |
+| Req    | Description                     | How it is met                                                                                                                 |
+| ------ | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| NFR-01 | Page load under 4 seconds       | Server-side rendering, dynamic Leaflet imports, Redis caching                                                                 |
+| NFR-02 | Mobile-first (360 px+)          | Responsive Tailwind breakpoints, mobile bottom nav, touch targets                                                             |
+| NFR-03 | Polling within rate limits      | Bus 15 s/operator, rail 30 s cache, weather 5 min cache                                                                       |
+| NFR-04 | WCAG 2.2 AA accessibility       | Skip-nav, ARIA landmarks, focus-visible outlines, prefers-reduced-motion, automated axe-core audit in the frontend test suite |
+| NFR-05 | Support 50 concurrent users     | k6 load test, stateless API, connection pooling                                                                               |
+| NFR-06 | Containerised deployment        | Dockerfiles + docker-compose.yml                                                                                              |
+| NFR-07 | Documentation and AI disclosure | This README, sub-project READMEs, inline comments                                                                             |
 
 ---
 

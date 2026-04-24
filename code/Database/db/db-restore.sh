@@ -19,7 +19,7 @@
 #   4. Runs prisma migrate to ensure schema is up to date
 # ──────────────────────────────────────────────────────────────────────────────
 
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DUMP_FILE="$SCRIPT_DIR/snapshots/transport_latest.dump"
@@ -88,12 +88,12 @@ echo ""
 # ── Restore ──────────────────────────────────────────────────────────────────
 echo "Restoring database (this may take a few minutes)..."
 pg_restore \
+  -U=postgres \
   --dbname="$DATABASE_URL" \
   --clean \
   --if-exists \
   --no-owner \
   --no-privileges \
-  --exit-on-error \
   "$DUMP_FILE"
 
 echo ""
@@ -102,7 +102,7 @@ echo "Restore complete."
 # ── Run Prisma migrate ───────────────────────────────────────────────────────
 echo ""
 echo "Running prisma migrate to sync schema..."
-cd "$DB_DIR"
+cd "$DB_DIR" || exit 1
 npx prisma migrate deploy
 
 echo ""
